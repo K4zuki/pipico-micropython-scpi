@@ -83,6 +83,6 @@ class EMU2751A(MicroScpiDevice):
             print("no parameter given")
 
     @staticmethod
-    def cb_idn():
+    def cb_idn(param=""):
         """<Vendor name>,<Model number>,<Serial number>,<Firmware version>"""
-        print("MicroScpiDevice,MSD1,C0FEE,0.0.1")
+        print("MicroScpiDevice,EMU2751A,C0FEE,0.0.1")
