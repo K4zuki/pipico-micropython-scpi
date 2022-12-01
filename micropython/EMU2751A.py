@@ -21,7 +21,7 @@ SYSTem:VERSion?
 from MicroScpiDevice import ScpiKeyword, ScpiCommand, MicroScpiDevice
 
 
-class KeysightU2751AEmu(MicroScpiDevice):
+class EMU2751A(MicroScpiDevice):
     kw_route = ScpiKeyword("ROUTe", "ROUT")
     kw_close = ScpiKeyword("CLOSe", "CLOS")
     kw_open = ScpiKeyword("OPEN", "OPEN")
