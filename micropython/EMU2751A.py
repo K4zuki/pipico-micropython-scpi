@@ -18,7 +18,37 @@ SYSTem:VERSion? <No Param>
 *STB? <No Param>
 *TST? <No Param>
 """
+import re
+from collections import namedtuple
+
 from MicroScpiDevice import ScpiKeyword, ScpiCommand, MicroScpiDevice
+
+
+class CrossBars(namedtuple("CrossBars", ["range", "start", "end", "single"])):
+    """
+    - range: crossbar id range
+    - start: crossbar start id
+    - end: crossbar end id inclusive
+    - single: crossbar id
+    """
+    CROSSBAR_MIN = 101
+    CROSSBAR_MAX = 206
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.range is not None:
+            if self.start is not None:
+                self.end = self.CROSSBAR_MAX
+                print(self.end, self.CROSSBAR_MAX)
+            elif self.end is not None:
+                self.start = self.CROSSBAR_MIN
+                print(self.start, self.CROSSBAR_MIN)
+        elif self.single is not None:
+            if not (self.CROSSBAR_MAX >= int(self.single) >= self.CROSSBAR_MIN):
+                print("Error:", self.single)
+            else:
+                self.single = int(self.single)
 
 
 class EMU2751A(MicroScpiDevice):
