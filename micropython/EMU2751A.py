@@ -76,11 +76,11 @@ class EMU2751A(MicroScpiDevice):
     def __init__(self):
         super().__init__()
 
-        diagnostic_relay_cycles = ScpiCommand((self.kw_diag, self.kw_relay, self.kw_cycles), self.cb_loopback)
+        diagnostic_relay_cycles = ScpiCommand((self.kw_diag, self.kw_relay, self.kw_cycles), self.cb_do_nothing)
         diagnostic_relay_cycles_clear = ScpiCommand((self.kw_diag, self.kw_relay, self.kw_cycles, self.kw_clear),
-                                                    self.cb_loopback)
-        route_close = ScpiCommand((self.kw_route, self.kw_close), self.cb_loopback)
-        route_open = ScpiCommand((self.kw_route, self.kw_open), self.cb_loopback)
+                                                    self.cb_do_nothing)
+        route_close = ScpiCommand((self.kw_route, self.kw_close), self.cb_relay_close)
+        route_open = ScpiCommand((self.kw_route, self.kw_open), self.cb_relay_open)
         system_description = ScpiCommand((self.kw_system, self.kw_cdescription), self.cb_loopback)
         system_error = ScpiCommand((self.kw_system, self.kw_error), self.cb_loopback)
         system_version = ScpiCommand((self.kw_system, self.kw_version), self.cb_loopback)
@@ -104,6 +104,42 @@ class EMU2751A(MicroScpiDevice):
                                route_close, route_open,
                                diagnostic_relay_cycles,
                                system_description, system_error, system_version]
+
+    @staticmethod
+    def cb_do_nothing(self, param=""):
+        return
+
+    rstring = re.compile(r"((\d..)?:(\d..)?),?|(\d..),?")
+
+    def cb_relay_close(self, param="(@101)"):
+        param = param.strip()
+        if not isinstance(param, str):
+            print("Error: No parameter given")
+        elif not (param.startswith("(@") and param.endswith(")")):
+            print("Error: Wrong parameter string: '{}'".format(param))
+        else:
+            param = param.strip("(@)")
+            start = 0
+            end = len(param)
+            while start < end:
+                param = param[start:]
+                rs = re.search(self.rstring, param)
+                if rs is None:
+                    break
+                else:
+                    crossbar = CrossBars(*rs.groups())
+                    print("Close:", param, crossbar)
+                    start = rs.end()
+                    print(start, end)
+        return
+
+    def cb_relay_open(self, param="(@101)"):
+        if not isinstance(param, str):
+            print("Error: No parameter given")
+        else:
+            param = param.strip()
+            print("Open:", param)
+        return
 
     @staticmethod
     def cb_loopback(param=""):
