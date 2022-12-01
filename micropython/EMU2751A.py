@@ -1,22 +1,22 @@
 """
-DIAGnostic:RELay:CYCLes?
-DIAGnostic:RELay:CYCLes:CLEar
-ROUTe:CLOSe
-ROUTe:CLOSe?
-ROUTe:OPEN
-ROUTe:OPEN?
-SYSTem:CDEScription?
-SYSTem:ERRor?
-SYSTem:VERSion?
-*CLS
-*ESE/*ESE?
-*ESR?
-*IDN?
-*OPC/*OPC?
-*RST
-*SRE/*SRE?
-*STB?
-*TST?
+DIAGnostic:RELay:CYCLes? <No Param>
+DIAGnostic:RELay:CYCLes:CLEar <No Param>
+ROUTe:CLOSe (@101)
+ROUTe:CLOSe? (@101)
+ROUTe:OPEN (@101)
+ROUTe:OPEN? (@101)
+SYSTem:CDEScription? <No Param>
+SYSTem:ERRor? <No Param>
+SYSTem:VERSion? <No Param>
+*CLS <No Param>
+*ESE/*ESE? <No Param>
+*ESR? <No Param>
+*IDN? <No Param>
+*OPC/*OPC? <No Param>
+*RST <No Param>
+*SRE/*SRE? <No Param>
+*STB? <No Param>
+*TST? <No Param>
 """
 from MicroScpiDevice import ScpiKeyword, ScpiCommand, MicroScpiDevice
 
