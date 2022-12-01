@@ -72,6 +72,7 @@ class EMU2751A(MicroScpiDevice):
     kw_sre = ScpiKeyword("*SRE", "*SRE")
     kw_stb = ScpiKeyword("*STB", "*STB")
     kw_tst = ScpiKeyword("*TST", "*TST")
+    bus = None
 
     def __init__(self):
         super().__init__()
