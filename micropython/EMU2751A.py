@@ -77,47 +77,51 @@ class EMU2751A(MicroScpiDevice):
     def __init__(self):
         super().__init__()
 
-        diagnostic_relay_cycles = ScpiCommand((self.kw_diag, self.kw_relay, self.kw_cycles), self.cb_do_nothing)
+        diagnostic_relay_cycles = ScpiCommand((self.kw_diag, self.kw_relay, self.kw_cycles), True, self.cb_do_nothing)
         diagnostic_relay_cycles_clear = ScpiCommand((self.kw_diag, self.kw_relay, self.kw_cycles, self.kw_clear),
-                                                    self.cb_do_nothing)
-        route_close = ScpiCommand((self.kw_route, self.kw_close), self.cb_relay_close)
-        route_open = ScpiCommand((self.kw_route, self.kw_open), self.cb_relay_open)
-        system_description = ScpiCommand((self.kw_system, self.kw_cdescription), self.cb_loopback)
-        system_error = ScpiCommand((self.kw_system, self.kw_error), self.cb_loopback)
-        system_version = ScpiCommand((self.kw_system, self.kw_version), self.cb_loopback)
-        cls = ScpiCommand((self.kw_cls,), self.cb_loopback)
-        ese = ScpiCommand((self.kw_ese,), self.cb_loopback)
-        opc = ScpiCommand((self.kw_opc,), self.cb_loopback)
-        rst = ScpiCommand((self.kw_rst,), self.cb_loopback)
-        sre = ScpiCommand((self.kw_sre,), self.cb_loopback)
-        ese_q = ScpiCommand((self.kw_ese,), self.cb_loopback)
-        esr_q = ScpiCommand((self.kw_esr,), self.cb_loopback)
-        idn_q = ScpiCommand((self.kw_idn,), self.cb_idn)
-        opc_q = ScpiCommand((self.kw_opc,), self.cb_loopback)
-        sre_q = ScpiCommand((self.kw_sre,), self.cb_loopback)
-        stb_q = ScpiCommand((self.kw_stb,), self.cb_loopback)
-        tst_q = ScpiCommand((self.kw_tst,), self.cb_loopback)
+                                                    False, self.cb_do_nothing)
+        route_close = ScpiCommand((self.kw_route, self.kw_close), False, self.cb_relay_close)
+        route_open = ScpiCommand((self.kw_route, self.kw_open), False, self.cb_relay_open)
+        route_close_q = ScpiCommand((self.kw_route, self.kw_close), True, self.cb_relay_close)
+        route_open_q = ScpiCommand((self.kw_route, self.kw_open), True, self.cb_relay_open)
+        system_description = ScpiCommand((self.kw_system, self.kw_cdescription), False, self.cb_loopback)
+        system_error = ScpiCommand((self.kw_system, self.kw_error), False, self.cb_loopback)
+        system_version = ScpiCommand((self.kw_system, self.kw_version), False, self.cb_loopback)
+        cls = ScpiCommand((self.kw_cls,), False, self.cb_loopback)
+        ese = ScpiCommand((self.kw_ese,), False, self.cb_loopback)
+        opc = ScpiCommand((self.kw_opc,), False, self.cb_loopback)
+        rst = ScpiCommand((self.kw_rst,), False, self.cb_loopback)
+        sre = ScpiCommand((self.kw_sre,), False, self.cb_loopback)
+        ese_q = ScpiCommand((self.kw_ese,), True, self.cb_loopback)
+        esr_q = ScpiCommand((self.kw_esr,), True, self.cb_loopback)
+        idn_q = ScpiCommand((self.kw_idn,), True, self.cb_idn)
+        opc_q = ScpiCommand((self.kw_opc,), True, self.cb_loopback)
+        sre_q = ScpiCommand((self.kw_sre,), True, self.cb_loopback)
+        stb_q = ScpiCommand((self.kw_stb,), True, self.cb_loopback)
+        tst_q = ScpiCommand((self.kw_tst,), True, self.cb_loopback)
 
         self.commands_write = [cls, ese, opc, rst, sre,
                                route_close, route_open,
                                diagnostic_relay_cycles_clear]
-        self.commands_query = [ese_q, esr_q, idn_q, opc_q, sre_q,
-                               route_close, route_open,
+        self.commands_query = [ese_q, esr_q, idn_q, opc_q, sre_q, stb_q, tst_q,
+                               route_close_q, route_open_q,
                                diagnostic_relay_cycles,
                                system_description, system_error, system_version]
 
     @staticmethod
-    def cb_do_nothing(self, param=""):
+    def cb_do_nothing(self, param="", query=False):
         return
 
     rstring = re.compile(r"((\d..)?:(\d..)?),?|(\d..),?")
 
-    def cb_relay_close(self, param="(@101)"):
+    def cb_relay_close(self, param="(@101)", query=False):
         param = param.strip()
         if not isinstance(param, str):
             print("Error: No parameter given")
+            return
         elif not (param.startswith("(@") and param.endswith(")")):
             print("Error: Wrong parameter string: '{}'".format(param))
+            return
         else:
             param = param.strip("(@)")
             start = 0
@@ -129,12 +133,12 @@ class EMU2751A(MicroScpiDevice):
                     break
                 else:
                     crossbar = CrossBars(*rs.groups())
-                    print("Close:", param, crossbar)
+                    crossbar = crossbar.update()
+                    print("Close:", "?" if query is True else "-", crossbar)
                     start = rs.end()
-                    print(start, end)
         return
 
-    def cb_relay_open(self, param="(@101)"):
+    def cb_relay_open(self, param="(@101)", query=False):
         if not isinstance(param, str):
             print("Error: No parameter given")
         else:
@@ -143,13 +147,13 @@ class EMU2751A(MicroScpiDevice):
         return
 
     @staticmethod
-    def cb_loopback(param=""):
+    def cb_loopback(param="", query=False):
         if param is not None:
             print(str(param))
         else:
             print("no parameter given")
 
     @staticmethod
-    def cb_idn(param=""):
+    def cb_idn(param="", query=False):
         """<Vendor name>,<Model number>,<Serial number>,<Firmware version>"""
         print("MicroScpiDevice,EMU2751A,C0FEE,0.0.1")
