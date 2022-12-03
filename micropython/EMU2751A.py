@@ -33,22 +33,37 @@ class CrossBars(namedtuple("CrossBars", ["range", "start", "end", "single"])):
     """
     CROSSBAR_MIN = 101
     CROSSBAR_MAX = 206
+    CROSSBARS = (101, 102, 103, 104, 105, 106, 201, 202, 203, 204, 205, 206)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
+    def update(self):
+        _single = self.CROSSBAR_MIN
+        _start = self.CROSSBAR_MIN
+        _end = self.CROSSBAR_MAX
+        _range = None
         if self.range is not None:
+            _single = self.single
+            _range = self.range
             if self.start is not None:
-                self.end = self.CROSSBAR_MAX
-                print(self.end, self.CROSSBAR_MAX)
-            elif self.end is not None:
-                self.start = self.CROSSBAR_MIN
-                print(self.start, self.CROSSBAR_MIN)
+                if int(self.start) < self.CROSSBAR_MIN:
+                    print("Error:", self.start)
+                _start = max(int(self.start), self.CROSSBAR_MIN)
+            if self.end is not None:
+                if int(self.end) > self.CROSSBAR_MAX:
+                    print("Error:", self.end)
+                _end = min(int(self.end), self.CROSSBAR_MAX)
+            _range = tuple(xb for xb in range(_start, _end + 1) if xb in self.CROSSBARS)
         elif self.single is not None:
+            _start = self.start
+            _end = self.end
+            _range = self.range
             if not (self.CROSSBAR_MAX >= int(self.single) >= self.CROSSBAR_MIN):
                 print("Error:", self.single)
+                _single = self.CROSSBAR_MAX if int(self.single) > self.CROSSBAR_MAX else min(int(self.single),
+                                                                                             self.CROSSBAR_MIN)
             else:
-                self.single = int(self.single)
+                _single = int(self.single)
+
+        return CrossBars(_range, _start, _end, _single)
 
 
 class EMU2751A(MicroScpiDevice):
