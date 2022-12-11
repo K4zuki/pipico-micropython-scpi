@@ -58,7 +58,7 @@ ReturnHome = BitField("RTH", 8, 0, 0b0000_0010, True)
 
 class EntryMode(Register):
     DISPLAY_SHIFT = BitField("DISPLAY_SHIFT", 1, 0, 0b0, False)
-    INCREMENT_DECREMENT = BitField("INCREMENT_DECREMENT", 1, 1, 0b0, False)
+    INCREMENT_DECREMENT = BitField("INCREMENT_DECREMENT", 1, 1, 0b1, False)
 
     @property
     def fields(self):
