@@ -13,7 +13,7 @@ class AQM0802Function(Function):
     @property
     def fields(self):
         return (self.INSTRUCTION_TABLE,
-                BitField("CONST", 1, 1, 0b00, True),
+                BitField("CONST", 1, 1, 0b0, True),
                 self.FONT_SELECTION,
                 self.DISPLAY_LINES_NUMBER,
                 self.DATA_LENGTH,
@@ -95,6 +95,7 @@ class AQM0802:
     rst = None
     visible = False
     line_counter = 0x00
+    line_counter_const = 2
     instructions = AQM0802Instructions()
 
     def __init__(self, bus, bled=None, reset=None):
@@ -149,6 +150,8 @@ class AQM0802:
         # self.send_command(0x38)
 
         self.instructions.DisplayStatus.DISPLAY_STATUS.val = 1
+        self.instructions.DisplayStatus.CURSOR_STATUS.val = 1
+        self.instructions.DisplayStatus.CURSOR_BLINK.val = 1
         self.send_command(self.instructions.DisplayStatus.val)
         # self.send_command(0x0c)
 
@@ -156,6 +159,7 @@ class AQM0802:
         # self.send_command(0x01)
 
     def reset(self):
+        self.line_counter = 0x00
         if self.rst is not None:
             self.rst.off()
             self.rst.on()
@@ -178,8 +182,8 @@ class AQM0802:
         return
 
     def line_feed(self):
-        self.line_counter += 1
-        self.line_counter &= 0x01
+        self.line_counter += self.line_counter_const
+        self.line_counter &= self.line_counter_const
 
     def set_backlight(self, duty=50):
         max_duty = 65535
