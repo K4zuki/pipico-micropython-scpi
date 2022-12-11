@@ -8,13 +8,8 @@ P0_REG = 0x76
 P1_REG = 0x79
 
 
-class Bit(namedtuple("Bit", ["read", "write"])):
+class Bit(namedtuple("Bit", ["reading_bit", "writing_bit"])):
     val = 0
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.reading_bit = self.read
-        self.writing_bit = self.write
 
 
 class Port:
