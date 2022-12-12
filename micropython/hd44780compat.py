@@ -52,11 +52,21 @@ class Register:
             field.val = (value >> field.offset) & mask
 
 
-ClearDisplay = BitField("CLS", 8, 0, 0b0000_0001, True)
-ReturnHome = BitField("RTH", 8, 0, 0b0000_0010, True)
-
-
 class EntryMode(Register):
+    """**Entry Mode Set (IS= X, RE = 0 or 1, SD = 0)**
+
+    Set the moving direction of cursor and display.
+
+    - ``I/D``: Increment/decrement of DDRAM address (cursor or blink)
+        * When ``I/D`` = "High", cursor/blink moves to right and DDRAM address is increased by 1.
+        * When ``I/D`` = "Low", cursor/blink moves to left and DDRAM address is decreased by 1.
+    -   CGRAM operates the same as DDRAM, when read from or write to CGRAM.
+    -   When ``S`` = "High", after DDRAM write, the display of enabled line by ``DS1`` - ``DS4`` bits in the command
+        “Shift Enable” is shifted to the right (``I/D`` = "0") or to the left (``I/D`` = "1").
+        But it will seem as if the cursor does not move.
+    -   When ``S`` = "Low", or DDRAM read, or CGRAM read/write operation, shift of display like this function
+        is not performed.
+    """
     DISPLAY_SHIFT = BitField("DISPLAY_SHIFT", 1, 0, 0b0, False)
     INCREMENT_DECREMENT = BitField("INCREMENT_DECREMENT", 1, 1, 0b1, False)
 
@@ -69,6 +79,8 @@ class EntryMode(Register):
 
 
 class DisplayStatus(Register):
+    """**Display ON/OFF Control (IS= X, RE = 0, SD = 0)**
+    """
     CURSOR_BLINK = BitField("CURSOR_BLINK", 1, 0, 0b0, False)
     CURSOR_STATUS = BitField("CURSOR_STATUS", 1, 1, 0b0, False)
     DISPLAY_STATUS = BitField("DISPLAY_STATUS", 1, 2, 0b0, False)
@@ -131,8 +143,16 @@ class CGRamAddress(Register):
 
 
 class HD44780Instructions:
-    ClearDisplay = ClearDisplay
-    ReturnHome = ReturnHome
+    ClearDisplay = BitField("CLS", 8, 0, 0b0000_0001, True)
+    """Clear all the display data by writing "20H" (space code) to all DDRAM address, and set DDRAM address to "00H" 
+    into AC (address counter). Return cursor to the original status, namely, bring the cursor to the left edge on first 
+    line of the display. Make entry mode increment (I/D = "1"). """
+
+    ReturnHome = BitField("RTH", 8, 0, 0b0000_0010, True)
+    """Return Home is cursor return home instruction. Set DDRAM address to "00H" into the address counter. 
+    Return cursor to its original site and return display to its original status, if shifted. Contents of DDRAM 
+    do not change. """
+
     EntryMode = EntryMode()
     DisplayStatus = DisplayStatus()
     Function = Function()
