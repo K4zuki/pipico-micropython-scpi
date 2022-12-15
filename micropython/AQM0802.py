@@ -149,9 +149,9 @@ class AQM0802:
         self.send_command(self.instructions.Function.val)
         # self.send_command(0x38)
 
-        self.instructions.DisplayStatus.DISPLAY_STATUS.val = 1
-        self.instructions.DisplayStatus.CURSOR_STATUS.val = 1
-        self.instructions.DisplayStatus.CURSOR_BLINK.val = 1
+        self.instructions.DisplayStatus.DISPLAY_ENABLE.val = 1
+        self.instructions.DisplayStatus.CURSOR_ENABLE.val = 1
+        self.instructions.DisplayStatus.CURSOR_BLINK_ENABLE.val = 1
         self.send_command(self.instructions.DisplayStatus.val)
         # self.send_command(0x0c)
 
