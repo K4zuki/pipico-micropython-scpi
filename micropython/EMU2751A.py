@@ -163,15 +163,17 @@ class EMU2751A(MicroScpiDevice):
     def cb_relay_close(self, param="(@101)", query=False):
         param = param.strip()
         crossbars = self.channel_parser(param)
-        for crossbar in crossbars:
-            print("Close:", "?" if query is True else "-", crossbar)
+        if crossbars is not None:
+            for crossbar in crossbars:
+                print("Close:", "?" if query is True else "-", crossbar)
         return
 
     def cb_relay_open(self, param="(@101)", query=False):
         param = param.strip()
         crossbars = self.channel_parser(param)
-        for crossbar in crossbars:
-            print("Open:", "?" if query is True else "-", crossbar)
+        if crossbars is not None:
+            for crossbar in crossbars:
+                print("Open:", "?" if query is True else "-", crossbar)
         return
 
     @staticmethod
