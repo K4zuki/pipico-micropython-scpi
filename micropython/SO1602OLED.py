@@ -286,27 +286,19 @@ class SO1602OLED(AQM0802.AQM0802):
     def _startup(self):
         self.send_command(self.instructions.ClearDisplay.val)
 
-        self.instructions.DisplayStatus.DISPLAY_STATUS.val = 1
-        self.instructions.DisplayStatus.CURSOR_STATUS.val = 1
-        self.instructions.DisplayStatus.CURSOR_BLINK.val = 1
+        self.instructions.DisplayStatus.DISPLAY_ENABLE.val = 1
+        self.instructions.DisplayStatus.CURSOR_ENABLE.val = 1
+        self.instructions.DisplayStatus.CURSOR_BLINK_ENABLE.val = 1
         self.send_command(self.instructions.DisplayStatus.val)
 
         self.send_command(self.instructions.ReturnHome.val)
 
-        self.instructions.Function.DISPLAY_LINES_NUMBER_LSB.val = 1
-        self.send_command(self.instructions.Function.val)
+        self.send_command(self.instructions.FunctionExtra.val)  # RE=1
 
-        self.instructions.FunctionExtra.REVERSE.val = 1
-        self.instructions.FunctionExtra.DISPLAY_LINES_NUMBER_LSB.val = 1
-        self.send_command(self.instructions.FunctionExtra.val)
-        self.send_command(self.instructions.FunctionExtra.val)
-
-        self.instructions.DisplayStatusExtra.FONT_WIDTH.val = 0
-        self.send_command(self.instructions.FunctionExtra.val)
         self.instructions.DisplayStatusExtra.DISPLAY_LINES_NUMBER_MSB.val = 1
         self.send_command(self.instructions.DisplayStatusExtra.val)
 
-        self.send_command(self.instructions.FunctionExtra.val)
+        self.instructions.Function.DISPLAY_LINES_NUMBER_LSB.val = 1
         self.send_command(self.instructions.Function.val)
 
     def set_backlight(self, duty=50):
