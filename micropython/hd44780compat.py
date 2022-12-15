@@ -81,15 +81,15 @@ class EntryMode(Register):
 class DisplayStatus(Register):
     """**Display ON/OFF Control (IS= X, RE = 0, SD = 0)**
     """
-    CURSOR_BLINK = BitField("CURSOR_BLINK", 1, 0, 0b0, False)
-    CURSOR_STATUS = BitField("CURSOR_STATUS", 1, 1, 0b0, False)
-    DISPLAY_STATUS = BitField("DISPLAY_STATUS", 1, 2, 0b0, False)
+    CURSOR_BLINK_ENABLE = BitField("CURSOR_BLINK_ENABLE", 1, 0, 0b0, False)
+    CURSOR_ENABLE = BitField("CURSOR_ENABLE", 1, 1, 0b0, False)
+    DISPLAY_ENABLE = BitField("DISPLAY_ENABLE", 1, 2, 0b0, False)
 
     @property
     def fields(self):
-        return (self.CURSOR_BLINK,
-                self.CURSOR_STATUS,
-                self.DISPLAY_STATUS,
+        return (self.CURSOR_BLINK_ENABLE,
+                self.CURSOR_ENABLE,
+                self.DISPLAY_ENABLE,
                 BitField("CONST", 5, 3, 0b00001, True)
                 )
 
