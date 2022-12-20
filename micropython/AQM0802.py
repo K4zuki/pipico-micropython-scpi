@@ -190,3 +190,7 @@ class AQM0802:
         if self.bled is not None:
             duty = min(max_duty - 1, int(duty * max_duty / 100))  # avoid blackout when set at 100% duty
             self.bled.duty_u16(duty)
+
+    def cls(self):
+        self.send_command(self.instructions.ClearDisplay.val)
+        self.line_counter = 0
