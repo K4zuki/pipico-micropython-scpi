@@ -1,3 +1,5 @@
+if sys.version_info > (3, 6, 0):
+    from typing import Tuple, List
 from collections import namedtuple
 from machine import I2C
 import time
@@ -80,6 +82,9 @@ class Row(namedtuple("Row", ["col5", "col4", "col3", "col2", "col1", "col0"])):
 
 
 class GpakMux:
+    max_row = 2
+    max_col = 6
+
     def __init__(self, bus, address):
         assert 0 <= address < 4
         self.address = SLG46826_ADDR | (address << 6)
@@ -119,6 +124,13 @@ class GpakMux:
         }
         self.disconnect_all()
 
+    def int_to_rowcol(self, num):
+        row = num // 100
+        col = num % 100
+        assert self.max_row >= row >= 1
+        assert self.max_col >= col >= 1
+        return row, col
+
     def connect(self, row, column):
         port, bit = self.cross_points[row][column]
         port.set_bit(bit, 1)
@@ -135,7 +147,7 @@ class GpakMux:
 
 
 def main(bus):
-    mux = GpakMux(bus, SLG46826_ADDR)
+    mux = GpakMux(bus, 0)
     for row in [1, 2]:
         for col in [1, 2, 3, 4, 5, 6]:
             print("connect", row, col)
@@ -147,4 +159,5 @@ def main(bus):
 
 
 if __name__ == '__main__':
-    main()
+    bus = I2C(1)
+    main(bus)
