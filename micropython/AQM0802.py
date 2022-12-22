@@ -1,6 +1,6 @@
 from machine import I2C, Pin, PWM
 
-from hd44780compat import BitField, Register, Function, HD44780Instructions
+from hd44780compat import BitField, Register, Function, HD44780Instructions, CGFont
 
 CR = 0x0d
 LF = 0x0a
@@ -194,3 +194,14 @@ class AQM0802:
     def cls(self):
         self.send_command(self.instructions.ClearDisplay.val)
         self.line_counter = 0
+
+    def send_font(self, font):
+        """
+        :param CGFont font:
+        """
+        cgaddress = font.CGRamAddress.val
+        font_data = [b.val for b in font.fields]
+
+        self.send_command(cgaddress)
+        for data in font_data:
+            self.send_data(data)
