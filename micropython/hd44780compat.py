@@ -2,7 +2,10 @@ from collections import namedtuple
 
 
 class BitField(namedtuple("BitField", ["name", "size", "offset", "por", "const"])):
-    __val = 0
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__val = self.por
 
     @property
     def val(self):
@@ -23,6 +26,9 @@ class BitField(namedtuple("BitField", ["name", "size", "offset", "por", "const"]
 class Register:
     size = 8
     __val = 0
+
+    def __init__(self):
+        self.__val = self.por
 
     @property
     def fields(self):
@@ -159,3 +165,45 @@ class HD44780Instructions:
     DDRamAddress = DDRamAddress()
     DisplayShift = DisplayShift()
     CGRamAddress = CGRamAddress()
+
+
+class CGFont(Register):
+    size = 64
+    CGRamAddress = CGRamAddress()
+    Font0 = BitField("FONT", 8, 0, 0b00000, False)
+    Font1 = BitField("FONT", 8, 8, 0b00000, False)
+    Font2 = BitField("FONT", 8, 16, 0b00000, False)
+    Font3 = BitField("FONT", 8, 24, 0b00000, False)
+    Font4 = BitField("FONT", 8, 32, 0b00000, False)
+    Font5 = BitField("FONT", 8, 40, 0b00000, False)
+    Font6 = BitField("FONT", 8, 48, 0b00000, False)
+    Font7 = BitField("FONT", 8, 56, 0b00000, False)
+
+    def __init__(self, font_id, font_data):
+        """
+        :param int font_id: font id 0-7
+        :param list of int font_data: font data, 8 bytes
+        """
+        super().__init__()
+
+        assert len(font_data) == 8
+        assert isinstance(font_id, int)
+
+        mask = 0b111
+
+        self.CGRamAddress.AC.val = (font_id & mask) << 3
+
+        for field, font in zip(self.fields, font_data):
+            field.val = font
+
+    @property
+    def fields(self):
+        return (self.Font0,
+                self.Font1,
+                self.Font2,
+                self.Font3,
+                self.Font4,
+                self.Font5,
+                self.Font6,
+                self.Font7,
+                )
