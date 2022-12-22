@@ -1,11 +1,11 @@
 ---
-title: 本のタイトル
-subtitle: 本の概要
-circle: サークル名
-author: 本の作者
-comiket: コミケ
-year: 出版年
-publisher: 印刷会社で印刷製本
+title: GreenPAK(TM)**勝手に**アプリケーションノート５
+subtitle: ラズピコでSCPIエミュレータを作ってみた
+circle: KY技研
+author: "@_K4ZUKI_"
+comiket: C101 2日目(2022/12/31) 西２ す22b
+year: 2022
+publisher: キンコーズ秋葉原店で印刷製本(予定)
 docrevision: "1.0"
 # front: images/front-image.png
 #frontoption:
