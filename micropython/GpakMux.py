@@ -1,3 +1,5 @@
+import sys
+
 if sys.version_info > (3, 6, 0):
     from typing import Tuple, List
 from collections import namedtuple
@@ -144,6 +146,13 @@ class GpakMux:
     def disconnect_all(self):
         self.port0.write(0x00)
         self.port1.write(0x00)
+
+    def query(self, row, column):
+        port, bit = self.cross_points[row][column]
+
+        stat = port.get_bit(bit)
+
+        return stat
 
 
 def main(bus):
