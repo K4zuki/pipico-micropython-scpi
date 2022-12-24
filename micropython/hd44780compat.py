@@ -126,8 +126,27 @@ class DDRamAddress(Register):
 
 
 class DisplayShift(Register):
+    """Set cursor moving and display shift control
+    bit, and the direction, without changing
+    DDRAM data.
+
+    S/C = "1": display shift,
+    S/C = "0": cursor shift,
+
+    R/L = "1": shift to right,
+    R/L = "0": shift to left
+    """
     RIGHT_LEFT = BitField("RIGHT_LEFT", 1, 2, 0b0, False)
+    """
+    R/L = "1": shift to right,
+    R/L = "0": shift to left     
+    """
+
     SCREEN_CURSOR = BitField("SCREEN_CURSOR", 1, 3, 0b0, False)
+    """
+    S/C = "1": display shift,
+    S/C = "0": cursor shift,
+    """
 
     @property
     def fields(self):

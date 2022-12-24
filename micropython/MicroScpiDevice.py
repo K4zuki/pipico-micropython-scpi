@@ -30,11 +30,11 @@ class ScpiKeyword(namedtuple("ScpiKeyword", ["long", "short"])):
             return False
 
 
-class ScpiCommand(namedtuple("ScpiCommand", ["keywords", "query", "param_callback"])):
+class ScpiCommand(namedtuple("ScpiCommand", ["keywords", "query", "callback"])):
     """
     - `keywords`: list of `ScpiKeyword`
     - `query`: flag if command is a query
-    - `param_callback`: `function pointer`
+    - `callback`: `function pointer`
     """
 
 
@@ -42,10 +42,8 @@ kw = ScpiKeyword("KEYWord", "KEYW")
 
 
 class MicroScpiDevice:
-    commands_write = [
-        (ScpiCommand((kw, kw), False, None), ScpiCommand((kw, kw), False, None))]  # type: List[ScpiCommand]
-    commands_query = [
-        (ScpiCommand((kw, kw), False, None), ScpiCommand((kw, kw), False, None))]  # type: List[ScpiCommand]
+    commands_write = [(ScpiCommand((kw, kw), False, None),)]  # type: List[ScpiCommand]
+    commands_query = [(ScpiCommand((kw, kw), False, None),)]  # type: List[ScpiCommand]
 
     @staticmethod
     def strip_semicolon(input_str: str):
@@ -87,9 +85,9 @@ class MicroScpiDevice:
             print("{}: command not found".format(':'.join(candidate_cmd)))
         else:
             candidate_cmd[-1] = candidate_cmd[-1].strip("?")
-            for command in commands:
-                if all(keyword.match(kw_candidate) for keyword, kw_candidate in zip(command.keywords, candidate_cmd)):
-                    command.param_callback(candidate_param, command.query)
+            for command in length_matched:
+                if all([keyword.match(kw_candidate) for keyword, kw_candidate in zip(command.keywords, candidate_cmd)]):
+                    command.callback(candidate_param, command.query)
                     break
             else:
                 print("{}: command not found".format(':'.join(candidate_cmd)))

@@ -7,6 +7,18 @@ LF = 0x0a
 AQM0802_ADDR = 0x3e  # 7-bits
 
 
+class DataCommandSelect(Register):
+    DATA_COMMAND = BitField("DATA_COMMAND", 1, 6, 0b0, False)
+    CONTINUATION = BitField("CONTINUATION", 1, 7, 0b0, False)
+
+    @property
+    def fields(self):
+        return (BitField("CONST", 6, 0, 0b00_0000, True),
+                self.DATA_COMMAND,
+                self.CONTINUATION
+                )
+
+
 class AQM0802Function(Function):
     INSTRUCTION_TABLE = BitField("INSTRUCTION_TABLE", 1, 0, 0b00, False)
 
@@ -80,6 +92,7 @@ class ContrastSet(Register):
 
 
 class AQM0802Instructions(HD44780Instructions):
+    DataCommandSelect = DataCommandSelect()
     Function = AQM0802Function()
     InternalOscillator = InternalOscillator()
     ICONAddress = ICONAddress()

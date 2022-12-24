@@ -15,7 +15,7 @@ docrevision: "1.0"
 #  - angle=0
 
 verbcolored: false
-# rmnote: false
+rmnote: true
 #toc-title: "Table of Contents"
 
 svgbob:

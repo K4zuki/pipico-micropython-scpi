@@ -63,7 +63,7 @@ class FunctionExtra(Register):
 
 
 class EntryModeExtra(Register):
-    BDS = BitField("BDS", 1, 0, 0b0, False)
+    BDS = BitField("BDS", 1, 0, 0b1, False)
     BDC = BitField("BDC", 1, 1, 0b0, False)
 
     @property
@@ -258,6 +258,7 @@ class FadeOutBlinkingConfig(LongRegister):
 
 
 class SO1602Instructions(HD44780Instructions):
+    DataCommandSelect = AQM0802.DataCommandSelect()
     DisplayStatusExtra = DisplayStatusExtra()
     Function = Function()
     FunctionExtra = FunctionExtra()

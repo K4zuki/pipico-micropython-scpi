@@ -11,7 +11,7 @@
 エラーハンドリングもけっこう適当です。
 
 また、非常に残念なことに、GreenPakの石を作っていたDialog社はルネサスに買われてしまいました。**もう直販もありません。**
-Mouserではかろうじて一部の石を売っていますが、GreenPAKから派生した**ForgeFPGAの開発キットをディスコンにした**あたりからすると、 もう先はないのかもしれません。
+Mouserではかろうじて一部の石を売っていますが、GreenPAKから派生した**ForgeFPGAの開発キットをディスコンにした**あたりからすると、もう先はないのかもしれません。
 この本が出される2022年12月31日がD社が登記上？存在する最後の日です。少なくとも日本では。
 
 そういうとこやぞ&#174;
@@ -54,47 +54,47 @@ Mouserではかろうじて一部の石を売っていますが、GreenPAKから
 
 :::
 
-# GpakMux
+# GpakMuxモジュール
 
 [](micropython/GpakMux.py){.listingtable .python from=1 to=10}
 
-# MicroScpiDevice
+# MicroScpiDeviceモジュール
 
-## ScpiKeyword
+## ScpiKeywordクラス
 
 [](micropython/MicroScpiDevice.py){.listingtable .python from=8 to=30}
 
-## ScpiCommand
+## ScpiCommandクラス
 
 [](micropython/MicroScpiDevice.py){.listingtable .python from=33 to=39}
 
-## MicroScpiDevice
+## MicroScpiDeviceクラス
 
 [](micropython/MicroScpiDevice.py){.listingtable .python from=44 to=94}
 
-# EMU2751A
+# EMU2751Aモジュール
 
-## CrossBars
+## CrossBarsクラス
 
 [](micropython/EMU2751A.py){.listingtable .python from=33 to=76}
 
-## EMU2751A
+## EMU2751Aクラス
 
 [](micropython/EMU2751A.py){.listingtable .python from=78 to=211}
 
 ::: rmnote
 
-# hd44780compat
+# hd44780compatモジュール
 
-## BitField
+## BitFieldクラス
 
 [](micropython/hd44780compat.py){.listingtable .python from=1 to=10}
 
-## Register
+## Registerクラス
 
 [](micropython/hd44780compat.py){.listingtable .python from=11 to=20}
 
-## HD44780Instructions
+## HD44780Instructionsクラス
 
 [](micropython/hd44780compat.py){.listingtable .python from=21 to=30}
 
@@ -104,14 +104,14 @@ Mouserではかろうじて一部の石を売っていますが、GreenPAKから
 
 ::: LANDSCAPE
 
-[](micropython/GpakMux.py){.listingtable .python}
+[GpakMuxモジュール全文](micropython/GpakMux.py){.listingtable .python}
 
 \newpage
 
-[](micropython/MicroScpiDevice.py){.listingtable .python}
+[MicroScpiDeviceモジュール全文](micropython/MicroScpiDevice.py){.listingtable .python}
 
 \newpage
 
-[](micropython/EMU2751A.py){.listingtable .python}
+[EMU2751Aモジュール全文](micropython/EMU2751A.py){.listingtable .python}
 
 :::

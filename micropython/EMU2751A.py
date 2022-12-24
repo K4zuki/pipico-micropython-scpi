@@ -18,10 +18,16 @@ SYSTem:VERSion? <No Param>
 *STB? <No Param>
 *TST? <No Param>
 """
+import sys
+
+if sys.version_info > (3, 6, 0):
+    from typing import Tuple, List
+
 import re
 from collections import namedtuple
 
 from MicroScpiDevice import ScpiKeyword, ScpiCommand, MicroScpiDevice
+from GpakMux import GpakMux
 
 
 class CrossBars(namedtuple("CrossBars", ["range", "start", "end", "single"])):
@@ -44,25 +50,27 @@ class CrossBars(namedtuple("CrossBars", ["range", "start", "end", "single"])):
             _single = self.single
             _range = self.range
             if self.start is not None:
-                if not self.CROSSBAR_MIN <= int(self.start) <= self.CROSSBAR_MAX:
-                    print("Error:", self.start)
-                _start = min(_end, max(int(self.start), self.CROSSBAR_MIN))
+                start = int(self.start)
+                if not self.CROSSBAR_MIN <= start <= self.CROSSBAR_MAX:
+                    print("Error:", start)
+                _start = min(_end, max(start, self.CROSSBAR_MIN))
             if self.end is not None:
-                if not self.CROSSBAR_MIN <= int(self.end) <= self.CROSSBAR_MAX:
-                    print("Error:", self.end)
-                _end = max(_start, min(int(self.end), self.CROSSBAR_MAX))
+                end = int(self.end)
+                if not self.CROSSBAR_MIN <= end <= self.CROSSBAR_MAX:
+                    print("Error:", end)
+                _end = max(_start, min(end, self.CROSSBAR_MAX))
             assert _start <= _end
             _range = tuple(xb for xb in range(_start, _end + 1) if xb in self.CROSSBARS)
         elif self.single is not None:
             _start = self.start
             _end = self.end
-            _range = self.range
-            if not (self.CROSSBAR_MAX >= int(self.single) >= self.CROSSBAR_MIN):
+            single = int(self.single)
+            if not (self.CROSSBAR_MAX >= single >= self.CROSSBAR_MIN):
                 print("Error:", self.single)
-                _single = self.CROSSBAR_MAX if int(self.single) > self.CROSSBAR_MAX else min(int(self.single),
-                                                                                             self.CROSSBAR_MIN)
+                _single = self.CROSSBAR_MAX if single > self.CROSSBAR_MAX else min(single, self.CROSSBAR_MIN)
             else:
-                _single = int(self.single)
+                _single = single
+            _range = (single,)
 
         return CrossBars(_range, _start, _end, _single)
 
@@ -94,7 +102,8 @@ class EMU2751A(MicroScpiDevice):
 
     def __init__(self, mux):
         super().__init__()
-        self.mux = mux
+        self.mux = mux  # type: GpakMux
+        self.mux.disconnect_all()
 
         diagnostic_relay_cycles = ScpiCommand((self.kw_diag, self.kw_relay, self.kw_cycles), True, self.cb_do_nothing)
         diagnostic_relay_cycles_clear = ScpiCommand((self.kw_diag, self.kw_relay, self.kw_cycles, self.kw_clear),
@@ -135,7 +144,7 @@ class EMU2751A(MicroScpiDevice):
 
     def channel_parser(self, param="(@101)"):
         param = param.strip()
-        crossbars = []
+        crossbars = []  # type: List[CrossBars]
         if not isinstance(param, str):
             print("Error: No parameter given")
             return
@@ -164,16 +173,32 @@ class EMU2751A(MicroScpiDevice):
         param = param.strip()
         crossbars = self.channel_parser(param)
         if crossbars is not None:
+            stat = []
             for crossbar in crossbars:
-                print("Close:", "?" if query is True else "-", crossbar)
+                for cross in crossbar.range:
+                    rowcol = self.mux.int_to_rowcol(cross)
+                    if query is True:
+                        stat.append(str(self.mux.query(*rowcol)))
+                    else:
+                        self.mux.connect(*rowcol)
+                print("Close:", "?" if query is True else "-", crossbar.range)
+            print("{}".format(",".join(stat)))
         return
 
     def cb_relay_open(self, param="(@101)", query=False):
         param = param.strip()
         crossbars = self.channel_parser(param)
         if crossbars is not None:
+            stat = []
             for crossbar in crossbars:
-                print("Open:", "?" if query is True else "-", crossbar)
+                for cross in crossbar.range:
+                    rowcol = self.mux.int_to_rowcol(cross)
+                    if query is True:
+                        stat.append("0" if self.mux.query(*rowcol) == 1 else "1")
+                    else:
+                        self.mux.disconnect(*rowcol)
+                print("Open:", "?" if query is True else "-", crossbar.range)
+            print("{}".format(",".join(stat)))
         return
 
     @staticmethod
