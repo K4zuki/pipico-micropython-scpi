@@ -7,10 +7,17 @@
 この本は、「勝手にアプリケーションノート4」で設計製作したリレーマトリクスHATを応用し、既存のSCPIデバイス"U2751A"をエミュレートするまでを解説
 したドキュメントです。SCPIのふりをする部分はラズピコ(Raspberry Pi pico)が行います。ラズピコの開発はMicroPythonとPyCharmで行いました。
 
+ここ2年ほどの半導体供給不安のせいで計測器類（すなわちSCPIデバイス）が入手難になったことがこの思いつきのきっかけです
+(Keysight/AgilentのU2751Aスイッチマトリクスを仕事で購入しましたが、納期が3ヶ月かかりました)。この機械と同様の機能をもち、なおかつ自作可能な
+入手性のよい
+
 エミュレートとは言っても、SCPI・IEEE488の厳密な準拠はしていません。たとえばセミコロンで数珠つなぎする部分などの実装はバッサリカットしましたし、
 エラーハンドリングもけっこう適当です。
 
-また、非常に残念なことに、GreenPakの石を作っていたDialog社はルネサスに買われてしまいました。**もう直販もありません。**
+## GreenPAKは死んだ！なぜだ！（Rだからさ） {-}
+
+2022年8月、非常に残念なことに、GreenPakの石を作っていたDialog社はルネサスに吸収されてしまいました。
+**Silego/Dialog時代にあった直販サイトももうありません。**
 Mouserではかろうじて一部の石を売っていますが、GreenPAKから派生した**ForgeFPGAの開発キットをディスコンにした**あたりからすると、もう先はないのかもしれません。
 この本が出される2022年12月31日がD社が登記上？存在する最後の日です。少なくとも日本では。
 
@@ -20,12 +27,39 @@ Mouserではかろうじて一部の石を売っていますが、GreenPAKから
 
 # SCPIエミュレーション方針
 
+エミュレーション対象の機能が比較的単純なこともあり、実装も簡易なものにしました。IEEE488の共通コマンド応答の実装もしょぼめです。
+本来は互換性についての定義もあるはずですが、調査しきれていません。
+
 ## 割り切り
 
-- **SCPIの完全な実装は目指さない**
-- ;でつないでも最初だけ解釈
+上のとおり、**SCPIの完全な実装は目指さない**方針で行きます。例えばセミコロンでつないでも最初の項だけ解釈する、ステータスレジスタを持たないなどです。
+[@tbl:ieee488-commands]に共通コマンドの実装ステータス一覧を示します。いまのところ`*IDN?`には応答を返します。
 
-# スイッチマトリクス「Agilent/Keysight U2751A」
+::: {.table width=[0.4,0.4,0.2]}
+Table: IEEE488コマンド実装ステータス {#tbl:ieee488-commands}
+
+| SCPI         | Parameter | Implemented |
+|--------------|-----------|-------------|
+| `*CLS`       | None      | False       |
+| `*ESE/*ESE?` | None      | False       |
+| `*ESR?`      | None      | False       |
+| `*IDN?`      | None      | True        |
+| `*OPC/*OPC?` | None      | False       |
+| `*RST`       | None      | False       |
+| `*SRE/*SRE?` | None      | False       |
+| `*STB?`      | None      | False       |
+| `*TST?`      | None      | False       |
+
+:::
+
+# スイッチマトリクス「Keysight/Agilent U2751A」
+
+今回モデルにしたKeysight(Agilent)社の計測器「U2751A」について簡単に説明します。USBモジュラーデータ収集装置シリーズの一つで、単体で使えるだけでなく、
+他のモジュールとともに最大6台、シャーシに収めて使うことができます。Keysightが提供している専用ソフトからスイッチを操作できる他、
+SCPIコマンドでの操作も受け付けます。専用ソフト一式をインストールしたPCあればNI VISA環境でも操作できます。
+
+- https://www.keysight.com/us/en/products/modular/data-acquisition-daq/usb-modular-data-acquisition.html
+- https://www.keysight.com/us/en/product/U2751A/4x8-2-wire-usb-modular-switch-matrix.html
 
 ## コマンド一覧
 
@@ -42,45 +76,36 @@ Mouserではかろうじて一部の石を売っていますが、GreenPAKから
 | `SYSTem:CDEScription?`          | None                  | False       |
 | `SYSTem:ERRor?`                 | None                  | False       |
 | `SYSTem:VERSion?`               | None                  | False       |
-| `*CLS`                          | None                  | False       |
-| `*ESE/*ESE?`                    | None                  | False       |
-| `*ESR?`                         | None                  | False       |
-| `*IDN?`                         | None                  | True        |
-| `*OPC/*OPC?`                    | None                  | False       |
-| `*RST`                          | None                  | False       |
-| `*SRE/*SRE?`                    | None                  | False       |
-| `*STB?`                         | None                  | False       |
-| `*TST?`                         | None                  | False       |
 
 :::
 
 # GpakMuxモジュール
 
-[](micropython/GpakMux.py){.listingtable .python from=1 to=10}
+[GpakMuxモジュール](micropython/GpakMux.py){.listingtable .python from=1 to=10 #lst:gpakmux-module}
 
 # MicroScpiDeviceモジュール
 
 ## ScpiKeywordクラス
 
-[](micropython/MicroScpiDevice.py){.listingtable .python from=8 to=30}
+[ScpiKeywordクラス](micropython/MicroScpiDevice.py){.listingtable .python from=8 to=30 #lst:scpikeyword-class}
 
 ## ScpiCommandクラス
 
-[](micropython/MicroScpiDevice.py){.listingtable .python from=33 to=39}
+[ScpiCommandクラス](micropython/MicroScpiDevice.py){.listingtable .python from=33 to=39 #lst:scpicommand-class}
 
 ## MicroScpiDeviceクラス
 
-[](micropython/MicroScpiDevice.py){.listingtable .python from=44 to=94}
+[MicroScpiDeviceクラス](micropython/MicroScpiDevice.py){.listingtable .python from=44 to=94 #lst:microscpidevice-class}
 
 # EMU2751Aモジュール
 
 ## CrossBarsクラス
 
-[](micropython/EMU2751A.py){.listingtable .python from=33 to=76}
+[CrossBarsクラス](micropython/EMU2751A.py){.listingtable .python from=33 to=76 #lst:crossbars-class}
 
 ## EMU2751Aクラス
 
-[](micropython/EMU2751A.py){.listingtable .python from=78 to=211}
+[EMU2751Aクラス](micropython/EMU2751A.py){.listingtable .python from=78 to=211 #lst:emu2751a-class}
 
 ::: rmnote
 
