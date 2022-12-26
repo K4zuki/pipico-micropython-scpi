@@ -114,7 +114,7 @@ class EMU2751A(MicroScpiDevice):
         route_open_q = ScpiCommand((self.kw_route, self.kw_open), True, self.cb_relay_open)
         system_description = ScpiCommand((self.kw_system, self.kw_cdescription), False, self.cb_loopback)
         system_error = ScpiCommand((self.kw_system, self.kw_error), False, self.cb_loopback)
-        system_version = ScpiCommand((self.kw_system, self.kw_version), False, self.cb_loopback)
+        system_version = ScpiCommand((self.kw_system, self.kw_version), False, self.cb_version)
         cls = ScpiCommand((self.kw_cls,), False, self.cb_loopback)
         ese = ScpiCommand((self.kw_ese,), False, self.cb_loopback)
         opc = ScpiCommand((self.kw_opc,), False, self.cb_loopback)
@@ -212,3 +212,10 @@ class EMU2751A(MicroScpiDevice):
     def cb_idn(param="", query=False):
         """<Vendor name>,<Model number>,<Serial number>,<Firmware version>"""
         print("MicroScpiDevice,EMU2751A,C0FEE,0.0.1")
+
+    @staticmethod
+    def cb_version(param="", query=False):
+        """The command returns a string in the form of “YYYY.V”, where “YYYY” represents
+        the year of the version and “V” represents a version for that year (e.g. 1997.0).
+        """
+        print("2022.12")
