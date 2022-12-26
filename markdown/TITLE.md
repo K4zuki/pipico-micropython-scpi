@@ -35,20 +35,20 @@ Mouserではかろうじて一部の石を売っていますが、GreenPAKから
 上のとおり、**SCPIの完全な実装は目指さない**方針で行きます。例えばセミコロンでつないでも最初の項だけ解釈する、ステータスレジスタを持たないなどです。
 [@tbl:ieee488-commands]に共通コマンドの実装ステータス一覧を示します。いまのところ`*IDN?`には応答を返します。
 
-::: {.table width=[0.4,0.4,0.2]}
+::: {.table width=[0.5,0.5]}
 Table: IEEE488コマンド実装ステータス {#tbl:ieee488-commands}
 
-| SCPI         | Parameter | Implemented |
-|--------------|-----------|-------------|
-| `*CLS`       | None      | False       |
-| `*ESE/*ESE?` | None      | False       |
-| `*ESR?`      | None      | False       |
-| `*IDN?`      | None      | True        |
-| `*OPC/*OPC?` | None      | False       |
-| `*RST`       | None      | False       |
-| `*SRE/*SRE?` | None      | False       |
-| `*STB?`      | None      | False       |
-| `*TST?`      | None      | False       |
+|          SCPI | Implemented  |
+|--------------:|:-------------|
+|        `*CLS` |              |
+|  `*ESE/*ESE?` |              |
+|       `*ESR?` |              |
+|       `*IDN?` | &check;      |
+|  `*OPC/*OPC?` |              |
+|        `*RST` |              |
+|  `*SRE/*SRE?` |              |
+|       `*STB?` |              |
+|       `*TST?` |              |
 
 :::
 
@@ -64,18 +64,19 @@ SCPIコマンドでの操作も受け付けます。専用ソフト一式をイ�
 ## コマンド一覧
 
 ::: {.table width=[0.4,0.4,0.2]}
+Table: U2751A固有コマンド実装ステータス {#tbl:u2751a-commands}
 
-| SCPI                            | Parameter             | Implemented |
-|---------------------------------|-----------------------|-------------|
-| `DIAGnostic:RELay:CYCLes?`      | None                  | False       |
-| `DIAGnostic:RELay:CYCLes:CLEar` | None                  | False       |
-| `ROUTe:CLOSe`                   | `(@101,102:105,201:)` | True        |
-| `ROUTe:CLOSe?`                  | `(@101,102:105,201:)` | True        |
-| `ROUTe:OPEN`                    | `(@101,102:105,201:)` | True        |
-| `ROUTe:OPEN?`                   | `(@101,102:105,201:)` | True        |
-| `SYSTem:CDEScription?`          | None                  | False       |
-| `SYSTem:ERRor?`                 | None                  | False       |
-| `SYSTem:VERSion?`               | None                  | False       |
+| SCPI                            | Parameter             | Implemented  |
+|---------------------------------|-----------------------|:-------------|
+| `DIAGnostic:RELay:CYCLes?`      | None                  |              |
+| `DIAGnostic:RELay:CYCLes:CLEar` | None                  |              |
+| `ROUTe:CLOSe`                   | `(@101,102:105,201:)` | &check;      |
+| `ROUTe:CLOSe?`                  | `(@101,102:105,201:)` | &check;      |
+| `ROUTe:OPEN`                    | `(@101,102:105,201:)` | &check;      |
+| `ROUTe:OPEN?`                   | `(@101,102:105,201:)` | &check;      |
+| `SYSTem:CDEScription?`          | None                  |              |
+| `SYSTem:ERRor?`                 | None                  |              |
+| `SYSTem:VERSion?`               | None                  |              |
 
 :::
 
@@ -123,8 +124,6 @@ SCPIコマンドでの操作も受け付けます。専用ソフト一式をイ�
 
 [](micropython/hd44780compat.py){.listingtable .python from=21 to=30}
 
-:::
-
 # コード
 
 ::: LANDSCAPE
@@ -138,5 +137,7 @@ SCPIコマンドでの操作も受け付けます。専用ソフト一式をイ�
 \newpage
 
 [EMU2751Aモジュール全文](micropython/EMU2751A.py){.listingtable .python}
+
+:::
 
 :::
