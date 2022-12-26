@@ -1,0 +1,25 @@
+name: Build document
+on: [push, create]
+jobs:
+  make-document:
+    name: Compile document
+    runs-on: ubuntu-latest
+    container:
+      image: k4zuki/pandocker-alpine:2.18
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Update dependencies
+        run: |
+          pip3 install pandocker-lua-filters docx-coreprop-writer
+          pip3 install git+https://github.com/k4zuki/pandoc_misc.git@2.16.2
+      - name: Build document
+        run: |
+          make clean html docx pdf
+      - name: Upload artifact files (at a push)
+        uses: actions/upload-artifact@v2
+        with:
+          name: pdf/html/docx files
+          path: Out
