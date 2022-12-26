@@ -5,7 +5,7 @@ jobs:
     name: Compile document
     runs-on: ubuntu-latest
     container:
-      image: k4zuki/pandocker-alpine:2.18
+      image: k4zuki/pandocker-alpine:2.19
     steps:
       - name: Checkout
         uses: actions/checkout@v2
