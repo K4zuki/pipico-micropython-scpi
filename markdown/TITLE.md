@@ -14,6 +14,8 @@
 エミュレートとは言っても、SCPI・IEEE488の厳密な準拠はしていません。たとえばセミコロンで数珠つなぎする部分などの実装はバッサリカットしましたし、
 エラーハンドリングもけっこう適当です。
 
+後半の章にmicropythonライブラリの抜粋を載せてあります。印刷後に更新される可能性が十分にあるので、参考にとどめてください。
+
 ## GreenPAKは死んだ！なぜだ！（Rだからさ） {-}
 
 2022年8月、非常に残念なことに、GreenPakの石を作っていたDialog社はルネサスに吸収されてしまいました。
@@ -56,10 +58,10 @@ Table: IEEE488コマンド実装ステータス {#tbl:ieee488-commands}
 
 今回モデルにしたKeysight(Agilent)社の計測器「U2751A」について簡単に説明します。USBモジュラーデータ収集装置シリーズの一つで、単体で使えるだけでなく、
 他のモジュールとともに最大6台、シャーシに収めて使うことができます。Keysightが提供している専用ソフトからスイッチを操作できる他、
-SCPIコマンドでの操作も受け付けます。専用ソフト一式をインストールしたPCあればNI VISA環境でも操作できます。
+SCPIコマンドでの操作も受け付けます。専用ソフト一式をインストールしたPCあればNI VISA環境でも操作できます。関連リンクをいかに示します。
 
-- https://www.keysight.com/us/en/products/modular/data-acquisition-daq/usb-modular-data-acquisition.html
-- https://www.keysight.com/us/en/product/U2751A/4x8-2-wire-usb-modular-switch-matrix.html
+- <https://www.keysight.com/us/en/products/modular/data-acquisition-daq/usb-modular-data-acquisition.html>
+- <https://www.keysight.com/us/en/product/U2751A/4x8-2-wire-usb-modular-switch-matrix.html>
 
 ## コマンド一覧
 
@@ -80,17 +82,56 @@ Table: U2751A固有コマンド実装ステータス {#tbl:u2751a-commands}
 
 :::
 
+# アルゴリズムというか処理フロー (main.py)
+
+#### 標準入力で1行取り込んだあとセミコロンで区切り、最初の要素だけをパース処理に回す {-}
+
+`gets = sys.stdin.readline`としてエイリアスを宣言しておいて、`line = gets().strip()`で標準入力から1行取り込んだのち空白文字を切り落とします。
+`line`の文字列長が0より大きければパース処理に回します(`u2751a.parse_and_process(line)`)。
+
+`parse_and_process`がさらに`mini_lexer()`を呼び出し、文字列の前処理を行います。
+
+#### パラメータ付きコマンドのことを考慮して空白で切り分ける（コマンドはさらにコロンで区切る） {-}
+
+U2751Aではわずか2種類ですが、一部コマンドはパラメータを受けることができます。コマンドとパラメータは空白で区分けされます。
+`mini_lexer()`がこの部分の処理を行います。最初の空白の直前までをコマンド文字列、残り全部をパラメータ文字列と考えます。
+さらに、コマンド文字列はコロンで区切られている場合があるので、`split(":")`で文字列のリストに変換します。
+`mini_lexer()`はこれらをタプルにして返却します。
+
+#### 要素数が合致するコマンドに候補を絞り込む {-}
+
+`mini_lexer()`に返されたコマンド文字列のリストの要素数と一致する登録済コマンドを抽出します。コマンドがクエリかどうかは
+リストの最後の要素が"?"で終わっているかどうかで判定します。
+
+#### すべてのコマンド文字列が一致した場合はコールバック関数を呼び出す {-}
+
+#### コールバック関数内で最終的な処理をする（パラメタ文字列のパースを含む） {-}
+
 # GpakMuxモジュール
+
+スイッチマトリクスHATを操作するためのモジュールです。前回ラズパイ用に書いたものを移植しました。もっとうまい設計できそうだけど動くからヨシ！ってことで。
 
 [GpakMuxモジュール](micropython/GpakMux.py){.listingtable .python from=1 to=10 #lst:gpakmux-module}
 
 # MicroScpiDeviceモジュール
 
+MicroScpiDeviceモジュールは今作の肝となるSCPIデバイスの挙動を大まかに定義したものです。
+キーワードおよびコマンド定義のためのヘルパークラス（`ScpiKeyword`、`ScpiCommand`）と、SCPIデバイスの基本的な動作を定義した`MicroScpiDevice`
+クラスの3部構成です。
+
 ## ScpiKeywordクラス
+
+SCPIコマンドを構成するキーワードの定義クラスです。候補文字列を検証してキーワード定義に一致すると`True`を返すクラス関数`match()`を持っています。
+引数`long`と`short`はそれぞれ完全表記（long form）と短縮表記（short form）に当たります。
+`match()`はこれら2つだけでなく、中間の表記も認めています。 たとえば`kw = ScpiKeyword(long="DEFault", short="DEF")`のとき、
+`DEF`/`DEFA`/`DEFAU`/`DEFAUL`/`DEFAULT`の全てにマッチします。
+関数内部で大文字に変換しているので、候補文字列の大文字小文字を区別しません。
 
 [ScpiKeywordクラス](micropython/MicroScpiDevice.py){.listingtable .python from=8 to=30 #lst:scpikeyword-class}
 
 ## ScpiCommandクラス
+
+SCPIコマンドの定義クラスです。`ScpiKeyword`のタプルとクエリコマンドを表すフラグ、マッチしたときのコールバック関数を登録します。
 
 [ScpiCommandクラス](micropython/MicroScpiDevice.py){.listingtable .python from=33 to=39 #lst:scpicommand-class}
 
@@ -141,3 +182,8 @@ Table: U2751A固有コマンド実装ステータス {#tbl:u2751a-commands}
 :::
 
 :::
+
+# あとがき
+
+- タルコフのワイプに間に合うように頑張って書きました
+- 本当はForgeFPGA試食本も書きたかったけどこっちの筆が進まんくて間に合わんかったすまん
