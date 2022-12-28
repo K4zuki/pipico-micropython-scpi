@@ -15,14 +15,20 @@
 エミュレートとは言っても、SCPI・IEEE488の厳密な準拠はしていません。たとえばセミコロンで数珠つなぎする部分などの実装はバッサリカットしましたし、
 エラーハンドリングもけっこう適当です。
 
-後半の章にmicropythonライブラリの抜粋を載せてあります。印刷後に更新される可能性が十分にあるので、参考にとどめてください。
+この本の構成は大きく３部構成です。エミュレーション方針の説明と処理フローの説明、そして関連するMicroPythonライブラリ全文を載せました。
+ライブラリの内容については、印刷後に更新される可能性が十分にあるので、参考にとどめてください。
 
 ## GreenPAKは死んだ！なぜだ！（Rだからさ） {-}
 
 2022年8月、非常に残念なことに、GreenPakの石を作っていたDialog社はルネサスに吸収されてしまいました。
-**Silego/Dialog時代にあった直販サイトももうありません。**
-Mouserではかろうじて一部の石を売っていますが、GreenPAKから派生した**ForgeFPGAの開発キットをディスコンにした**あたりからすると、もう先はないのかもしれません。
 この本が出される2022年12月31日がD社が登記上？存在する最後の日です。少なくとも日本では。
+
+**Silego/Dialog時代にあった直販サイトはもうありません。**
+Mouserではかろうじて一部の石を売っています。おそらくマクニカがRの代理店だからでしょう。DigiKeyでは納期が全部５２週になっています。
+Mouserにしても、GreenPAKから派生した**ForgeFPGAの開発キットを買えなくした**あたりからすると、もう先はないのかもしれません。
+このキット、筆者の記憶が正しければ、2022年８月に新商品として購入可能になったばかりでした。同年１１月に購入不能になりました。
+
+- <https://www.mouser.jp/ProductDetail/Dialog-Semiconductor/SLG7DVKFORGE?qs=Rp5uXu7WBW9lupzVV%252Bp7VQ%3D%3D>
 
 そういうとこやぞ&#174;
 
@@ -31,7 +37,9 @@ Mouserではかろうじて一部の石を売っていますが、GreenPAKから
 # SCPIエミュレーション方針
 
 エミュレーション対象の機能が比較的単純なこともあり、実装も簡易なものにしました。IEEE488の共通コマンド応答の実装もしょぼめです。
-本来は互換性についての定義もあるはずですが、調査しきれていません。
+本来は互換性についての定義もあるはずですが、調査しきれていません。SCPI-1999のドキュメントPDFを見つけたので参考に置いておきます。
+
+- <https://www.keysight.com/us/en/assets/9921-01870/miscellaneous/SCPI-99.pdf>
 
 ## 割り切り
 
@@ -59,7 +67,7 @@ Table: IEEE488コマンド実装ステータス {#tbl:ieee488-commands}
 
 今回モデルにしたKeysight(Agilent)社の計測器「U2751A」について簡単に説明します。USBモジュラーデータ収集装置シリーズの一つで、単体で使えるだけでなく、
 他のモジュールとともに最大6台、シャーシに収めて使うことができます。Keysightが提供している専用ソフトからスイッチを操作できる他、
-SCPIコマンドでの操作も受け付けます。専用ソフト一式をインストールしたPCあればNI VISA環境でも操作できます。関連リンクをいかに示します。
+SCPIコマンドでの操作も受け付けます。専用ソフト一式をインストールしたPCあればNI VISA環境でも操作できます。関連リンクを以下に示します。
 
 - <https://www.keysight.com/us/en/products/modular/data-acquisition-daq/usb-modular-data-acquisition.html>
 - <https://www.keysight.com/us/en/product/U2751A/4x8-2-wire-usb-modular-switch-matrix.html>
@@ -67,7 +75,7 @@ SCPIコマンドでの操作も受け付けます。専用ソフト一式をイ�
 ## コマンド一覧
 
 ::: {.table width=[0.4,0.4,0.2]}
-Table: U2751A固有コマンド実装ステータス {#tbl:u2751a-commands}
+Table: U2751A固有SCPIコマンド実装ステータス {#tbl:u2751a-commands}
 
 | SCPI                            | Parameter             | Implemented |
 |---------------------------------|-----------------------|:------------|
@@ -83,38 +91,56 @@ Table: U2751A固有コマンド実装ステータス {#tbl:u2751a-commands}
 
 :::
 
-# アルゴリズムというか処理フロー (main.py)
+# アルゴリズムというか処理フロー
 
-SCPIコマンドを受け取ったあとの処理はだいたい以下のような感じです。ラズピコをUSBシリアルデバイスとしてPCに認識させます。UART0/1は使いません。
+SCPIコマンドを受け取ったあとの処理はだいたい以下のような感じです。例として、ホストから`ROUTe:CLOSe (@101:103)<CR><LF>`が送られてきた場合の
+処理を説明します。
 
-"CANDDIDate:COMmand:STRing"
+#### １．標準入力で1行取り込んだあとセミコロンで区切り、最初の要素だけをパース処理に回す (main.py) {-}
 
-#### １．標準入力で1行取り込んだあとセミコロンで区切り、最初の要素だけをパース処理に回す {-}
-
-[](micropython/main.py){.listingtable nocaption=true from=22 #lst:readline-parse }
+[](micropython/main.py){.listingtable nocaption=true from=22 #lst:readline-parse .python}
 
 ファイルの先頭で`gets = sys.stdin.readline`としてエイリアスを宣言しておいて、無限ループ内の`line = gets().strip()`で
 標準入力から1行取り込んだのち空白文字を切り落とします。`line`の文字列長が0より大きければパース処理に回します。
 
-`parse_and_process`がさらに`mini_lexer()`を呼び出し、文字列の前処理を行います。
+- `line = "ROUTe:CLOSe (@101:103)"`
 
-#### ２．パラメータ付きコマンドのことを考慮して空白で切り分ける（コマンドはさらにコロンで区切る） {-}
+#### ２．パラメータ付きコマンドのことを考慮して空白とコロンで切り分ける（MicroScpiDevice.py） {-}
 
-[](micropython/MicroScpiDevice.py){.listingtable nocaption=true from=48 to=65 #lst:split-command-parameter }
+[](micropython/MicroScpiDevice.py){.listingtable nocaption=true from=48 to=65 #lst:split-command-parameter .python}
 
 U2751Aではわずか2種類ですが、一部コマンドはパラメータを受けることができます。コマンドとパラメータは空白で区分けされます。
 `mini_lexer()`がこの部分の処理を行います。最初の空白の直前までをコマンド文字列、残り全部をパラメータ文字列と考えます。
 さらに、コマンド文字列はコロンで区切られている場合があるので、`split(":")`で文字列のリストに変換します。
 `mini_lexer()`はこれらをタプルにして返却します。
 
-#### 要素数が合致するコマンドに候補を絞り込む {-}
+- `candidate_cmd = ["ROUTe", "CLOSe"]`
+- `candidate_param = "(@101:103)"`
+
+#### ３．要素数が合致するコマンドに候補を絞り込む（MicroScpiDevice.py） {-}
+
+[](micropython/MicroScpiDevice.py){.listingtable nocaption=true from=74 to=78 #lst:get-command-candidate .python}
 
 `mini_lexer()`に返されたコマンド文字列のリストの要素数と一致する登録済コマンドを抽出します。コマンドがクエリかどうかは
 リストの最後の要素が"?"で終わっているかどうかで判定します。
+登録済コマンドの中に長さが等しいものが一つもない場合はエラーになります。
 
-#### すべてのコマンド文字列が一致した場合はコールバック関数を呼び出す {-}
+今回は長さ２であるコマンドが抽出されます。
 
-#### コールバック関数内で最終的な処理をする（パラメタ文字列のパースを含む） {-}
+``` .python
+length_matched = [
+    ScpiCommand(keywords=(ScpiKeyword(long='ROUTe', short='ROUT'), ScpiKeyword(long='CLOSe', short='CLOS')),
+                query=False, callback= < bound_method >),
+    ScpiCommand(keywords=(ScpiKeyword(long='ROUTe', short='ROUT'), ScpiKeyword(long='OPEN', short='OPEN')),
+                query=False, callback= < bound_method >)
+]
+```
+
+#### ４．すべてのコマンド文字列が一致した場合はコールバック関数を呼び出す（MicroScpiDevice.py） {-}
+
+[](micropython/MicroScpiDevice.py){.listingtable nocaption=true from=80 #lst:callback-when-all-matched .python}
+
+#### コールバック関数内でパラメタ文字列のパースやクエリに返答するなどを含む最終的な処理をする（EMU2751A.py） {-}
 
 # GpakMuxモジュール
 
@@ -124,7 +150,7 @@ U2751Aではわずか2種類ですが、一部コマンドはパラメータを�
 
 # MicroScpiDeviceモジュール
 
-MicroScpiDeviceモジュールは今作の肝となるSCPIデバイスの挙動を定義したものです。
+MicroScpiDeviceモジュールは今作の肝となる「マイクロSCPIデバイス」の挙動を定義したものです。
 キーワードおよびコマンド定義のためのヘルパークラス（`ScpiKeyword`、`ScpiCommand`）と、SCPIデバイスの共通動作を定義した`MicroScpiDevice`
 クラスの3部構成です。
 
@@ -135,14 +161,14 @@ SCPIコマンドを構成するキーワードの定義クラスです。候補�
 これらの定義が動作中に変わることはないので、`namedtuple`を継承しています。
 
 `match()`はこれら2つだけでなく、中間の表記も認めています。 たとえば`kw = ScpiKeyword(long="DEFault", short="DEF")`のとき、
-`DEF`/`DEFA`/`DEFAU`/`DEFAUL`/`DEFAULT`の全てにマッチします。
+`DEF`/`DEFA`/`DEFAU`/`DEFAUL`/`DEFAULT`の全てにマッチしますが、`DEFINE`にはマッチしません。
 関数内部で大文字に変換しているので、候補文字列の大文字小文字を区別しません。
 
 [ScpiKeywordクラス](micropython/MicroScpiDevice.py){.listingtable .python from=8 to=30 #lst:scpikeyword-class}
 
 ## ScpiCommandクラス
 
-SCPIコマンドの定義クラスです。`ScpiKeyword`のタプルとクエリコマンドを表すフラグ、マッチしたときのコールバック関数を登録します。
+SCPIコマンドの定義クラスです。`ScpiKeyword`のタプルとクエリコマンドを表すフラグ、マッチしたときのコールバック関数へのポインタを登録します。
 
 [ScpiCommandクラス](micropython/MicroScpiDevice.py){.listingtable .python from=33 to=39 #lst:scpicommand-class}
 
@@ -201,5 +227,6 @@ SCPIデバイスの定義クラスです。`mini_lexer()`がコマンド文字�
 
 # あとがき
 
-- タルコフのワイプに間に合うように頑張って書きました
+- タルコフのワイプに間に合うように頑張って書きました。今回も前日印刷&trade;です
 - 本当はForgeFPGA試食本も書きたかったけどこっちの筆が進まんくて間に合わんかったすまん
+- ライブラリの設計はラズピコのメモリ量に頼っている部分があるので、ほかのMicroPythonなマイコンに移植できるかはやってみないとわかりません。
