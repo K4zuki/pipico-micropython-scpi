@@ -138,15 +138,21 @@ length_matched = [
 
 #### ４．すべてのコマンド文字列が一致した場合はコールバック関数を呼び出す（MicroScpiDevice.py） {-}
 
+`length_matched`の各`ScpiCommand`アイテムについて`keywords`に登録された`ScpiKeyword`の全てにマッチするかを調べます。
+全てにマッチする最初の`ScpiCommand`アイテムに登録されたコールバック関数を呼び出します。一つもマッチがない場合はエラーになります。
+コールバック関数は引数にパラメタ文字列とクエリフラグを受け取ります。
+
 [](micropython/MicroScpiDevice.py){.listingtable nocaption=true from=80 #lst:callback-when-all-matched .python}
 
 #### コールバック関数内でパラメタ文字列のパースやクエリに返答するなどを含む最終的な処理をする（EMU2751A.py） {-}
 
 # GpakMuxモジュール
 
-スイッチマトリクスHATを操作するためのモジュールです。前回ラズパイ用に書いたものを移植しました。もっとうまい設計できそうだけど動くからヨシ！ってことで。
+スイッチマトリクスHATを操作するためのモジュールです。前回ラズパイ用に書いたものを移植・改変しました。スイッチマトリクスの接続状態を返す`query()`
+と数値から行・列の情報を返す`int_to_rowcol()`が足されています。
+もっとうまい設計できそうだけど動くからヨシ！ってことで。
 
-[GpakMuxモジュール](micropython/GpakMux.py){.listingtable .python from=86 #lst:gpakmux-module}
+[GpakMuxモジュール](micropython/GpakMux.py){.listingtable .python from=86 to=156 #lst:gpakmux-module}
 
 # MicroScpiDeviceモジュール
 
@@ -195,6 +201,6 @@ SCPIデバイスの定義クラスです。`mini_lexer()`がコマンド文字�
 
 # あとがき {-}
 
-- タルコフのワイプに間に合うように頑張って書きました。今回も前日印刷&trade;です
+- タルコフのワイプ・パッチ１３に間に合うように頑張って書きました。今回も前日印刷&trade;です（１２月２８日）
 - 本当はForgeFPGA試食本も書きたかったけどこっちの筆が進まんくて間に合わんかったすまん
 - ライブラリの設計はラズピコのメモリ量に頼っている部分があるので、ほかのMicroPythonなマイコンに移植できるかはやってみないとわかりません
