@@ -191,42 +191,10 @@ SCPIデバイスの定義クラスです。`mini_lexer()`がコマンド文字�
 
 [EMU2751Aクラス](micropython/EMU2751A.py){.listingtable .python from=78 #lst:emu2751a-class}
 
-::: rmnote
+# #include "extra_libs.md"
 
-# hd44780compatモジュール
-
-## BitFieldクラス
-
-[](micropython/hd44780compat.py){.listingtable .python from=1 to=10}
-
-## Registerクラス
-
-[](micropython/hd44780compat.py){.listingtable .python from=11 to=20}
-
-## HD44780Instructionsクラス
-
-[](micropython/hd44780compat.py){.listingtable .python from=21 to=30}
-
-# コード
-
-::: LANDSCAPE
-
-[GpakMuxモジュール全文](micropython/GpakMux.py){.listingtable .python}
-
-\newpage
-
-[MicroScpiDeviceモジュール全文](micropython/MicroScpiDevice.py){.listingtable .python}
-
-\newpage
-
-[EMU2751Aモジュール全文](micropython/EMU2751A.py){.listingtable .python}
-
-:::
-
-:::
-
-# あとがき
+# あとがき {-}
 
 - タルコフのワイプに間に合うように頑張って書きました。今回も前日印刷&trade;です
 - 本当はForgeFPGA試食本も書きたかったけどこっちの筆が進まんくて間に合わんかったすまん
-- ライブラリの設計はラズピコのメモリ量に頼っている部分があるので、ほかのMicroPythonなマイコンに移植できるかはやってみないとわかりません。
+- ライブラリの設計はラズピコのメモリ量に頼っている部分があるので、ほかのMicroPythonなマイコンに移植できるかはやってみないとわかりません
