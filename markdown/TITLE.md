@@ -146,7 +146,7 @@ length_matched = [
 
 スイッチマトリクスHATを操作するためのモジュールです。前回ラズパイ用に書いたものを移植しました。もっとうまい設計できそうだけど動くからヨシ！ってことで。
 
-[GpakMuxモジュール](micropython/GpakMux.py){.listingtable .python from=1 to=10 #lst:gpakmux-module}
+[GpakMuxモジュール](micropython/GpakMux.py){.listingtable .python from=86 #lst:gpakmux-module}
 
 # MicroScpiDeviceモジュール
 
