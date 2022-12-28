@@ -37,6 +37,9 @@ class ScpiCommand(namedtuple("ScpiCommand", ["keywords", "query", "callback"])):
     - `callback`: `function pointer`
     """
 
+    def match(self, candidate_cmd):
+        return all([keyword.match(kw_candidate) for keyword, kw_candidate in zip(self.keywords, candidate_cmd)])
+
 
 kw = ScpiKeyword("KEYWord", "KEYW")
 
@@ -82,7 +85,7 @@ class MicroScpiDevice:
         else:
             candidate_cmd[-1] = candidate_cmd[-1].strip("?")
             for command in length_matched:
-                if all([keyword.match(kw_candidate) for keyword, kw_candidate in zip(command.keywords, candidate_cmd)]):
+                if command.match(candidate_cmd):
                     command.callback(candidate_param, command.query)
                     break
             else:
