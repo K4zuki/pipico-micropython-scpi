@@ -119,7 +119,7 @@ U2751Aではわずか2種類ですが、一部コマンドはパラメータを�
 
 #### ３．要素数が合致するコマンドに候補を絞り込む（MicroScpiDevice.py） {-}
 
-[](micropython/MicroScpiDevice.py){.listingtable nocaption=true from=74 to=78 #lst:get-command-candidate .python}
+[](micropython/MicroScpiDevice.py){.listingtable nocaption=true from=77 to=82 #lst:get-command-candidate .python}
 
 `mini_lexer()`に返されたコマンド文字列のリストの要素数と一致する登録済コマンドを抽出します。コマンドがクエリかどうかは
 リストの最後の要素が"?"で終わっているかどうかで判定します。
@@ -130,21 +130,34 @@ U2751Aではわずか2種類ですが、一部コマンドはパラメータを�
 ``` .python
 length_matched = [
     ScpiCommand(keywords=(ScpiKeyword(long='ROUTe', short='ROUT'), ScpiKeyword(long='CLOSe', short='CLOS')),
-                query=False, callback= < bound_method >),
+                query=False, callback=cb_relay_close),
     ScpiCommand(keywords=(ScpiKeyword(long='ROUTe', short='ROUT'), ScpiKeyword(long='OPEN', short='OPEN')),
-                query=False, callback= < bound_method >)
+                query=False, callback=cb_relay_open)
 ]
 ```
 
+\newpage
+
 #### ４．すべてのコマンド文字列が一致した場合はコールバック関数を呼び出す（MicroScpiDevice.py） {-}
+
+[](micropython/MicroScpiDevice.py){.listingtable nocaption=true from=83 #lst:callback-when-all-matched .python}
+
+[](micropython/EMU2751A.py){.listingtable nocaption=true from=111 to=112 #lst:get-command-candidate .python}
 
 `length_matched`の各`ScpiCommand`アイテムについて`keywords`に登録された`ScpiKeyword`の全てにマッチするかを調べます。
 全てにマッチする最初の`ScpiCommand`アイテムに登録されたコールバック関数を呼び出します。一つもマッチがない場合はエラーになります。
 コールバック関数は引数にパラメタ文字列とクエリフラグを受け取ります。
 
-[](micropython/MicroScpiDevice.py){.listingtable nocaption=true from=80 #lst:callback-when-all-matched .python}
+#### ５．コールバック関数内でパラメタ文字列のパースやクエリに返答するなどを含む最終的な処理をする（EMU2751A.py） {-}
 
-#### コールバック関数内でパラメタ文字列のパースやクエリに返答するなどを含む最終的な処理をする（EMU2751A.py） {-}
+[](micropython/EMU2751A.py){.listingtable nocaption=true from=172 to=186 #lst:callback-function .python}
+
+`ROUTe:CLOSe`コマンドに割り当てられたコールバック関数`cb_relay_close()`を呼び出します。内部で`channel_parser()`を
+呼び出してパラメタ文字列をパースします。
+
+[](micropython/EMU2751A.py){.listingtable nocaption=true from=145 to=171 #lst:parse-parameter-string .python}
+
+`param`が文字列でない場合・文字列の先頭と末尾が期待どおりでない場合にはエラーになります。
 
 # GpakMuxモジュール
 
@@ -176,14 +189,14 @@ SCPIコマンドを構成するキーワードの定義クラスです。候補�
 
 SCPIコマンドの定義クラスです。`ScpiKeyword`のタプルとクエリコマンドを表すフラグ、マッチしたときのコールバック関数へのポインタを登録します。
 
-[ScpiCommandクラス](micropython/MicroScpiDevice.py){.listingtable .python from=33 to=39 #lst:scpicommand-class}
+[ScpiCommandクラス](micropython/MicroScpiDevice.py){.listingtable .python from=33 to=42 #lst:scpicommand-class}
 
 ## MicroScpiDeviceクラス
 
 SCPIデバイスの定義クラスです。`mini_lexer()`がコマンド文字列の分解処理、`parse_and_process()`がコマンドの走査とコールバック 関数の
 呼び出しを行います。
 
-[MicroScpiDeviceクラス](micropython/MicroScpiDevice.py){.listingtable .python from=44 to=94 #lst:microscpidevice-class}
+[MicroScpiDeviceクラス](micropython/MicroScpiDevice.py){.listingtable .python from=47 #lst:microscpidevice-class}
 
 # EMU2751Aモジュール
 
@@ -201,6 +214,6 @@ SCPIデバイスの定義クラスです。`mini_lexer()`がコマンド文字�
 
 # あとがき {-}
 
-- タルコフのワイプ・パッチ１３に間に合うように頑張って書きました。今回も前日印刷&trade;です（１２月２８日）
+- タルコフのワイプ・パッチ１３に間に合うように頑張って書きましたが、間に合いませんでした。今回も前日印刷&trade;です（１２月２９日）
 - 本当はForgeFPGA試食本も書きたかったけどこっちの筆が進まんくて間に合わんかったすまん
 - ライブラリの設計はラズピコのメモリ量に頼っている部分があるので、ほかのMicroPythonなマイコンに移植できるかはやってみないとわかりません
