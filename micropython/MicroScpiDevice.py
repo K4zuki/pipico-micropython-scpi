@@ -46,17 +46,13 @@ class MicroScpiDevice:
     commands_query = [(ScpiCommand((kw, kw), False, None),)]  # type: List[ScpiCommand]
 
     @staticmethod
-    def strip_semicolon(input_str: str):
-        out = input_str.split(";")[0]
-        return out
-
-    def mini_lexer(self, line: str):
+    def mini_lexer(line: str):
         """ Split `line` into tuple of (list of keywords) and a parameter string
 
         :param str line: candidate command string
         :return tuple: ([keywords], param)
         """
-        line = self.strip_semicolon(line)
+        line = line.split(";")[0]
         command = line
         param = None
 
