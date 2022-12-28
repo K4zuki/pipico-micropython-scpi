@@ -6,10 +6,11 @@
 
 この本は、「勝手にアプリケーションノート4」で設計製作したリレーマトリクスHATを応用し、既存のSCPIデバイス"U2751A"をエミュレートするまでを解説
 したドキュメントです。SCPIのふりをする部分はラズピコ(Raspberry Pi pico)が行います。ラズピコの開発はMicroPythonとPyCharmで行いました。
+ラズピコにこだわりはなく、USBシリアルコンバータと任意のUART持ちマイコンで実現可能だと思います。
 
 ここ2年ほどの半導体供給不安のせいで計測器類（すなわちSCPIデバイス）が入手難になったことがこの思いつきのきっかけです
-(Keysight/AgilentのU2751Aスイッチマトリクスを仕事で購入しましたが、納期が3ヶ月かかりました)。この機械と同様の機能をもち、なおかつ自作可能な
-入手性のよい
+(KeysightのU2751Aスイッチマトリクスを仕事で購入しましたが、納期が3ヶ月かかりました)。この機械と同様の機能をもち、なおかつ自作可能な
+入手性のよい装置が欲しくなったので、「なければ作る」の精神で作りました。
 
 エミュレートとは言っても、SCPI・IEEE488の厳密な準拠はしていません。たとえばセミコロンで数珠つなぎする部分などの実装はバッサリカットしましたし、
 エラーハンドリングもけっこう適当です。
@@ -68,30 +69,38 @@ SCPIコマンドでの操作も受け付けます。専用ソフト一式をイ�
 ::: {.table width=[0.4,0.4,0.2]}
 Table: U2751A固有コマンド実装ステータス {#tbl:u2751a-commands}
 
-| SCPI                            | Parameter             | Implemented  |
-|---------------------------------|-----------------------|:-------------|
-| `DIAGnostic:RELay:CYCLes?`      | None                  |              |
-| `DIAGnostic:RELay:CYCLes:CLEar` | None                  |              |
-| `ROUTe:CLOSe`                   | `(@101,102:105,201:)` | &check;      |
-| `ROUTe:CLOSe?`                  | `(@101,102:105,201:)` | &check;      |
-| `ROUTe:OPEN`                    | `(@101,102:105,201:)` | &check;      |
-| `ROUTe:OPEN?`                   | `(@101,102:105,201:)` | &check;      |
-| `SYSTem:CDEScription?`          | None                  |              |
-| `SYSTem:ERRor?`                 | None                  |              |
-| `SYSTem:VERSion?`               | None                  |              |
+| SCPI                            | Parameter             | Implemented |
+|---------------------------------|-----------------------|:------------|
+| `DIAGnostic:RELay:CYCLes?`      | None                  |             |
+| `DIAGnostic:RELay:CYCLes:CLEar` | None                  |             |
+| `ROUTe:CLOSe`                   | `(@101,102:105,201:)` | &check;     |
+| `ROUTe:CLOSe?`                  | `(@101,102:105,201:)` | &check;     |
+| `ROUTe:OPEN`                    | `(@101,102:105,201:)` | &check;     |
+| `ROUTe:OPEN?`                   | `(@101,102:105,201:)` | &check;     |
+| `SYSTem:CDEScription?`          | None                  |             |
+| `SYSTem:ERRor?`                 | None                  |             |
+| `SYSTem:VERSion?`               | None                  | &check;     |
 
 :::
 
 # アルゴリズムというか処理フロー (main.py)
 
-#### 標準入力で1行取り込んだあとセミコロンで区切り、最初の要素だけをパース処理に回す {-}
+SCPIコマンドを受け取ったあとの処理はだいたい以下のような感じです。ラズピコをUSBシリアルデバイスとしてPCに認識させます。UART0/1は使いません。
 
-`gets = sys.stdin.readline`としてエイリアスを宣言しておいて、`line = gets().strip()`で標準入力から1行取り込んだのち空白文字を切り落とします。
-`line`の文字列長が0より大きければパース処理に回します(`u2751a.parse_and_process(line)`)。
+"CANDDIDate:COMmand:STRing"
+
+#### １．標準入力で1行取り込んだあとセミコロンで区切り、最初の要素だけをパース処理に回す {-}
+
+[](micropython/main.py){.listingtable nocaption=true from=22 #lst:readline-parse }
+
+ファイルの先頭で`gets = sys.stdin.readline`としてエイリアスを宣言しておいて、無限ループ内の`line = gets().strip()`で
+標準入力から1行取り込んだのち空白文字を切り落とします。`line`の文字列長が0より大きければパース処理に回します。
 
 `parse_and_process`がさらに`mini_lexer()`を呼び出し、文字列の前処理を行います。
 
-#### パラメータ付きコマンドのことを考慮して空白で切り分ける（コマンドはさらにコロンで区切る） {-}
+#### ２．パラメータ付きコマンドのことを考慮して空白で切り分ける（コマンドはさらにコロンで区切る） {-}
+
+[](micropython/MicroScpiDevice.py){.listingtable nocaption=true from=48 to=65 #lst:split-command-parameter }
 
 U2751Aではわずか2種類ですが、一部コマンドはパラメータを受けることができます。コマンドとパラメータは空白で区分けされます。
 `mini_lexer()`がこの部分の処理を行います。最初の空白の直前までをコマンド文字列、残り全部をパラメータ文字列と考えます。
@@ -115,14 +124,16 @@ U2751Aではわずか2種類ですが、一部コマンドはパラメータを�
 
 # MicroScpiDeviceモジュール
 
-MicroScpiDeviceモジュールは今作の肝となるSCPIデバイスの挙動を大まかに定義したものです。
-キーワードおよびコマンド定義のためのヘルパークラス（`ScpiKeyword`、`ScpiCommand`）と、SCPIデバイスの基本的な動作を定義した`MicroScpiDevice`
+MicroScpiDeviceモジュールは今作の肝となるSCPIデバイスの挙動を定義したものです。
+キーワードおよびコマンド定義のためのヘルパークラス（`ScpiKeyword`、`ScpiCommand`）と、SCPIデバイスの共通動作を定義した`MicroScpiDevice`
 クラスの3部構成です。
 
 ## ScpiKeywordクラス
 
 SCPIコマンドを構成するキーワードの定義クラスです。候補文字列を検証してキーワード定義に一致すると`True`を返すクラス関数`match()`を持っています。
 引数`long`と`short`はそれぞれ完全表記（long form）と短縮表記（short form）に当たります。
+これらの定義が動作中に変わることはないので、`namedtuple`を継承しています。
+
 `match()`はこれら2つだけでなく、中間の表記も認めています。 たとえば`kw = ScpiKeyword(long="DEFault", short="DEF")`のとき、
 `DEF`/`DEFA`/`DEFAU`/`DEFAUL`/`DEFAULT`の全てにマッチします。
 関数内部で大文字に変換しているので、候補文字列の大文字小文字を区別しません。
@@ -137,17 +148,22 @@ SCPIコマンドの定義クラスです。`ScpiKeyword`のタプルとクエリ
 
 ## MicroScpiDeviceクラス
 
+SCPIデバイスの定義クラスです。`mini_lexer()`がコマンド文字列の分解処理、`parse_and_process()`がコマンドの走査とコールバック 関数の
+呼び出しを行います。
+
 [MicroScpiDeviceクラス](micropython/MicroScpiDevice.py){.listingtable .python from=44 to=94 #lst:microscpidevice-class}
 
 # EMU2751Aモジュール
 
 ## CrossBarsクラス
 
+スイッチマトリクスの接点データ管理クラスです。
+
 [CrossBarsクラス](micropython/EMU2751A.py){.listingtable .python from=33 to=76 #lst:crossbars-class}
 
 ## EMU2751Aクラス
 
-[EMU2751Aクラス](micropython/EMU2751A.py){.listingtable .python from=78 to=211 #lst:emu2751a-class}
+[EMU2751Aクラス](micropython/EMU2751A.py){.listingtable .python from=78 #lst:emu2751a-class}
 
 ::: rmnote
 
