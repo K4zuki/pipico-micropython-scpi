@@ -96,9 +96,11 @@ Table: U2751A固有SCPIコマンド実装ステータス {#tbl:u2751a-commands}
 SCPIコマンドを受け取ったあとの処理はだいたい以下のような感じです。例として、ホストから`ROUTe:CLOSe (@101:103)<CR><LF>`が送られてきた場合の
 処理を説明します。
 
+なお、処理途中でエラーが起きると残りの処理に移行することなく中断し、標準入力を待つ状態に戻ります。
+
 #### １．標準入力で1行取り込んだあとセミコロンで区切り、最初の要素だけをパース処理に回す (main.py) {-}
 
-[](micropython/main.py){.listingtable nocaption=true from=22 #lst:readline-parse .python}
+[](micropython/main.py){.listingtable from=22 #lst:readline-parse .python}
 
 ファイルの先頭で`gets = sys.stdin.readline`としてエイリアスを宣言しておいて、無限ループ内の`line = gets().strip()`で
 標準入力から1行取り込んだのち空白文字を切り落とします。`line`の文字列長が0より大きければパース処理に回します。
@@ -107,7 +109,7 @@ SCPIコマンドを受け取ったあとの処理はだいたい以下のよう�
 
 #### ２．パラメータ付きコマンドのことを考慮して空白とコロンで切り分ける（MicroScpiDevice.py） {-}
 
-[](micropython/MicroScpiDevice.py){.listingtable nocaption=true from=48 to=65 #lst:split-command-parameter .python}
+[](micropython/MicroScpiDevice.py){.listingtable from=48 to=65 #lst:split-command-parameter .python}
 
 U2751Aではわずか2種類ですが、一部コマンドはパラメータを受けることができます。コマンドとパラメータは空白で区分けされます。
 `mini_lexer()`がこの部分の処理を行います。最初の空白の直前までをコマンド文字列、残り全部をパラメータ文字列と考えます。
@@ -119,7 +121,7 @@ U2751Aではわずか2種類ですが、一部コマンドはパラメータを�
 
 #### ３．要素数が合致するコマンドに候補を絞り込む（MicroScpiDevice.py） {-}
 
-[](micropython/MicroScpiDevice.py){.listingtable nocaption=true from=77 to=82 #lst:get-command-candidate .python}
+[](micropython/MicroScpiDevice.py){.listingtable from=77 to=82 #lst:get-command-candidate .python}
 
 `mini_lexer()`に返されたコマンド文字列のリストの要素数と一致する登録済コマンドを抽出します。コマンドがクエリかどうかは
 リストの最後の要素が"?"で終わっているかどうかで判定します。
@@ -129,9 +131,13 @@ U2751Aではわずか2種類ですが、一部コマンドはパラメータを�
 
 ``` .python
 length_matched = [
-    ScpiCommand(keywords=(ScpiKeyword(long='ROUTe', short='ROUT'), ScpiKeyword(long='CLOSe', short='CLOS')),
+    ScpiCommand(keywords=(ScpiKeyword(long='ROUTe', short='ROUT'), 
+                          ScpiKeyword(long='CLOSe', short='CLOS')
+                          ),
                 query=False, callback=cb_relay_close),
-    ScpiCommand(keywords=(ScpiKeyword(long='ROUTe', short='ROUT'), ScpiKeyword(long='OPEN', short='OPEN')),
+    ScpiCommand(keywords=(ScpiKeyword(long='ROUTe', short='ROUT'),
+                          ScpiKeyword(long='OPEN', short='OPEN')
+                          ),
                 query=False, callback=cb_relay_open)
 ]
 ```
@@ -140,9 +146,9 @@ length_matched = [
 
 #### ４．すべてのコマンド文字列が一致した場合はコールバック関数を呼び出す（MicroScpiDevice.py） {-}
 
-[](micropython/MicroScpiDevice.py){.listingtable nocaption=true from=83 #lst:callback-when-all-matched .python}
+[](micropython/MicroScpiDevice.py){.listingtable from=83 #lst:callback-when-all-matched .python}
 
-[](micropython/EMU2751A.py){.listingtable nocaption=true from=111 to=112 #lst:get-command-candidate .python}
+[](micropython/EMU2751A.py){.listingtable from=111 to=112 #lst:get-command-candidate .python}
 
 `length_matched`の各`ScpiCommand`アイテムについて`keywords`に登録された`ScpiKeyword`の全てにマッチするかを調べます。
 全てにマッチする最初の`ScpiCommand`アイテムに登録されたコールバック関数を呼び出します。一つもマッチがない場合はエラーになります。
@@ -150,12 +156,12 @@ length_matched = [
 
 #### ５．コールバック関数内でパラメタ文字列のパースやクエリに返答するなどを含む最終的な処理をする（EMU2751A.py） {-}
 
-[](micropython/EMU2751A.py){.listingtable nocaption=true from=172 to=186 #lst:callback-function .python}
+[](micropython/EMU2751A.py){.listingtable from=172 to=186 #lst:callback-function .python}
 
 `ROUTe:CLOSe`コマンドに割り当てられたコールバック関数`cb_relay_close()`を呼び出します。内部で`channel_parser()`を
 呼び出してパラメタ文字列をパースします。
 
-[](micropython/EMU2751A.py){.listingtable nocaption=true from=145 to=171 #lst:parse-parameter-string .python}
+[](micropython/EMU2751A.py){.listingtable from=145 to=171 #lst:parse-parameter-string .python}
 
 `param`が文字列でない場合・文字列の先頭と末尾が期待どおりでない場合にはエラーになります。
 
@@ -189,24 +195,30 @@ SCPIコマンドを構成するキーワードの定義クラスです。候補�
 
 SCPIコマンドの定義クラスです。`ScpiKeyword`のタプルとクエリコマンドを表すフラグ、マッチしたときのコールバック関数へのポインタを登録します。
 
-[ScpiCommandクラス](micropython/MicroScpiDevice.py){.listingtable .python from=33 to=42 #lst:scpicommand-class}
+[ScpiCommandクラス](micropython/MicroScpiDevice.py){.listingtable .python from=33 to=47 #lst:scpicommand-class}
 
 ## MicroScpiDeviceクラス
 
-SCPIデバイスの定義クラスです。`mini_lexer()`がコマンド文字列の分解処理、`parse_and_process()`がコマンドの走査とコールバック 関数の
-呼び出しを行います。
+SCPIデバイスの定義クラスです。`mini_lexer()`がコマンド文字列の分解処理、`parse_and_process()`がコマンドの走査とコールバック関数の
+呼び出しを行います。「何もしない」コールバック関数として`cb_do_nothing()`を用意してあります。
 
-[MicroScpiDeviceクラス](micropython/MicroScpiDevice.py){.listingtable .python from=47 #lst:microscpidevice-class}
+[MicroScpiDeviceクラス](micropython/MicroScpiDevice.py){.listingtable .python from=52 #lst:microscpidevice-class}
 
 # EMU2751Aモジュール
 
 ## CrossBarsクラス
 
-スイッチマトリクスの接点データ管理クラスです。
+スイッチマトリクスの接点データ管理クラスです。接点の指定が単数のときは`single`に、複数のときは`start`または`end`および`range`に値が入ります。
+`update()`関数は、`single`/`start`/`end`/`range`を予め設定された最小値・最大値の範囲に丸めたCrossBarオブジェクトを返します。
+本来はエラーを出すべきですが。
 
 [CrossBarsクラス](micropython/EMU2751A.py){.listingtable .python from=33 to=76 #lst:crossbars-class}
 
 ## EMU2751Aクラス
+
+EMU2751AはMicroScpiDeviceを継承した、U2751Aエミュレーションのためのクラスです。U2751A固有のSCPIコマンドに応じたScpiCommandオブジェクトと
+コールバック関数を用意するのが主な役目です。はじめにキーワードを登録し（`kw_*`）、`__init__()`の中でScpiCommandオブジェクトを定義します。
+[@tbl:ieee488-commands]と[@tbl:u2751a-commands]で実装済みでないものは、コールバック関数に`cb_do_nothing()`を指定しています。
 
 [EMU2751Aクラス](micropython/EMU2751A.py){.listingtable .python from=78 #lst:emu2751a-class}
 
@@ -217,3 +229,4 @@ SCPIデバイスの定義クラスです。`mini_lexer()`がコマンド文字�
 - タルコフのワイプ・パッチ１３に間に合うように頑張って書きましたが、間に合いませんでした。今回も前日印刷&trade;です（１２月２９日）
 - 本当はForgeFPGA試食本も書きたかったけどこっちの筆が進まんくて間に合わんかったすまん
 - ライブラリの設計はラズピコのメモリ量に頼っている部分があるので、ほかのMicroPythonなマイコンに移植できるかはやってみないとわかりません
+- 
