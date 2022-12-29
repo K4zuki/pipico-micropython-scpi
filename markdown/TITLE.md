@@ -148,7 +148,7 @@ length_matched = [
 
 [](micropython/MicroScpiDevice.py){.listingtable from=83 #lst:callback-when-all-matched .python}
 
-[](micropython/EMU2751A.py){.listingtable from=111 to=112 #lst:get-command-candidate .python}
+[](micropython/EMU2751A.py){.listingtable from=111 to=112 #lst:callback-for-relay-controls .python}
 
 `length_matched`の各`ScpiCommand`アイテムについて`keywords`に登録された`ScpiKeyword`の全てにマッチするかを調べます。
 全てにマッチする最初の`ScpiCommand`アイテムに登録されたコールバック関数を呼び出します。一つもマッチがない場合はエラーになります。
