@@ -26,7 +26,7 @@ if sys.version_info > (3, 6, 0):
 import re
 from collections import namedtuple
 
-from MicroScpiDevice import ScpiKeyword, ScpiCommand, MicroScpiDevice
+from MicroScpiDevice import ScpiKeyword, ScpiCommand, MicroScpiDevice, cb_do_nothing
 from GpakMux import GpakMux
 
 
@@ -105,28 +105,28 @@ class EMU2751A(MicroScpiDevice):
         self.mux = mux  # type: GpakMux
         self.mux.disconnect_all()
 
-        diagnostic_relay_cycles = ScpiCommand((self.kw_diag, self.kw_relay, self.kw_cycles), True, self.cb_do_nothing)
+        diagnostic_relay_cycles = ScpiCommand((self.kw_diag, self.kw_relay, self.kw_cycles), True, cb_do_nothing)
         diagnostic_relay_cycles_clear = ScpiCommand((self.kw_diag, self.kw_relay, self.kw_cycles, self.kw_clear),
-                                                    False, self.cb_do_nothing)
+                                                    False, cb_do_nothing)
         route_close = ScpiCommand((self.kw_route, self.kw_close), False, self.cb_relay_close)
         route_open = ScpiCommand((self.kw_route, self.kw_open), False, self.cb_relay_open)
         route_close_q = ScpiCommand((self.kw_route, self.kw_close), True, self.cb_relay_close)
         route_open_q = ScpiCommand((self.kw_route, self.kw_open), True, self.cb_relay_open)
-        system_description = ScpiCommand((self.kw_system, self.kw_cdescription), False, self.cb_loopback)
-        system_error = ScpiCommand((self.kw_system, self.kw_error), False, self.cb_loopback)
+        system_description = ScpiCommand((self.kw_system, self.kw_cdescription), False, cb_do_nothing)
+        system_error = ScpiCommand((self.kw_system, self.kw_error), False, cb_do_nothing)
         system_version = ScpiCommand((self.kw_system, self.kw_version), False, self.cb_version)
-        cls = ScpiCommand((self.kw_cls,), False, self.cb_loopback)
-        ese = ScpiCommand((self.kw_ese,), False, self.cb_loopback)
-        opc = ScpiCommand((self.kw_opc,), False, self.cb_loopback)
-        rst = ScpiCommand((self.kw_rst,), False, self.cb_loopback)
-        sre = ScpiCommand((self.kw_sre,), False, self.cb_loopback)
-        ese_q = ScpiCommand((self.kw_ese,), True, self.cb_loopback)
-        esr_q = ScpiCommand((self.kw_esr,), True, self.cb_loopback)
+        cls = ScpiCommand((self.kw_cls,), False, cb_do_nothing)
+        ese = ScpiCommand((self.kw_ese,), False, cb_do_nothing)
+        opc = ScpiCommand((self.kw_opc,), False, cb_do_nothing)
+        rst = ScpiCommand((self.kw_rst,), False, cb_do_nothing)
+        sre = ScpiCommand((self.kw_sre,), False, cb_do_nothing)
+        ese_q = ScpiCommand((self.kw_ese,), True, cb_do_nothing)
+        esr_q = ScpiCommand((self.kw_esr,), True, cb_do_nothing)
         idn_q = ScpiCommand((self.kw_idn,), True, self.cb_idn)
-        opc_q = ScpiCommand((self.kw_opc,), True, self.cb_loopback)
-        sre_q = ScpiCommand((self.kw_sre,), True, self.cb_loopback)
-        stb_q = ScpiCommand((self.kw_stb,), True, self.cb_loopback)
-        tst_q = ScpiCommand((self.kw_tst,), True, self.cb_loopback)
+        opc_q = ScpiCommand((self.kw_opc,), True, cb_do_nothing)
+        sre_q = ScpiCommand((self.kw_sre,), True, cb_do_nothing)
+        stb_q = ScpiCommand((self.kw_stb,), True, cb_do_nothing)
+        tst_q = ScpiCommand((self.kw_tst,), True, cb_do_nothing)
 
         self.commands_write = [cls, ese, opc, rst, sre,
                                route_close, route_open,
@@ -135,10 +135,6 @@ class EMU2751A(MicroScpiDevice):
                                route_close_q, route_open_q,
                                diagnostic_relay_cycles,
                                system_description, system_error, system_version]
-
-    @staticmethod
-    def cb_do_nothing(self, param="", query=False):
-        return
 
     rstring = re.compile(r"((\d..)?:(\d..)?),?|(\d..),?")
 
@@ -200,13 +196,6 @@ class EMU2751A(MicroScpiDevice):
                 print("Open:", "?" if query is True else "-", crossbar.range)
             print("{}".format(",".join(stat)))
         return
-
-    @staticmethod
-    def cb_loopback(param="", query=False):
-        if param is not None:
-            print(str(param))
-        else:
-            print("no parameter given")
 
     @staticmethod
     def cb_idn(param="", query=False):
