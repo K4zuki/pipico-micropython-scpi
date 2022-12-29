@@ -30,6 +30,11 @@ class ScpiKeyword(namedtuple("ScpiKeyword", ["long", "short"])):
             return False
 
 
+def cb_do_nothing(param="", query=False):
+    """Abstract callback function for ScpiCommand class"""
+    pass
+
+
 class ScpiCommand(namedtuple("ScpiCommand", ["keywords", "query", "callback"])):
     """
     - `keywords`: list of `ScpiKeyword`
@@ -45,8 +50,8 @@ kw = ScpiKeyword("KEYWord", "KEYW")
 
 
 class MicroScpiDevice:
-    commands_write = [(ScpiCommand((kw, kw), False, None),)]  # type: List[ScpiCommand]
-    commands_query = [(ScpiCommand((kw, kw), False, None),)]  # type: List[ScpiCommand]
+    commands_write = [ScpiCommand((kw, kw), False, cb_do_nothing), ]  # type: List[ScpiCommand]
+    commands_query = [ScpiCommand((kw, kw), False, cb_do_nothing), ]  # type: List[ScpiCommand]
 
     @staticmethod
     def mini_lexer(line: str):
@@ -89,4 +94,5 @@ class MicroScpiDevice:
                     command.callback(candidate_param, command.query)
                     break
             else:
+                # When no break occurred - error
                 print("{}: command not found".format(':'.join(candidate_cmd)))
