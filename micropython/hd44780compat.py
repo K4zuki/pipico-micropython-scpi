@@ -2,10 +2,18 @@ from collections import namedtuple
 
 
 class BitField(namedtuple("BitField", ["name", "size", "offset", "por", "const"])):
+    """ Bit field definition class
+
+    - *str* ``name``: name of the field
+    - *int* ``size``: bit width
+    - *int* ``offset``: offset from LSB
+    - *int* ``por``: initial value of the field
+    - *bool* ``const``: set *True* when read only field, *False* if writable
+    """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.__val = self.por
+        self.val = self.por
 
     @property
     def val(self):
@@ -16,14 +24,14 @@ class BitField(namedtuple("BitField", ["name", "size", "offset", "por", "const"]
 
     @val.setter
     def val(self, value):
-        if self.const:
-            pass
-        else:
+        if not self.const:
             mask = (1 << self.size) - 1
             self.__val = value & mask
 
 
 class Register:
+    """Register definition base class"""
+
     size = 8
     __val = 0
 
