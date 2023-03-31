@@ -28,12 +28,16 @@ class ScpiKeyword(namedtuple("ScpiKeyword", ["long", "short", "opt"])):
         short = self.short.upper()
         long = self.long.upper()
         optionval = None
+        matched = False
         if isinstance(candidate, str):
             candidate = candidate.upper()
             if self.opt is not None:
-                candidate, optionval = re.search(rstring, candidate)
+                search = re.search(rstring, candidate)
+                if search is not None:
+                    candidate, optionval = search.groups()
 
             matched = candidate.startswith(short) and long.startswith(candidate)
+
             return ScpiMatch(matched, optionval)
         else:
             return ScpiMatch(False, optionval)
@@ -43,8 +47,9 @@ class ScpiMatch(namedtuple("ScpiMatch", ["match", "opt"])):
     pass
 
 
-def cb_do_nothing(param="", query=False, opt=None):
-    """Abstract callback function for ScpiCommand class"""
+def cb_do_nothing(*args, **kwargs):
+    """Abstract callback function for ScpiCommand class
+    """
     pass
 
 
@@ -76,8 +81,7 @@ kw = ScpiKeyword("KEYWord", "KEYW", None)
 
 
 class MicroScpiDevice:
-    commands_write = [ScpiCommand((kw, kw), False, cb_do_nothing), ]  # type: List[ScpiCommand]
-    commands_query = [ScpiCommand((kw, kw), False, cb_do_nothing), ]  # type: List[ScpiCommand]
+    commands = [ScpiCommand((kw, kw), False, cb_do_nothing), ]  # type: List[ScpiCommand]
 
     @staticmethod
     def mini_lexer(line: str):
@@ -86,15 +90,12 @@ class MicroScpiDevice:
         :param str line: candidate command string
         :return tuple: ([keywords], param)
         """
-        line = line.split(";")[0]
-        command = line
-        param = None
+        lexer_rstring = re.compile(r"^(([\w:?\*]+)\s?([\w.,]+)?);?")
 
-        if " " in line:
-            command = line.split()[0]  # type:str 
-            param = line.lstrip(command)
+        processed_line = lexer_rstring.search(line).groups()
+        line, command, param = processed_line
 
-        command = command.split(":")  # type: List[str]
+        command = command.split(":")
         return command, param
 
     def parse_and_process(self, line: str):
@@ -107,18 +108,17 @@ class MicroScpiDevice:
             return
         candidate_cmd, candidate_param = self.mini_lexer(line)
 
-        commands = self.commands_query if candidate_cmd[-1].endswith("?") else self.commands_write
+        commands = self.commands
 
         length_matched = [c for c in commands if len(c.keywords) == len(candidate_cmd)]  # type: List[ScpiCommand]
 
         if len(length_matched) == 0:
             print("{}: command not found".format(':'.join(candidate_cmd)))
         else:
-            candidate_cmd[-1] = candidate_cmd[-1].strip("?")
             for command in length_matched:
                 result = command.match(candidate_cmd)
                 if result.match is True:
-                    command.callback(candidate_param, command.query, result.opt)
+                    command.callback(candidate_param, result.opt)
                     break
             else:
                 # When no break occurred - error
