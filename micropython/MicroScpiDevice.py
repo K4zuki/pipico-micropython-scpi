@@ -1,14 +1,18 @@
 import sys
+import re
 
 if sys.version_info > (3, 6, 0):
     from typing import Tuple, List
 from collections import namedtuple
 
+rstring = re.compile(r"^(\D+)(\d+)$")
 
-class ScpiKeyword(namedtuple("ScpiKeyword", ["long", "short"])):
+
+class ScpiKeyword(namedtuple("ScpiKeyword", ["long", "short", "opt"])):
     """
     - long: `str`
     - short: `str`
+    - opt: `list(str)`
     - param_callback: `function`
     """
 
@@ -17,17 +21,23 @@ class ScpiKeyword(namedtuple("ScpiKeyword", ["long", "short"])):
 
     def match(self, candidate):
         """
-        :param str candidate:
+        :param str candidate: "XXX" or "XXX123" style string
         :return Boolean:
         """
         short = self.short.upper()
         long = self.long.upper()
+        optionval = None
         if isinstance(candidate, str):
             candidate = candidate.upper()
+            if self.opt is not None:
+                candidate, optionval = re.search(rstring, candidate)
 
             return candidate.startswith(short) and long.startswith(candidate)
         else:
             return False
+
+
+ScpiKeyword.__new__.__defaults__ = tuple([None] * 3)
 
 
 def cb_do_nothing(param="", query=False):
