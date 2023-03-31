@@ -37,9 +37,6 @@ class ScpiKeyword(namedtuple("ScpiKeyword", ["long", "short", "opt"])):
             return False
 
 
-ScpiKeyword.__new__.__defaults__ = tuple([None] * 3)
-
-
 def cb_do_nothing(param="", query=False):
     """Abstract callback function for ScpiCommand class"""
     pass
@@ -56,7 +53,7 @@ class ScpiCommand(namedtuple("ScpiCommand", ["keywords", "query", "callback"])):
         return all([keyword.match(kw_candidate) for keyword, kw_candidate in zip(self.keywords, candidate_cmd)])
 
 
-kw = ScpiKeyword("KEYWord", "KEYW")
+kw = ScpiKeyword("KEYWord", "KEYW", None)
 
 
 class MicroScpiDevice:
