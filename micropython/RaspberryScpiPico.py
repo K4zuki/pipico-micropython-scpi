@@ -34,62 +34,56 @@
 """
 import sys
 
-if sys.version_info > (3, 6, 0):
-    from typing import Tuple, List
-
-import re
-from collections import namedtuple
-
 import machine
 
 from MicroScpiDevice import ScpiKeyword, ScpiCommand, MicroScpiDevice, cb_do_nothing
-from GpakMux import GpakMux
+
+ABS_MAX_CLOCK = 275_000_000
+ABS_MIN_CLOCK = 100_000_000
 
 
 class RaspberryScpiPico(MicroScpiDevice):
-    kw_cls = ScpiKeyword("*CLS", "*CLS")
-    kw_ese = ScpiKeyword("*ESE", "*ESE")
-    kw_esr = ScpiKeyword("*ESR", "*ESR")
-    kw_idn = ScpiKeyword("*IDN", "*IDN")
-    kw_opc = ScpiKeyword("*OPC", "*OPC")
-    kw_rst = ScpiKeyword("*RST", "*RST")
-    kw_sre = ScpiKeyword("*SRE", "*SRE")
-    kw_stb = ScpiKeyword("*STB", "*STB")
-    kw_tst = ScpiKeyword("*TST", "*TST")
+    kw_cls = ScpiKeyword("*CLS", "*CLS", None)
+    kw_ese = ScpiKeyword("*ESE", "*ESE", None)
+    kw_esr = ScpiKeyword("*ESR", "*ESR", None)
+    kw_idn = ScpiKeyword("*IDN", "*IDN", None)
+    kw_opc = ScpiKeyword("*OPC", "*OPC", None)
+    kw_rst = ScpiKeyword("*RST", "*RST", None)
+    kw_sre = ScpiKeyword("*SRE", "*SRE", None)
+    kw_stb = ScpiKeyword("*STB", "*STB", None)
+    kw_tst = ScpiKeyword("*TST", "*TST", None)
 
-    kw_machine = ScpiKeyword("MACHINE", "MACHINE")
+    kw_machine = ScpiKeyword("MACHINE", "MACHINE", None)
     kw_pin = ScpiKeyword("PIN", "PIN", ["6", "7", "14", "15", "20", "21", "22"])
-    kw_pwm = ScpiKeyword("PWM", "PWM")
-    kw_duty = ScpiKeyword("DUTY", "DUTY")
-    kw_on = ScpiKeyword("ON", "ON")
-    kw_off = ScpiKeyword("OFF", "OFF")
-    kw_uart = ScpiKeyword("UART", "UART")
-    kw_baud = ScpiKeyword("BAUDrate", "BAUD")
-    kw_parity = ScpiKeyword("PARITY", "PARITY")
-    kw_width = ScpiKeyword("WIDTH", "WIDTH")
-    kw_start = ScpiKeyword("START", "START")
-    kw_stop = ScpiKeyword("STOP", "STOP")
+    kw_pwm = ScpiKeyword("PWM", "PWM", None)
+    kw_duty = ScpiKeyword("DUTY", "DUTY", None)
+    kw_on = ScpiKeyword("ON", "ON", None)
+    kw_off = ScpiKeyword("OFF", "OFF", None)
+    kw_uart = ScpiKeyword("UART", "UART", None)
+    kw_baud = ScpiKeyword("BAUDrate", "BAUD", None)
+    kw_parity = ScpiKeyword("PARITY", "PARITY", None)
+    kw_width = ScpiKeyword("WIDTH", "WIDTH", None)
+    kw_start = ScpiKeyword("START", "START", None)
+    kw_stop = ScpiKeyword("STOP", "STOP", None)
     kw_i2c = ScpiKeyword("I2C", "I2C", ["0", "1"])
-    kw_scan = ScpiKeyword("SCAN", "SCAN")
-    kw_addr = ScpiKeyword("ADDRess", "ADDR")
-    kw_bit = ScpiKeyword("BIT", "BIT")
-    kw_freq = ScpiKeyword("FREQuency", "FREQ")
+    kw_scan = ScpiKeyword("SCAN", "SCAN", None)
+    kw_addr = ScpiKeyword("ADDRess", "ADDR", None)
+    kw_bit = ScpiKeyword("BIT", "BIT", None)
+    kw_freq = ScpiKeyword("FREQuency", "FREQ", None)
     kw_spi = ScpiKeyword("SPI", "SPI", ["0", "1"])
-    kw_csel = ScpiKeyword("CSEL", "CS")
-    kw_mode = ScpiKeyword("MODE", "MODE")
-    kw_pol = ScpiKeyword("POLarity", "POL")
-    kw_xfer = ScpiKeyword("TRANSfer", "TRANS")
+    kw_csel = ScpiKeyword("CSEL", "CS", None)
+    kw_mode = ScpiKeyword("MODE", "MODE", None)
+    kw_pol = ScpiKeyword("POLarity", "POL", None)
+    kw_xfer = ScpiKeyword("TRANSfer", "TRANS", None)
     kw_adc = ScpiKeyword("ADC", "ADC", ["0", "1", "2"])
-    kw_high = ScpiKeyword("HIGH", "HIGH")
-    kw_low = ScpiKeyword("LOW", "LOW")
-    kw_write = ScpiKeyword("WRITE", "WRITE")
-    kw_read = ScpiKeyword("READ", "READ")
-    kw_value = ScpiKeyword("VALue", "VALue")
+    kw_high = ScpiKeyword("HIGH", "HIGH", None)
+    kw_low = ScpiKeyword("LOW", "LOW", None)
+    kw_write = ScpiKeyword("WRITE", "WRITE", None)
+    kw_read = ScpiKeyword("READ", "READ", None)
+    kw_value = ScpiKeyword("VALue", "VALue", None)
 
-    def __init__(self, mux):
+    def __init__(self):
         super().__init__()
-        self.mux = mux  # type: GpakMux
-        self.mux.disconnect_all()
 
         cls = ScpiCommand((self.kw_cls,), False, cb_do_nothing)
         ese = ScpiCommand((self.kw_ese,), False, cb_do_nothing)
@@ -104,7 +98,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         stb_q = ScpiCommand((self.kw_stb,), True, cb_do_nothing)
         tst_q = ScpiCommand((self.kw_tst,), True, cb_do_nothing)
 
-        machine_freq = ScpiCommand((self.kw_machine, self.kw_freq), False, cb_do_nothing)
+        machine_freq = ScpiCommand((self.kw_machine, self.kw_freq), False, self.cb_machine_freq)
 
         pin_mode = ScpiCommand((self.kw_pin, self.kw_mode), False, cb_do_nothing)
         pin_val = ScpiCommand((self.kw_pin, self.kw_value), False, cb_do_nothing)
@@ -122,7 +116,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         spi_mode = ScpiCommand((self.kw_spi, self.kw_mode), False, cb_do_nothing)
         spi_freq = ScpiCommand((self.kw_spi, self.kw_freq), False, cb_do_nothing)
 
-        machine_freq_q = ScpiCommand((self.kw_machine, self.kw_freq), True, cb_do_nothing)
+        machine_freq_q = ScpiCommand((self.kw_machine, self.kw_freq), True, self.cb_machine_freq)
 
         pin_mode_q = ScpiCommand((self.kw_pin, self.kw_mode), True, cb_do_nothing)
         pin_val_q = ScpiCommand((self.kw_pin, self.kw_value), True, cb_do_nothing)
@@ -169,3 +163,22 @@ class RaspberryScpiPico(MicroScpiDevice):
         the year of the version and “V” represents a version for that year (e.g. 1997.0).
         """
         print("2023.04")
+
+    @staticmethod
+    def cb_machine_freq(param="", query=False):
+        """
+
+        :return:
+        """
+
+        machine_freq = param
+
+        if query is True:
+            machine_freq = machine.freq()
+            print(f"{machine_freq}")
+        else:
+            assert machine_freq is not None
+            machine_freq = int(machine_freq)
+            assert ABS_MIN_CLOCK < machine_freq < ABS_MAX_CLOCK
+            assert isinstance(machine_freq, int)
+            machine.freq(machine_freq)
