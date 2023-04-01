@@ -35,8 +35,13 @@ class ScpiKeyword(namedtuple("ScpiKeyword", ["long", "short", "opt"])):
                 search = re.search(rstring, candidate)
                 if search is not None:
                     candidate, optionval = search.groups()
-
-            matched = candidate.startswith(short) and long.startswith(candidate)
+                if "?" in self.opt and optionval != "?":
+                    matched = candidate.startswith(short) and long.startswith(candidate)
+                else:
+                    matched = (str(optionval) in self.opt) and candidate.startswith(
+                        short) and long.startswith(candidate)
+            else:
+                matched = candidate.startswith(short) and long.startswith(candidate)
 
             return ScpiMatch(matched, optionval)
         else:
