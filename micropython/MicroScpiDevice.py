@@ -97,11 +97,15 @@ class MicroScpiDevice:
         """
         lexer_rstring = re.compile(r"^(([\w:?\*]+)\s?([\w.,]+)?);?")
 
-        processed_line = lexer_rstring.search(line).groups()
-        line, command, param = processed_line
+        search = lexer_rstring.search(line)
+        if search is not None:
+            processed_line = search.groups()
+            line, command, param = processed_line
 
-        command = command.split(":")
-        return command, param
+            command = command.split(":")
+            return command, param
+        else:
+            return "", ""
 
     def parse_and_process(self, line: str):
         """ Parse `line` and process if it is valid
