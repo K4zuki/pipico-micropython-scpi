@@ -99,7 +99,7 @@ class RaspberryScpiPico(MicroScpiDevice):
     kw_low = ScpiKeyword("LOW", "LOW", None)
     kw_write = ScpiKeyword("WRITE", "WRITE", None)
     kw_read = ScpiKeyword("READ", "READ", ["?"])
-    kw_value = ScpiKeyword("VALue", "VALue", ["?"])
+    kw_value = ScpiKeyword("VALue", "VAL", ["?"])
 
     def __init__(self):
         super().__init__()
@@ -116,13 +116,13 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         machine_freq = ScpiCommand((self.kw_machine, self.kw_freq), False, self.cb_machine_freq)
 
-        pin_mode = ScpiCommand((self.kw_pin, self.kw_mode), False, cb_do_nothing)
-        pin_val = ScpiCommand((self.kw_pin, self.kw_value), False, cb_do_nothing)
-        pin_on = ScpiCommand((self.kw_pin, self.kw_on), False, cb_do_nothing)
-        pin_off = ScpiCommand((self.kw_pin, self.kw_off), False, cb_do_nothing)
+        pin_mode = ScpiCommand((self.kw_pin, self.kw_mode), False, self.cb_pin_mode)
+        pin_val = ScpiCommand((self.kw_pin, self.kw_value), False, self.cb_pin_val)
+        pin_on = ScpiCommand((self.kw_pin, self.kw_on), False, self.cb_pin_on)
+        pin_off = ScpiCommand((self.kw_pin, self.kw_off), False, self.cb_pin_off)
 
-        pwm_freq = ScpiCommand((self.kw_pin, self.kw_pwm, self.kw_freq), False, cb_do_nothing)
-        pwm_duty = ScpiCommand((self.kw_pin, self.kw_pwm, self.kw_duty), False, cb_do_nothing)
+        pwm_freq = ScpiCommand((self.kw_pin, self.kw_pwm, self.kw_freq), False, self.cb_pin_pwm_freq)
+        pwm_duty = ScpiCommand((self.kw_pin, self.kw_pwm, self.kw_duty), False, self.cb_pin_pwm_duty)
 
         i2c_scan_q = ScpiCommand((self.kw_i2c, self.kw_scan), True, cb_do_nothing)
         i2c_freq = ScpiCommand((self.kw_i2c, self.kw_freq), False, cb_do_nothing)
@@ -166,8 +166,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         machine_freq = param
+        query = (opt[-1] == "?")
 
-        if opt[-1] == "?":
+        print("cb_machine_freq", param, opt)
+        if query:
             machine_freq = machine.freq()
             print(f"{machine_freq}")
         else:
@@ -176,3 +178,107 @@ class RaspberryScpiPico(MicroScpiDevice):
             assert ABS_MIN_CLOCK < machine_freq < ABS_MAX_CLOCK
             assert isinstance(machine_freq, int)
             machine.freq(machine_freq)
+
+    @staticmethod
+    def cb_pin_val(param="", opt=None):
+        """
+        - PIN[6|7|14|15|20|21|22]:VALue[?]
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        pin_number = opt[0]
+        query = (opt[-1] == "?")
+
+        if query:
+            print("cb_pin_val", pin_number, "Query", param)
+        else:
+            print("cb_pin_val", pin_number, param)
+
+    @staticmethod
+    def cb_pin_mode(param="", opt=None):
+        """
+        - PIN[6|7|14|15|20|21|22]:MODE[?]
+
+        :param param:
+        :param opt:
+        :return:
+        """
+        pin_number = opt[0]
+        query = (opt[-1] == "?")
+
+        if query:
+            print("cb_pin_mode", pin_number, "Query", param)
+        else:
+            print("cb_pin_mode", pin_number, param)
+
+    @staticmethod
+    def cb_pin_on(param="", opt=None):
+        """
+        - PIN[6|7|14|15|20|21|22]:ON
+        - PIN[6|7|14|15|20|21|22]:OFF
+
+        :param param:
+        :param opt:
+        :return:
+        """
+        pin_number = opt[0]
+        query = (opt[-1] == "?")
+
+        if query:
+            print("cb_pin_on", pin_number, "Query", param)
+        else:
+            print("cb_pin_on", pin_number, param)
+
+    @staticmethod
+    def cb_pin_off(param="", opt=None):
+        """
+        - PIN[6|7|14|15|20|21|22]:ON
+        - PIN[6|7|14|15|20|21|22]:OFF
+
+        :param param:
+        :param opt:
+        :return:
+        """
+        pin_number = opt[0]
+        query = (opt[-1] == "?")
+
+        if query:
+            print("cb_pin_off", pin_number, "Query", param)
+        else:
+            print("cb_pin_off", pin_number, param)
+
+    @staticmethod
+    def cb_pin_pwm_freq(param="", opt=None):
+        """
+        - PIN[6|7|14|15|20|21|22]:PWM:FREQuency[?] num
+
+        :param param:
+        :param opt:
+        :return:
+        """
+        pin_number = opt[0]
+        query = (opt[-1] == "?")
+
+        if query:
+            print("cb_pin_pwm_freq", pin_number, "Query", param)
+        else:
+            print("cb_pin_pwm_freq", pin_number, param)
+
+    @staticmethod
+    def cb_pin_pwm_duty(param="", opt=None):
+        """
+        - PIN[6|7|14|15|20|21|22]:PWM:DUTY[?] num
+
+        :param param:
+        :param opt:
+        :return:
+        """
+        pin_number = opt[0]
+        query = (opt[-1] == "?")
+
+        if query:
+            print("cb_pin_pwm_duty", pin_number, "Query", param)
+        else:
+            print("cb_pin_pwm_duty", pin_number, param)
