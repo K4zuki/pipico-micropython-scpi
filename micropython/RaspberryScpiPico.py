@@ -174,9 +174,9 @@ class RaspberryScpiPico(MicroScpiDevice):
             print(f"{machine_freq}")
         else:
             assert machine_freq is not None
-            machine_freq = int(machine_freq)
+            machine_freq = int(float(machine_freq))
             assert ABS_MIN_CLOCK < machine_freq < ABS_MAX_CLOCK
-            assert isinstance(machine_freq, int)
+            assert isinstance(machine_freq, (int, float))
             machine.freq(machine_freq)
 
     @staticmethod
