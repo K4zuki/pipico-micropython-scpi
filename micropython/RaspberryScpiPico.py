@@ -51,8 +51,8 @@ ABS_MAX_CLOCK = 275_000_000
 ABS_MIN_CLOCK = 100_000_000
 MAX_PWM_CLOCK = 100_000
 MIN_PWM_CLOCK = 1_000
-MAX_PWM_DUTY = 100_000
-MIN_PWM_DUTY = 100_000
+MAX_PWM_DUTY = 65536
+MIN_PWM_DUTY = 0
 
 uart0 = machine.UART(0, tx=machine.Pin(0), rx=machine.Pin(1))
 spi0 = machine.SPI(0, sck=machine.Pin(2), mosi=machine.Pin(3), miso=machine.Pin(4))
@@ -261,9 +261,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         :return:
         """
 
-        pin_number = opt[0]
-        pin = self.pins[int(pin_number)]
+        pin_number = int(opt[0])
+        pin = self.pins[pin_number]
         query = (opt[-1] == "?")
+        conf = self.pin_conf[pin_number]
 
         if query:
             print("cb_pin_val", pin_number, "Query", param)
@@ -271,12 +272,14 @@ class RaspberryScpiPico(MicroScpiDevice):
             print(val)
         elif param is not None:
             print("cb_pin_val", pin_number, int(param))
-            if int(param) in [0, 1]:
-                pin.value(int(param))
-            elif self.kw_on.match(param):
+            if int(param) == 1 or self.kw_on.match(param):
                 pin.on()
-            elif self.kw_off.match(param):
+                conf = PinConfig(machine.Pin.OUT, 1, conf.pull)
+                self.pin_conf[pin_number] = conf
+            elif int(param) == 0 or self.kw_off.match(param):
                 pin.off()
+                conf = PinConfig(machine.Pin.OUT, 0, conf.pull)
+                self.pin_conf[pin_number] = conf
             else:
                 print("syntax error: invalid value:", param)
         else:
@@ -290,10 +293,11 @@ class RaspberryScpiPico(MicroScpiDevice):
         :param opt:
         :return:
         """
-        pin_number = opt[0]
-        pin = self.pins[int(pin_number)]
+
+        pin_number = int(opt[0])
+        pin = self.pins[pin_number]
         query = (opt[-1] == "?")
-        conf = self.pin_conf[int(pin_number)]
+        conf = self.pin_conf[pin_number]
         mode = conf.mode
 
         if query:
@@ -307,7 +311,10 @@ class RaspberryScpiPico(MicroScpiDevice):
             elif self.kw_od.match(param):
                 mode = machine.Pin.OPEN_DRAIN
 
-            pin.init(mode=mode, value=conf.value, pull=conf.pull)
+            pin = machine.Pin(pin_number, mode)
+            self.pins[pin_number] = pin
+            self.pin_conf[pin_number] = PinConfig(mode, conf.value, conf.pull)
+            print(pin)
 
     def cb_pin_on(self, param="", opt=None):
         """
@@ -318,17 +325,17 @@ class RaspberryScpiPico(MicroScpiDevice):
         :param opt:
         :return:
         """
-        pin_number = opt[0]
-        pin = self.pins[int(pin_number)]
+        pin_number = int(opt[0])
+        pin = self.pins[pin_number]
         query = (opt[-1] == "?")
-        conf = self.pin_conf[int(pin_number)]
+        conf = self.pin_conf[pin_number]
 
         if query:
             print("cb_pin_on", pin_number, "Query", param)
         else:
             print("cb_pin_on", pin_number, param)
-            pin.init(mode=machine.Pin.OUT, value=1, pull=conf.pull)
-            self.pin_conf[int(pin_number)] = PinConfig(machine.Pin.OUT, 1, conf.pull)
+            self.pins[pin_number] = machine.Pin(pin_number, machine.Pin.OUT, 1)
+            self.pin_conf[pin_number] = PinConfig(machine.Pin.OUT, 1, conf.pull)
 
     def cb_pin_off(self, param="", opt=None):
         """
@@ -339,17 +346,17 @@ class RaspberryScpiPico(MicroScpiDevice):
         :param opt:
         :return:
         """
-        pin_number = opt[0]
-        pin = self.pins[int(pin_number)]
+        pin_number = int(opt[0])
+        pin = self.pins[pin_number]
         query = (opt[-1] == "?")
-        conf = self.pin_conf[int(pin_number)]
+        conf = self.pin_conf[pin_number]
 
         if query:
             print("cb_pin_off", pin_number, "Query", param)
         else:
             print("cb_pin_off", pin_number, param)
-            pin.init(mode=machine.Pin.OUT, value=0, pull=conf.pull)
-            self.pin_conf[int(pin_number)] = PinConfig(machine.Pin.OUT, 0, conf.pull)
+            self.pins[pin_number] = machine.Pin(pin_number, machine.Pin.OUT, 0)
+            self.pin_conf[pin_number] = PinConfig(machine.Pin.OUT, 0, conf.pull)
 
     def cb_pin_pwm_freq(self, param="", opt=None):
         """
@@ -359,15 +366,15 @@ class RaspberryScpiPico(MicroScpiDevice):
         :param opt:
         :return:
         """
-        pin_number = opt[0]
-        pin = self.pins[int(pin_number)]
-        conf = self.pwm_conf[int(pin_number)]
+        pin_number = int(opt[0])
+        pin = self.pins[pin_number]
+        conf = self.pwm_conf[pin_number]
         query = (opt[-1] == "?")
         pwm_freq = param
 
         if query:
             print("cb_pin_pwm_freq", pin_number, "Query", param)
-            pwm_freq = conf.freq()
+            pwm_freq = conf.freq
             print(f"{pwm_freq}")
         elif pwm_freq is not None:
             print("cb_pin_pwm_freq", pin_number, param)
@@ -375,9 +382,11 @@ class RaspberryScpiPico(MicroScpiDevice):
             pwm_freq = int(float(pwm_freq))
 
             if MIN_PWM_CLOCK <= pwm_freq <= MAX_PWM_CLOCK:
-                pwm = machine.PWM(pin, freq=conf.freq, duty_u16=conf.duty_u16)
-                pwm.freq(pwm_freq)
-                self.pwm_conf[int(pin_number)] = PwmConfig(pwm_freq, conf.duty_u16)
+                pwm = machine.PWM(pin)
+                pwm.freq(conf.freq)
+                pwm.duty_u16(conf.duty_u16)
+                print(pwm)
+                self.pwm_conf[pin_number] = PwmConfig(pwm_freq, conf.duty_u16)
             else:
                 print("syntax error: out of range")
         else:
@@ -391,15 +400,15 @@ class RaspberryScpiPico(MicroScpiDevice):
         :param opt:
         :return:
         """
-        pin_number = opt[0]
-        pin = self.pins[int(pin_number)]
-        conf = self.pwm_conf[int(pin_number)]
+        pin_number = int(opt[0])
+        pin = self.pins[pin_number]
+        conf = self.pwm_conf[pin_number]
         query = (opt[-1] == "?")
         pwm_duty = param
 
         if query:
             print("cb_pin_pwm_duty", pin_number, "Query", param)
-            pwm_duty = conf.duty_u16()
+            pwm_duty = conf.duty_u16
             print(f"{pwm_duty}")
         elif pwm_duty is not None:
             print("cb_pin_pwm_duty", pin_number, param)
@@ -407,9 +416,11 @@ class RaspberryScpiPico(MicroScpiDevice):
             pwm_duty = int(float(pwm_duty))
 
             if MIN_PWM_DUTY <= pwm_duty <= MAX_PWM_DUTY:
-                pwm = machine.PWM(pin, freq=conf.freq, duty_u16=conf.duty_u16)
-                pwm.duty_u16(pwm_duty)
-                self.pwm_conf[int(pin_number)] = PwmConfig(conf.freq, pwm_duty)
+                pwm = machine.PWM(pin)
+                pwm.freq(conf.freq)
+                pwm.duty_u16(conf.duty_u16)
+                print(pwm)
+                self.pwm_conf[pin_number] = PwmConfig(conf.freq, pwm_duty)
             else:
                 print("syntax error: out of range")
         else:
