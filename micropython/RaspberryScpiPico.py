@@ -53,6 +53,12 @@ MAX_PWM_CLOCK = 100_000
 MIN_PWM_CLOCK = 1_000
 MAX_PWM_DUTY = 65536
 MIN_PWM_DUTY = 0
+MAX_I2C_CLOCK = 400_000
+MIN_I2C_CLOCK = 10_000
+MAX_SPI_CLOCK = 10_000_000
+MIN_SPI_CLOCK = 10_000
+MAX_UART_BAUD = 500_000
+MIN_UART_BAUD = 300
 
 uart0 = machine.UART(0, tx=machine.Pin(0), rx=machine.Pin(1))
 spi0 = machine.SPI(0, sck=machine.Pin(2), mosi=machine.Pin(3), miso=machine.Pin(4))
@@ -87,6 +93,13 @@ class PwmConfig(namedtuple("PwmConfig", ["freq", "duty_u16"])):
     """
     :int freq: frequency
     :int duty_u16: duty
+    """
+
+
+class I2cConfig(namedtuple("I2cConfig", ["freq", "bit"])):
+    """
+    :int freq: frequency
+    :int bit: addres bit
     """
 
 
@@ -148,6 +161,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         22: pin22,
         25: pin25
     }
+    i2c = {
+        0: i2c0,
+        1: i2c1
+    }
     pin_conf = {
         6: PinConfig(machine.Pin.IN, 0, machine.Pin.PULL_DOWN),
         7: PinConfig(machine.Pin.IN, 0, machine.Pin.PULL_DOWN),
@@ -167,6 +184,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         21: PwmConfig(1000, 32768),
         22: PwmConfig(1000, 32768),
         25: PwmConfig(1000, 32768)
+    }
+    i2c_conf = {
+        0: I2cConfig(100_000, 8),
+        1: I2cConfig(100_000, 8)
     }
 
     def __init__(self):
@@ -197,11 +218,11 @@ class RaspberryScpiPico(MicroScpiDevice):
         led_pwm_freq = ScpiCommand((self.kw_led, self.kw_pwm, self.kw_freq), False, self.cb_led_pwm_freq)
         led_pwm_duty = ScpiCommand((self.kw_led, self.kw_pwm, self.kw_duty), False, self.cb_led_pwm_duty)
 
-        i2c_scan_q = ScpiCommand((self.kw_i2c, self.kw_scan), True, cb_do_nothing)
-        i2c_freq = ScpiCommand((self.kw_i2c, self.kw_freq), False, cb_do_nothing)
-        i2c_abit = ScpiCommand((self.kw_i2c, self.kw_addr, self.kw_bit), False, cb_do_nothing)
-        i2c_write = ScpiCommand((self.kw_i2c, self.kw_write), False, cb_do_nothing)
-        i2c_read_q = ScpiCommand((self.kw_i2c, self.kw_read), True, cb_do_nothing)
+        i2c_scan_q = ScpiCommand((self.kw_i2c, self.kw_scan), True, self.cb_i2c_scan)
+        i2c_freq = ScpiCommand((self.kw_i2c, self.kw_freq), False, self.cb_i2c_freq)
+        i2c_abit = ScpiCommand((self.kw_i2c, self.kw_addr, self.kw_bit), False, self.cb_i2c_address_bit)
+        i2c_write = ScpiCommand((self.kw_i2c, self.kw_write), False, self.cb_i2c_write)
+        i2c_read_q = ScpiCommand((self.kw_i2c, self.kw_read), True, self.cb_i2c_read)
 
         spi_cpol = ScpiCommand((self.kw_spi, self.kw_csel, self.kw_pol), False, cb_do_nothing)
         spi_mode = ScpiCommand((self.kw_spi, self.kw_mode), False, cb_do_nothing)
@@ -525,3 +546,125 @@ class RaspberryScpiPico(MicroScpiDevice):
             print("syntax error: no parameter")
 
         self.cb_pin_pwm_duty(param, opt)
+
+    def cb_i2c_scan(self, param, opt):
+        """
+        - I2C:BUS[01]:SCAN?
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        query = (opt[-1] == "?")
+        bus_number = int(opt[1])
+        bus = self.i2c[bus_number]
+        conf = self.i2c_conf[bus_number]
+        shift = conf.bit
+        scanned = []
+
+        if query:
+            print("cb_i2c_scan", "Query", param)
+            scanned = bus.scan()
+            if scanned is None:
+                print(0)
+            else:
+                print([s << shift for s in scanned])
+        else:
+            print("syntax error: query only")
+
+    def cb_i2c_freq(self, param, opt):
+        """
+        - I2C:BUS[01]:FREQuency[?] num
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        query = (opt[-1] == "?")
+        bus_number = int(opt[1])
+        bus = self.i2c[bus_number]
+        bus_freq = param
+        conf = self.i2c_conf[bus_number]
+
+        if query:
+            print("cb_i2c_freq", bus_number, "Query", param)
+
+            bus_freq = conf.freq
+            print(f"{bus_freq}")
+        elif bus_freq is not None:
+            print("cb_i2c_freq", bus_number, param)
+
+            bus_freq = int(float(bus_freq))
+
+            if MIN_I2C_CLOCK <= bus_freq <= MAX_I2C_CLOCK:
+                bus.init(freq=conf.freq)
+                print(bus)
+                self.i2c[bus_number] = bus
+                self.i2c_conf[bus_number] = I2cConfig(bus_freq, conf.bit)
+            else:
+                print("syntax error: out of range")
+        else:
+            print("syntax error: no parameter")
+
+    def cb_i2c_address_bit(self, param, opt):
+        """
+        - I2C:BUS[01]:ADDRess:BIT[?] 0/1
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        query = (opt[-1] == "?")
+        bus_number = int(opt[1])
+        bus = self.i2c[bus_number]
+        bit = param
+        conf = self.i2c_conf[bus_number]
+
+        if query:
+            print("cb_i2c_address_bit", "Query", param)
+
+            bit = conf.bit
+            print(f"{bit}")
+        elif bit is not None:
+            print("cb_i2c_address_bit", param)
+        else:
+            print("syntax error: no parameter")
+
+    def cb_i2c_write(self, param, opt):
+        """
+        - I2C:BUS[01]:WRITE data,repeated
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        query = (opt[-1] == "?")
+
+        if query:
+            print("cb_i2c_write", "Query", param)
+        elif param is not None:
+            print("cb_i2c_write", param)
+        else:
+            print("syntax error: no parameter")
+
+    def cb_i2c_read(self, param, opt):
+        """
+        - I2C:BUS[01]:READ? address,length,repeated
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        query = (opt[-1] == "?")
+
+        if query:
+            print("cb_i2c_read", "Query", param)
+        elif param is not None:
+            print("cb_i2c_read", param)
+        else:
+            print("syntax error: no parameter")
