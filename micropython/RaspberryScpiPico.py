@@ -104,16 +104,6 @@ class I2cConfig(namedtuple("I2cConfig", ["freq", "bit"])):
 
 
 class RaspberryScpiPico(MicroScpiDevice):
-    kw_cls = ScpiKeyword("*CLS", "*CLS", None)
-    kw_ese = ScpiKeyword("*ESE", "*ESE", ["?"])
-    kw_esr = ScpiKeyword("*ESR", "*ESR", ["?"])
-    kw_idn = ScpiKeyword("*IDN", "*IDN", ["?"])
-    kw_opc = ScpiKeyword("*OPC", "*OPC", ["?"])
-    kw_rst = ScpiKeyword("*RST", "*RST", ["?"])
-    kw_sre = ScpiKeyword("*SRE", "*SRE", ["?"])
-    kw_stb = ScpiKeyword("*STB", "*STB", ["?"])
-    kw_tst = ScpiKeyword("*TST", "*TST", ["?"])
-
     kw_machine = ScpiKeyword("MACHINE", "MACHINE", None)
     kw_pin = ScpiKeyword("PIN", "PIN", ["6", "7", "14", "15", "20", "21", "22"])
     kw_in = ScpiKeyword("INput", "IN", None)

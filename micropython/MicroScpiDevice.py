@@ -86,6 +86,15 @@ kw = ScpiKeyword("KEYWord", "KEYW", None)
 
 
 class MicroScpiDevice:
+    kw_cls = ScpiKeyword("*CLS", "*CLS", None)
+    kw_ese = ScpiKeyword("*ESE", "*ESE", ["?"])
+    kw_esr = ScpiKeyword("*ESR", "*ESR", ["?"])
+    kw_idn = ScpiKeyword("*IDN", "*IDN", ["?"])
+    kw_opc = ScpiKeyword("*OPC", "*OPC", ["?"])
+    kw_rst = ScpiKeyword("*RST", "*RST", None)
+    kw_sre = ScpiKeyword("*SRE", "*SRE", ["?"])
+    kw_stb = ScpiKeyword("*STB", "*STB", ["?"])
+    kw_tst = ScpiKeyword("*TST", "*TST", ["?"])
     commands = [ScpiCommand((kw, kw), False, cb_do_nothing), ]  # type: List[ScpiCommand]
 
     @staticmethod
