@@ -557,15 +557,14 @@ class RaspberryScpiPico(MicroScpiDevice):
         bus = self.i2c[bus_number]
         conf = self.i2c_conf[bus_number]
         shift = conf.bit
-        scanned = []
 
         if query:
             print("cb_i2c_scan", "Query", param)
             scanned = bus.scan()
-            if scanned is None:
-                print(0)
+            if not scanned:
+                print("0")
             else:
-                print("".join([s << shift for s in scanned]))
+                print(",".join([s << shift for s in scanned]))
         else:
             print("syntax error: query only")
 
@@ -648,6 +647,9 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         query = (opt[-1] == "?")
         bus_number = int(opt[0])
+        bus = self.i2c[bus_number]
+        conf = self.i2c_conf[bus_number]
+        shift = conf.bit
 
         if query:
             print("cb_i2c_write", "Query", param)
@@ -666,6 +668,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        bus_number = int(opt[0])
+        bus = self.i2c[bus_number]
+        conf = self.i2c_conf[bus_number]
+        shift = conf.bit
 
         if query:
             print("cb_i2c_read", "Query", param)
