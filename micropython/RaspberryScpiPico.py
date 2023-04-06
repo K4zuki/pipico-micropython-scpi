@@ -27,16 +27,16 @@
 - LED:PWM:FREQuency[?] num
 - LED:PWM:DUTY[?] num
 
-- I2C:BUS[01]:SCAN?
-- I2C:BUS[01]:FREQuency[?] num
-- I2C:BUS[01]:ADDRess:BIT[?] 0/1
-- I2C:BUS[01]:WRITE data,repeated
-- I2C:BUS[01]:READ? address,length,repeated
+- I2C[01]:SCAN?
+- I2C[01]:FREQuency[?] num
+- I2C[01]:ADDRess:BIT[?] 0/1
+- I2C[01]:WRITE data,repeated
+- I2C[01]:READ? address,length,repeated
 
-- SPI:BUS[01]:CSEL:POLarity[?] 0/1
-- SPI:BUS[01]:MODE[?] 0/1/2/3
-- SPI:BUS[01]:FREQuency[?] num
-- SPI:BUS[01]:TRANSfer length
+- SPI[01]:CSEL:POLarity[?] 0/1
+- SPI[01]:MODE[?] 0/1/2/3
+- SPI[01]:FREQuency[?] num
+- SPI[01]:TRANSfer length
 
 - ADC[012]:READ?
 
@@ -186,8 +186,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         25: PwmConfig(1000, 32768)
     }
     i2c_conf = {
-        0: I2cConfig(100_000, 8),
-        1: I2cConfig(100_000, 8)
+        0: I2cConfig(100_000, 1),
+        1: I2cConfig(100_000, 1)
     }
 
     def __init__(self):
@@ -549,7 +549,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_i2c_scan(self, param, opt):
         """
-        - I2C:BUS[01]:SCAN?
+        - I2C[01]:SCAN?
 
         :param param:
         :param opt:
@@ -557,7 +557,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
-        bus_number = int(opt[1])
+        bus_number = int(opt[0])
         bus = self.i2c[bus_number]
         conf = self.i2c_conf[bus_number]
         shift = conf.bit
@@ -569,13 +569,13 @@ class RaspberryScpiPico(MicroScpiDevice):
             if scanned is None:
                 print(0)
             else:
-                print([s << shift for s in scanned])
+                print("".join([s << shift for s in scanned]))
         else:
             print("syntax error: query only")
 
     def cb_i2c_freq(self, param, opt):
         """
-        - I2C:BUS[01]:FREQuency[?] num
+        - I2Cpin_number[01]:FREQuency[?] num
 
         :param param:
         :param opt:
@@ -583,7 +583,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
-        bus_number = int(opt[1])
+        bus_number = int(opt[0])
         bus = self.i2c[bus_number]
         bus_freq = param
         conf = self.i2c_conf[bus_number]
@@ -610,7 +610,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_i2c_address_bit(self, param, opt):
         """
-        - I2C:BUS[01]:ADDRess:BIT[?] 0/1
+        - I2Cpin_number[01]:ADDRess:BIT[?] 0/1
 
         :param param:
         :param opt:
@@ -618,7 +618,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
-        bus_number = int(opt[1])
+        bus_number = int(opt[0])
         bus = self.i2c[bus_number]
         bit = param
         conf = self.i2c_conf[bus_number]
@@ -635,7 +635,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_i2c_write(self, param, opt):
         """
-        - I2C:BUS[01]:WRITE data,repeated
+        - I2Cpin_number[01]:WRITE data,repeated
 
         :param param:
         :param opt:
@@ -643,6 +643,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        bus_number = int(opt[0])
 
         if query:
             print("cb_i2c_write", "Query", param)
@@ -653,7 +654,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_i2c_read(self, param, opt):
         """
-        - I2C:BUS[01]:READ? address,length,repeated
+        - I2C[01]:READ? address,length,repeated
 
         :param param:
         :param opt:
