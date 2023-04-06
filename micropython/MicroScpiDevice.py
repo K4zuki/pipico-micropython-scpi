@@ -5,7 +5,7 @@ if sys.version_info > (3, 6, 0):
     from typing import Tuple, List
 from collections import namedtuple
 
-rstring = re.compile(r"^(\D+)(\d+|\?)$")
+rstring = re.compile(r"^(\w+)(\d+|\?)$")
 
 
 class ScpiKeyword(namedtuple("ScpiKeyword", ["long", "short", "opt"])):
