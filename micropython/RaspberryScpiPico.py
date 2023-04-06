@@ -165,6 +165,11 @@ class RaspberryScpiPico(MicroScpiDevice):
         0: i2c0,
         1: i2c1
     }
+    adc = {
+        0: adc0,
+        1: adc1,
+        2: adc2
+    }
     pin_conf = {
         6: PinConfig(machine.Pin.IN, 0, machine.Pin.PULL_DOWN),
         7: PinConfig(machine.Pin.IN, 0, machine.Pin.PULL_DOWN),
@@ -228,7 +233,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         spi_mode = ScpiCommand((self.kw_spi, self.kw_mode), False, cb_do_nothing)
         spi_freq = ScpiCommand((self.kw_spi, self.kw_freq), False, cb_do_nothing)
 
-        adc_read_q = ScpiCommand((self.kw_adc, self.kw_read), True, cb_do_nothing)
+        adc_read = ScpiCommand((self.kw_adc, self.kw_read), True, self.cb_adc_read)
 
         self.commands = [cls, ese, opc, rst, sre, esr_q, idn_q, stb_q, tst_q,
                          machine_freq,
@@ -236,7 +241,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                          led_val, led_on, led_off, led_pwm_freq, led_pwm_duty,
                          i2c_scan_q, i2c_freq, i2c_abit, i2c_write, i2c_read_q,
                          spi_cpol, spi_mode, spi_freq,
-                         adc_read_q,
+                         adc_read,
                          ]
 
     @staticmethod
@@ -669,3 +674,23 @@ class RaspberryScpiPico(MicroScpiDevice):
             print("cb_i2c_read", param)
         else:
             print("syntax error: no parameter")
+
+    def cb_adc_read(self, param, opt):
+        """
+        - ADC[012]:READ?
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        query = (opt[-1] == "?")
+        adc_ch = int(opt[0])
+        adc = self.adc[adc_ch]
+
+        if query:
+            print("cb_adc_read", "Query", param)
+            value = adc.read_u16()
+            print(f"{value}")  # decimal
+        else:
+            print("syntax error: query only")
