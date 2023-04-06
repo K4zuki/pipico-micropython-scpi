@@ -29,7 +29,7 @@
 
 - I2C[01]:SCAN?
 - I2C[01]:FREQuency[?] num
-- I2C[01]:ADDRess:BIT[?] 0/1
+- I2C[01]:ADDRess:BIT[?] 0|1|DEFault
 - I2C[01]:WRITE data,repeated
 - I2C[01]:READ? address,length,repeated
 
@@ -149,6 +149,7 @@ class RaspberryScpiPico(MicroScpiDevice):
     kw_write = ScpiKeyword("WRITE", "WRITE", None)
     kw_read = ScpiKeyword("READ", "READ", ["?"])
     kw_value = ScpiKeyword("VALue", "VAL", ["?"])
+    kw_def = ScpiKeyword("DEFault", "DEF", None)
 
     "PIN[6|7|14|15|20|21|22|25"
     pins = {
@@ -580,7 +581,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_i2c_freq(self, param, opt):
         """
-        - I2Cpin_number[01]:FREQuency[?] num
+        - I2C[01]:FREQuency[?] num
 
         :param param:
         :param opt:
@@ -615,7 +616,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_i2c_address_bit(self, param, opt):
         """
-        - I2Cpin_number[01]:ADDRess:BIT[?] 0/1
+        - I2C[01]:ADDRess:BIT[?] 0|1|DEFault
 
         :param param:
         :param opt:
@@ -635,12 +636,20 @@ class RaspberryScpiPico(MicroScpiDevice):
             print(f"{bit}")
         elif bit is not None:
             print("cb_i2c_address_bit", param)
+            if int(param) in [0, 1]:
+                conf = I2cConfig(conf.freq, int(param))
+                self.i2c_conf[bus_number] = conf
+            elif self.kw_def.match(param):
+                conf = I2cConfig(conf.freq, 1)
+                self.i2c_conf[bus_number] = conf
+            else:
+                print("syntax error: invalid value:", param)
         else:
             print("syntax error: no parameter")
 
     def cb_i2c_write(self, param, opt):
         """
-        - I2Cpin_number[01]:WRITE data,repeated
+        - I2C[01]:WRITE data,repeated
 
         :param param:
         :param opt:
