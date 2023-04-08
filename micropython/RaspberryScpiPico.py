@@ -30,18 +30,21 @@
 - I2C[01]:SCAN?
 - I2C[01]:FREQuency[?] num
 - I2C[01]:ADDRess:BIT[?] 0|1|DEFault
-- I2C[01]:WRITE data,repeated
-- I2C[01]:READ? address,length,repeated
+- I2C[01]:WRITE address,buffer,stop
+- I2C[01]:READ? address,length,stop
+- I2C[01]:MEMory:WRITE address,memaddress,buffer,addrsize
+- I2C[01]:MEMory:READ? address,memaddress,nbytes,addrsize
 
 - SPI[01]:CSEL:POLarity[?] 0/1
 - SPI[01]:MODE[?] 0/1/2/3
 - SPI[01]:FREQuency[?] num
-- SPI[01]:TRANSfer length
+- SPI[01]:TRANSfer length,data
 
-- ADC[012]:READ?
+- ADC[0123]:READ?
 
 """
 import sys
+import re
 
 import machine
 from collections import namedtuple
@@ -79,6 +82,7 @@ pin25 = machine.Pin(25, machine.Pin.OUT, value=0)
 adc0 = machine.ADC(machine.Pin(26))
 adc1 = machine.ADC(machine.Pin(27))
 adc2 = machine.ADC(machine.Pin(28))
+adc3 = machine.ADC(machine.Pin(29))
 
 
 class PinConfig(namedtuple("PinConfig", ["mode", "value", "pull"])):
@@ -127,13 +131,14 @@ class RaspberryScpiPico(MicroScpiDevice):
     kw_scan = ScpiKeyword("SCAN", "SCAN", ["?"])
     kw_addr = ScpiKeyword("ADDRess", "ADDR", None)
     kw_bit = ScpiKeyword("BIT", "BIT", ["?"])
+    kw_memory = ScpiKeyword("MEMory", "MEM", None)
     kw_freq = ScpiKeyword("FREQuency", "FREQ", ["?"])
     kw_spi = ScpiKeyword("SPI", "SPI", ["0", "1"])
     kw_csel = ScpiKeyword("CSEL", "CS", None)
     kw_mode = ScpiKeyword("MODE", "MODE", ["?"])
     kw_pol = ScpiKeyword("POLarity", "POL", ["?"])
     kw_xfer = ScpiKeyword("TRANSfer", "TRANS", None)
-    kw_adc = ScpiKeyword("ADC", "ADC", ["0", "1", "2"])
+    kw_adc = ScpiKeyword("ADC", "ADC", ["0", "1", "2", "3"])
     kw_high = ScpiKeyword("HIGH", "HIGH", None)
     kw_low = ScpiKeyword("LOW", "LOW", None)
     kw_write = ScpiKeyword("WRITE", "WRITE", None)
@@ -159,7 +164,8 @@ class RaspberryScpiPico(MicroScpiDevice):
     adc = {
         0: adc0,
         1: adc1,
-        2: adc2
+        2: adc2,
+        3: adc3
     }
     pin_conf = {
         6: PinConfig(machine.Pin.IN, 0, machine.Pin.PULL_DOWN),
@@ -219,6 +225,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         i2c_abit = ScpiCommand((self.kw_i2c, self.kw_addr, self.kw_bit), False, self.cb_i2c_address_bit)
         i2c_write = ScpiCommand((self.kw_i2c, self.kw_write), False, self.cb_i2c_write)
         i2c_read_q = ScpiCommand((self.kw_i2c, self.kw_read), True, self.cb_i2c_read)
+        i2c_write_memory = ScpiCommand((self.kw_i2c, self.kw_write, self.kw_memory), False, self.cb_i2c_write_memory)
+        i2c_read_memory = ScpiCommand((self.kw_i2c, self.kw_read, self.kw_memory), True, self.cb_i2c_read_memory)
 
         spi_cpol = ScpiCommand((self.kw_spi, self.kw_csel, self.kw_pol), False, cb_do_nothing)
         spi_mode = ScpiCommand((self.kw_spi, self.kw_mode), False, cb_do_nothing)
@@ -231,6 +239,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                          pin_mode, pin_val, pin_on, pin_off, pin_pwm_freq, pin_pwm_duty,
                          led_val, led_on, led_off, led_pwm_freq, led_pwm_duty,
                          i2c_scan_q, i2c_freq, i2c_abit, i2c_write, i2c_read_q,
+                         i2c_write_memory, i2c_read_memory,
                          spi_cpol, spi_mode, spi_freq,
                          adc_read,
                          ]
@@ -626,11 +635,9 @@ class RaspberryScpiPico(MicroScpiDevice):
         elif bit is not None:
             print("cb_i2c_address_bit", param)
             if int(param) in [0, 1]:
-                conf = I2cConfig(conf.freq, int(param))
-                self.i2c_conf[bus_number] = conf
+                self.i2c_conf[bus_number] = I2cConfig(conf.freq, int(param))
             elif self.kw_def.match(param):
-                conf = I2cConfig(conf.freq, 1)
-                self.i2c_conf[bus_number] = conf
+                self.i2c_conf[bus_number] = I2cConfig(conf.freq, 1)
             else:
                 print("syntax error: invalid value:", param)
         else:
@@ -638,7 +645,11 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_i2c_write(self, param, opt):
         """
-        - I2C[01]:WRITE data,repeated
+        - I2C[01]:WRITE address,buffer,stop
+
+        address: 01-ff
+        buffer: data
+        stop: 0|1
 
         :param param:
         :param opt:
@@ -660,7 +671,11 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_i2c_read(self, param, opt):
         """
-        - I2C[01]:READ? address,length,repeated
+        - I2C[01]:READ? address,length,stop
+
+        address: 01-ff
+        length: 1-99
+        stop: 0|1
 
         :param param:
         :param opt:
@@ -672,13 +687,106 @@ class RaspberryScpiPico(MicroScpiDevice):
         bus = self.i2c[bus_number]
         conf = self.i2c_conf[bus_number]
         shift = conf.bit
+        rstring = re.compile(r"^([0-9a-fA-F][1-9a-fA-F]),([1-9][0-9]+),([01])$")
 
         if query:
             print("cb_i2c_read", "Query", param)
         elif param is not None:
             print("cb_i2c_read", param)
+
+            searched = rstring.search(param)
+            if searched is not None:
+                address, length, stop = searched.groups()
+                stop = True if (int(stop) == 1) else False
+                print(f"0x{address >> shift}, {length}, {stop}")
+                read = bus.readfrom(int(address) >> shift, int(length), stop)
+                print(",".join(read))
         else:
             print("syntax error: no parameter")
+
+    def cb_i2c_write_memory(self, param, opt):
+        """
+        - I2C[01]:MEMory:WRITE address,memaddress,buf,addrsize
+
+        address: 01-ff
+        memaddress: 0000-ffff
+        buf: data
+        addrsize: 1|2
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        query = (opt[-1] == "?")
+        bus_number = int(opt[0])
+        bus = self.i2c[bus_number]
+        conf = self.i2c_conf[bus_number]
+        shift = conf.bit
+        rstring = re.compile(r"^([0-9a-fA-F][1-9a-fA-F]),([0-9a-fA-F].|[0-9a-fA-F]...),([1-9][0-9]+),([01])$")
+
+        if query:
+            print("cb_i2c_write_memory", "Query", param)
+        elif param is not None:
+            print("cb_i2c_write_memory", param)
+
+            searched = rstring.search(param)
+
+            if searched is not None:
+                address, memaddress, data, addrsize = searched.groups()
+
+                address = int(f"0x{address}") >> shift
+                memaddress = int(f"0x{memaddress}")
+                data = bytes(data, encoding="utf-8")
+                addrsize = 8 * int(addrsize)
+
+                bus.writeto_mem(address, memaddress, data, addrsize)
+            else:
+                print("syntax error: invalid parameters")
+        else:
+            print("syntax error: no parameter")
+
+    def cb_i2c_read_memory(self, param, opt):
+        """
+        - I2C[01]:MEMory:READ? address,memaddress,nbytes,addrsize
+
+        addr: 01-FF
+        memaddr: 00-FF | 0000-FFFF
+        nbytes: 1-99
+        addrsize: 1|2
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        query = (opt[-1] == "?")
+        bus_number = int(opt[0])
+        bus = self.i2c[bus_number]
+        conf = self.i2c_conf[bus_number]
+        shift = conf.bit
+        rstring = re.compile(r"^([0-9a-fA-F][1-9a-fA-F]),([0-9a-fA-F].|[0-9a-fA-F]...),([1-9][0-9]+),([12])$")
+
+        if query:
+            print("cb_i2c_read_memory", "Query", param)
+
+            if param is not None:
+                searched = rstring.search(param)
+                if searched is not None:
+                    address, memaddress, length, addrsize = searched.groups()
+                    address = int(f"0x{address}") >> shift
+                    memaddress = int(f"0x{memaddress}")
+                    length = int(f"0x{length}")
+                    addrsize = 8 * int(addrsize)
+
+                    data = bus.readfrom_mem(address, memaddress, length, addrsize)
+                    print(data)
+                else:
+                    print("syntax error: invalid parameters")
+            else:
+                print("syntax error: no parameter")
+        else:
+            print("syntax error: query only")
 
     def cb_adc_read(self, param, opt):
         """
