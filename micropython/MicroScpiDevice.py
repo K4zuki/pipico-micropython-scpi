@@ -5,7 +5,7 @@ if sys.version_info > (3, 6, 0):
     from typing import Tuple, List
 from collections import namedtuple
 
-rstring = re.compile(r"^(\w+)(\d+|\?)$")
+rstring = re.compile(r"^([a-zA-Z]+)(\d+|\?)$")
 
 
 class ScpiKeyword(namedtuple("ScpiKeyword", ["long", "short", "opt"])):
@@ -64,6 +64,9 @@ class ScpiCommand(namedtuple("ScpiCommand", ["keywords", "query", "callback"])):
     - `query`: flag if command is a query
     - `callback`: `function pointer`
     """
+
+    def cat(self):
+        return ":".join([k.long for k in self.keywords])
 
     def match(self, candidate_cmd):
         """ Tests if `candidate_cmd` matches with `keywords`.
