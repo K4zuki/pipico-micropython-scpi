@@ -55,7 +55,7 @@ class ScpiMatch(namedtuple("ScpiMatch", ["match", "opt"])):
 def cb_do_nothing(*args, **kwargs):
     """Abstract callback function for ScpiCommand class
     """
-    pass
+    print("cb_do_nothing")
 
 
 class ScpiCommand(namedtuple("ScpiCommand", ["keywords", "query", "callback"])):
