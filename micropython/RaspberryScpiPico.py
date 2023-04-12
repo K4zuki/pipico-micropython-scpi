@@ -62,6 +62,8 @@ MAX_SPI_CLOCK = 10_000_000
 MIN_SPI_CLOCK = 10_000
 MAX_UART_BAUD = 500_000
 MIN_UART_BAUD = 300
+IO_ON = 1
+IO_OFF = 0
 
 uart0 = machine.UART(0, tx=machine.Pin(0), rx=machine.Pin(1))
 spi0 = machine.SPI(0, sck=machine.Pin(2), mosi=machine.Pin(3), miso=machine.Pin(4))
@@ -87,7 +89,7 @@ adc3 = machine.ADC(machine.Pin(29))
 
 class PinConfig(namedtuple("PinConfig", ["mode", "value", "pull"])):
     """
-    mode: Pin.IN|OUT|OPEN_DRAIN
+    mode: Pin.IN|OUT|OPEN_DRAIN|ALT
     value: 1/0
     pull: Pin.PULL_UP|PULL_DOWN
     """
@@ -109,7 +111,7 @@ class I2cConfig(namedtuple("I2cConfig", ["freq", "bit"])):
 
 class RaspberryScpiPico(MicroScpiDevice):
     kw_machine = ScpiKeyword("MACHINE", "MACHINE", None)
-    kw_pin = ScpiKeyword("PIN", "PIN", ["6", "7", "14", "15", "20", "21", "22"])
+    kw_pin = ScpiKeyword("PIN", "PIN", ["6", "7", "14", "15", "20", "21", "22", "25"])
     kw_in = ScpiKeyword("INput", "IN", None)
     kw_out = ScpiKeyword("OUTput", "OUT", None)
     kw_od = ScpiKeyword("ODrain", "OD", None)
@@ -168,14 +170,14 @@ class RaspberryScpiPico(MicroScpiDevice):
         3: adc3
     }
     pin_conf = {
-        6: PinConfig(machine.Pin.IN, 0, machine.Pin.PULL_DOWN),
-        7: PinConfig(machine.Pin.IN, 0, machine.Pin.PULL_DOWN),
-        14: PinConfig(machine.Pin.IN, 0, machine.Pin.PULL_DOWN),
-        15: PinConfig(machine.Pin.IN, 0, machine.Pin.PULL_DOWN),
-        20: PinConfig(machine.Pin.IN, 0, machine.Pin.PULL_DOWN),
-        21: PinConfig(machine.Pin.IN, 0, machine.Pin.PULL_DOWN),
-        22: PinConfig(machine.Pin.IN, 0, machine.Pin.PULL_DOWN),
-        25: PinConfig(machine.Pin.IN, 0, machine.Pin.PULL_DOWN)
+        6: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
+        7: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
+        14: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
+        15: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
+        20: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
+        21: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
+        22: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
+        25: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN)
     }
     pwm_conf = {
         6: PwmConfig(1000, 32768),
@@ -298,13 +300,13 @@ class RaspberryScpiPico(MicroScpiDevice):
             print(val)
         elif param is not None:
             print("cb_pin_val", pin_number, int(param))
-            if int(param) == 1 or self.kw_on.match(param):
-                pin.on()
-                conf = PinConfig(machine.Pin.OUT, 1, conf.pull)
+            if int(param) == IO_ON or self.kw_on.match(param).match:
+                pin.init(machine.Pin.OUT, value=IO_ON)
+                conf = PinConfig(machine.Pin.OUT, IO_ON, conf.pull)
                 self.pin_conf[pin_number] = conf
-            elif int(param) == 0 or self.kw_off.match(param):
-                pin.off()
-                conf = PinConfig(machine.Pin.OUT, 0, conf.pull)
+            elif int(param) == IO_OFF or self.kw_off.match(param).match:
+                pin.init(machine.Pin.OUT, value=IO_OFF)
+                conf = PinConfig(machine.Pin.OUT, IO_OFF, conf.pull)
                 self.pin_conf[pin_number] = conf
             else:
                 print("syntax error: invalid value:", param)
@@ -325,19 +327,23 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
         conf = self.pin_conf[pin_number]
         mode = conf.mode
+        alt = 0
 
         if query:
             print("cb_pin_mode", pin_number, "Query", param)
         else:
             print("cb_pin_mode", pin_number, param)
-            if self.kw_in.match(param):
+            if self.kw_in.match(param).match:
                 mode = machine.Pin.IN
-            elif self.kw_out.match(param):
+            elif self.kw_out.match(param).match:
                 mode = machine.Pin.OUT
-            elif self.kw_od.match(param):
+            elif self.kw_od.match(param).match:
                 mode = machine.Pin.OPEN_DRAIN
+            elif self.kw_pwm.match(param).match:
+                mode = machine.Pin.ALT
+                alt = machine.Pin.ALT_PWM
 
-            pin = machine.Pin(pin_number, mode)
+            pin.init(mode, alt=alt, pull=conf.pull)
             self.pins[pin_number] = pin
             self.pin_conf[pin_number] = PinConfig(mode, conf.value, conf.pull)
             print(pin)
@@ -360,8 +366,8 @@ class RaspberryScpiPico(MicroScpiDevice):
             print("cb_pin_on", pin_number, "Query", param)
         else:
             print("cb_pin_on", pin_number, param)
-            self.pins[pin_number] = machine.Pin(pin_number, machine.Pin.OUT, 1)
-            self.pin_conf[pin_number] = PinConfig(machine.Pin.OUT, 1, conf.pull)
+            pin.init(machine.Pin.OUT, value=IO_ON)
+            self.pin_conf[pin_number] = PinConfig(machine.Pin.OUT, IO_ON, conf.pull)
 
     def cb_pin_off(self, param="", opt=None):
         """
@@ -381,8 +387,8 @@ class RaspberryScpiPico(MicroScpiDevice):
             print("cb_pin_off", pin_number, "Query", param)
         else:
             print("cb_pin_off", pin_number, param)
-            self.pins[pin_number] = machine.Pin(pin_number, machine.Pin.OUT, 0)
-            self.pin_conf[pin_number] = PinConfig(machine.Pin.OUT, 0, conf.pull)
+            pin.init(machine.Pin.OUT, value=IO_OFF)
+            self.pin_conf[pin_number] = PinConfig(machine.Pin.OUT, IO_OFF, conf.pull)
 
     def cb_pin_pwm_freq(self, param="", opt=None):
         """
@@ -467,7 +473,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             print("cb_led_on", "Query", param)
         else:
             print("cb_led_on", param)
-            pin25.on()
+            pin25.init(machine.Pin.OUT, value=IO_ON)
 
     @staticmethod
     def cb_led_off(param="", opt=None):
@@ -485,7 +491,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             print("cb_led_off", "Query", param)
         else:
             print("cb_led_off", param)
-            pin25.off()
+            pin25.init(machine.Pin.OUT, value=IO_OFF)
 
     def cb_led_val(self, param, opt):
         """
