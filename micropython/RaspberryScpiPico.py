@@ -30,9 +30,9 @@
 - I2C[01]:FREQuency[?] num
 - I2C[01]:ADDRess:BIT[?] 0|1|DEFault
 - I2C[01]:WRITE address,buffer,stop
-- I2C[01]:READ? address,length,stop
+- I2C[01]:READ address,length,stop
 - I2C[01]:MEMory:WRITE address,memaddress,buffer,addrsize
-- I2C[01]:MEMory:READ? address,memaddress,nbytes,addrsize
+- I2C[01]:MEMory:READ address,memaddress,nbytes,addrsize
 
 - SPI[01]:CSEL:POLarity[?] 0/1
 - SPI[01]:MODE[?] 0/1/2/3
@@ -63,6 +63,7 @@ MAX_UART_BAUD = 500_000
 MIN_UART_BAUD = 300
 IO_ON = 1
 IO_OFF = 0
+DEFAULT_I2C_BIT = 1
 
 uart0 = machine.UART(0, tx=machine.Pin(0), rx=machine.Pin(1))
 spi0 = machine.SPI(0, sck=machine.Pin(2), mosi=machine.Pin(3), miso=machine.Pin(4))
@@ -74,8 +75,12 @@ spi1 = machine.SPI(1, sck=machine.Pin(10), mosi=machine.Pin(11), miso=machine.Pi
 cs1 = machine.Pin(13, mode=machine.Pin.OUT, value=IO_ON)
 pin14 = machine.Pin(14, machine.Pin.IN)
 pin15 = machine.Pin(15, machine.Pin.IN)
-i2c0 = machine.I2C(0, scl=machine.Pin(17), sda=machine.Pin(16))
-i2c1 = machine.I2C(1, scl=machine.Pin(19), sda=machine.Pin(18))
+sda0 = machine.Pin(16)
+scl0 = machine.Pin(17)
+i2c0 = machine.I2C(0, scl=scl0, sda=sda0)
+sda1 = machine.Pin(18)
+scl1 = machine.Pin(19)
+i2c1 = machine.I2C(1, scl=scl1, sda=sda1)
 pin20 = machine.Pin(20, machine.Pin.IN)
 pin21 = machine.Pin(21, machine.Pin.IN)
 pin22 = machine.Pin(22, machine.Pin.IN)
@@ -101,10 +106,12 @@ class PwmConfig(namedtuple("PwmConfig", ["freq", "duty_u16"])):
     """
 
 
-class I2cConfig(namedtuple("I2cConfig", ["freq", "bit"])):
+class I2cConfig(namedtuple("I2cConfig", ["freq", "bit", "scl", "sda"])):
     """
     :int freq: frequency
     :int bit: addres bit
+    :Pin scl: scl pin
+    :Pin sda: sda pin
     """
 
 
@@ -189,8 +196,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         25: PwmConfig(1000, 32768)
     }
     i2c_conf = {
-        0: I2cConfig(100_000, 1),
-        1: I2cConfig(100_000, 1)
+        0: I2cConfig(100_000, 1, scl0, sda0),
+        1: I2cConfig(100_000, 1, scl1, sda1)
     }
 
     def __init__(self):
@@ -612,10 +619,9 @@ class RaspberryScpiPico(MicroScpiDevice):
             bus_freq = int(float(bus_freq))
 
             if MIN_I2C_CLOCK <= bus_freq <= MAX_I2C_CLOCK:
-                bus.init(freq=conf.freq)
-                print(bus)
+                bus = machine.I2C(bus_number, scl=conf.scl, sda=conf.sda, freq=bus_freq)
                 self.i2c[bus_number] = bus
-                self.i2c_conf[bus_number] = I2cConfig(bus_freq, conf.bit)
+                self.i2c_conf[bus_number] = I2cConfig(bus_freq, conf.bit, conf.scl, conf.sda)
             else:
                 print("syntax error: out of range")
         else:
@@ -643,10 +649,10 @@ class RaspberryScpiPico(MicroScpiDevice):
             print(f"{bit}")
         elif bit is not None:
             print("cb_i2c_address_bit", param)
-            if int(param) in [0, 1]:
-                self.i2c_conf[bus_number] = I2cConfig(conf.freq, int(param))
+            if param in ["0", "1"]:
+                self.i2c_conf[bus_number] = I2cConfig(conf.freq, int(param), conf.scl, conf.sda)
             elif self.kw_def.match(param):
-                self.i2c_conf[bus_number] = I2cConfig(conf.freq, 1)
+                self.i2c_conf[bus_number] = I2cConfig(conf.freq, DEFAULT_I2C_BIT, conf.scl, conf.sda)
             else:
                 print("syntax error: invalid value:", param)
         else:
@@ -680,7 +686,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_i2c_read(self, param, opt):
         """
-        - I2C[01]:READ? address,length,stop
+        - I2C[01]:READ address,length,stop
 
         address: 01-ff
         length: 1-99
@@ -707,9 +713,13 @@ class RaspberryScpiPico(MicroScpiDevice):
             if searched is not None:
                 address, length, stop = searched.groups()
                 stop = True if (int(stop) == 1) else False
-                print(f"0x{address >> shift}, {length}, {stop}")
-                read = bus.readfrom(int(address) >> shift, int(length), stop)
-                print(",".join(read))
+                address = int(f"0x{address}") >> shift
+                print(f"0x{address:02x}", length, stop)
+                try:
+                    read = bus.readfrom(int(address), int(length), stop)
+                    print(",".join([str(r) for r in read]))
+                except OSError:
+                    print("bus read failed")
         else:
             print("syntax error: no parameter")
 
