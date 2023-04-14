@@ -64,14 +64,24 @@ MIN_UART_BAUD = 300
 IO_ON = 1
 IO_OFF = 0
 DEFAULT_I2C_BIT = 1
+SPI_MODE0 = 0
+SPI_MODE1 = 1
+SPI_MODE2 = 2
+SPI_MODE3 = 3
 
 uart0 = machine.UART(0, tx=machine.Pin(0), rx=machine.Pin(1))
-spi0 = machine.SPI(0, sck=machine.Pin(2), mosi=machine.Pin(3), miso=machine.Pin(4))
+sck0 = machine.Pin(2)
+mosi0 = machine.Pin(3)
+miso0 = machine.Pin(4)
+spi0 = machine.SPI(0, sck=sck0, mosi=mosi0, miso=miso0)
 cs0 = machine.Pin(5, mode=machine.Pin.OUT, value=IO_ON)
 pin6 = machine.Pin(6, machine.Pin.IN)
 pin7 = machine.Pin(7, machine.Pin.IN)
 uart1 = machine.UART(1, tx=machine.Pin(8), rx=machine.Pin(9))
-spi1 = machine.SPI(1, sck=machine.Pin(10), mosi=machine.Pin(11), miso=machine.Pin(12))
+sck1 = machine.Pin(10)
+mosi1 = machine.Pin(11)
+miso1 = machine.Pin(12)
+spi1 = machine.SPI(1, sck=sck1, mosi=mosi1, miso=miso1)
 cs1 = machine.Pin(13, mode=machine.Pin.OUT, value=IO_ON)
 pin14 = machine.Pin(14, machine.Pin.IN)
 pin15 = machine.Pin(15, machine.Pin.IN)
@@ -112,6 +122,17 @@ class I2cConfig(namedtuple("I2cConfig", ["freq", "bit", "scl", "sda"])):
     :int bit: addres bit
     :Pin scl: scl pin
     :Pin sda: sda pin
+    """
+
+
+class SpiConfig(namedtuple("SpiConfig", ["freq", "mode", "sck", "mosi", "miso", "csel"])):
+    """
+    :int freq: frequency
+    :int mode: clock/phase mode
+    :Pin sck: sck pin
+    :Pin mosi: mosi pin
+    :Pin miso: miso pin
+    :Pin csel: csel pin
     """
 
 
@@ -175,6 +196,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         2: adc2,
         3: adc3
     }
+    spi = {
+        0: spi0,
+        1: spi1
+    }
     pin_conf = {
         6: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
         7: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
@@ -198,6 +223,10 @@ class RaspberryScpiPico(MicroScpiDevice):
     i2c_conf = {
         0: I2cConfig(100_000, 1, scl0, sda0),
         1: I2cConfig(100_000, 1, scl1, sda1)
+    }
+    spi_conf = {
+        0: SpiConfig(1_000_000, SPI_MODE0, sck0, mosi0, miso0, cs0),
+        1: SpiConfig(1_000_000, SPI_MODE0, sck1, mosi1, miso1, cs1)
     }
 
     def __init__(self):
@@ -826,3 +855,87 @@ class RaspberryScpiPico(MicroScpiDevice):
             print(f"{value}")  # decimal
         else:
             print("syntax error: query only")
+
+    def cb_spi_cs_pol(self, param, opt):
+        """
+        - SPI[01]:CSEL:POLarity[?] 0/1
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        query = (opt[-1] == "?")
+        bus_number = int(opt[0])
+        bus = self.spi[bus_number]
+        conf = self.spi_conf[bus_number]
+
+        if query:
+            print("cb_spi_cs_pol", "Query", param)
+        elif param is not None:
+            print("cb_spi_cs_pol", param)
+        else:
+            print("syntax error: no parameter")
+
+    def cb_spi_clock_phase(self, param, opt):
+        """
+        - SPI[01]:MODE[?] 0/1/2/3
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+    def cb_spi_freq(self, param, opt):
+        """
+        - SPI[01]:FREQuency[?] num
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+    def cb_spi_tx(self, param, opt):
+        """
+        - ADC[012]:READ?
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+    def cb_spi_write(self, param, opt):
+        """
+        - ADC[012]:READ?
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+    def cb_spi_read(self, param, opt):
+        """
+        - ADC[012]:READ?
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+    def cb_spi_write_memory(self, param, opt):
+        """
+        - ADC[012]:READ?
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+    def cb_spi_read_memory(self, param, opt):
+        """
+        - ADC[012]:READ?
+
+        :param param:
+        :param opt:
+        :return:
+        """
