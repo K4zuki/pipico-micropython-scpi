@@ -68,6 +68,10 @@ SPI_MODE0 = 0
 SPI_MODE1 = 1
 SPI_MODE2 = 2
 SPI_MODE3 = 3
+DEFAULT_SPI_MODE = SPI_MODE0
+SPI_CSPOL_HI = 1
+SPI_CSPOL_LO = 0
+DEFAULT_SPI_CSPOL = SPI_CSPOL_LO
 
 uart0 = machine.UART(0, tx=machine.Pin(0), rx=machine.Pin(1))
 sck0 = machine.Pin(2)
@@ -125,10 +129,11 @@ class I2cConfig(namedtuple("I2cConfig", ["freq", "bit", "scl", "sda"])):
     """
 
 
-class SpiConfig(namedtuple("SpiConfig", ["freq", "mode", "sck", "mosi", "miso", "csel"])):
+class SpiConfig(namedtuple("SpiConfig", ["freq", "mode", "cspol", "sck", "mosi", "miso", "csel"])):
     """
     :int freq: frequency
     :int mode: clock/phase mode
+    :Pin cspol: csel pin polarity
     :Pin sck: sck pin
     :Pin mosi: mosi pin
     :Pin miso: miso pin
@@ -225,8 +230,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         1: I2cConfig(100_000, 1, scl1, sda1)
     }
     spi_conf = {
-        0: SpiConfig(1_000_000, SPI_MODE0, sck0, mosi0, miso0, cs0),
-        1: SpiConfig(1_000_000, SPI_MODE0, sck1, mosi1, miso1, cs1)
+        0: SpiConfig(1_000_000, SPI_MODE0, SPI_CSPOL_LO, sck0, mosi0, miso0, cs0),
+        1: SpiConfig(1_000_000, SPI_MODE0, SPI_CSPOL_LO, sck1, mosi1, miso1, cs1)
     }
 
     def __init__(self):
@@ -337,12 +342,10 @@ class RaspberryScpiPico(MicroScpiDevice):
             print("cb_pin_val", pin_number, param)
             if param == str(IO_ON) or self.kw_on.match(param).match:
                 pin.init(machine.Pin.OUT, value=IO_ON)
-                conf = PinConfig(machine.Pin.OUT, IO_ON, conf.pull)
-                self.pin_conf[pin_number] = conf
+                self.pin_conf[pin_number] = conf._replace(value=IO_ON)
             elif param == str(IO_OFF) or self.kw_off.match(param).match:
                 pin.init(machine.Pin.OUT, value=IO_OFF)
-                conf = PinConfig(machine.Pin.OUT, IO_OFF, conf.pull)
-                self.pin_conf[pin_number] = conf
+                self.pin_conf[pin_number] = conf._replace(value=IO_OFF)
             else:
                 print("syntax error: invalid value:", param)
         else:
@@ -383,7 +386,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
             pin.init(mode, alt=alt, pull=conf.pull)
             self.pins[pin_number] = pin
-            self.pin_conf[pin_number] = PinConfig(mode, conf.value, conf.pull)
+            self.pin_conf[pin_number] = conf._replace(mode=mode)
             print(pin)
         else:
             print("syntax error: no parameter")
@@ -455,7 +458,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 pwm.freq(conf.freq)
                 pwm.duty_u16(conf.duty_u16)
                 print(pwm)
-                self.pwm_conf[pin_number] = PwmConfig(pwm_freq, conf.duty_u16)
+                self.pwm_conf[pin_number] = conf._replace(freq=pwm_freq)
             else:
                 print("syntax error: out of range")
         else:
@@ -490,7 +493,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 pwm.freq(conf.freq)
                 pwm.duty_u16(conf.duty_u16)
                 print(pwm)
-                self.pwm_conf[pin_number] = PwmConfig(conf.freq, pwm_duty)
+                self.pwm_conf[pin_number] = conf._replace(duty_u16=pwm_duty)
             else:
                 print("syntax error: out of range")
         else:
@@ -650,7 +653,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             if MIN_I2C_CLOCK <= bus_freq <= MAX_I2C_CLOCK:
                 bus = machine.I2C(bus_number, scl=conf.scl, sda=conf.sda, freq=bus_freq)
                 self.i2c[bus_number] = bus
-                self.i2c_conf[bus_number] = I2cConfig(bus_freq, conf.bit, conf.scl, conf.sda)
+                self.i2c_conf[bus_number] = conf._replace(freq=bus_freq)
             else:
                 print("syntax error: out of range")
         else:
@@ -679,9 +682,9 @@ class RaspberryScpiPico(MicroScpiDevice):
         elif bit is not None:
             print("cb_i2c_address_bit", param)
             if param in ["0", "1"]:
-                self.i2c_conf[bus_number] = I2cConfig(conf.freq, int(param), conf.scl, conf.sda)
+                self.i2c_conf[bus_number] = conf._replace(bit=int(param))
             elif self.kw_def.match(param):
-                self.i2c_conf[bus_number] = I2cConfig(conf.freq, DEFAULT_I2C_BIT, conf.scl, conf.sda)
+                self.i2c_conf[bus_number] = conf._replace(bit=DEFAULT_I2C_BIT)
             else:
                 print("syntax error: invalid value:", param)
         else:
@@ -858,7 +861,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_spi_cs_pol(self, param, opt):
         """
-        - SPI[01]:CSEL:POLarity[?] 0/1
+        - SPI[01]:CSEL:POLarity[?] 0|1|DEFault
 
         :param param:
         :param opt:
@@ -869,22 +872,47 @@ class RaspberryScpiPico(MicroScpiDevice):
         bus_number = int(opt[0])
         bus = self.spi[bus_number]
         conf = self.spi_conf[bus_number]
+        cspol = param
 
         if query:
             print("cb_spi_cs_pol", "Query", param)
-        elif param is not None:
+            cspol = conf.cspol
+            print(cspol)
+        elif cspol is not None:
             print("cb_spi_cs_pol", param)
+            if cspol in ["0", "1"]:
+                self.spi_conf[bus_number] = conf._replace(cspol=int(cspol))
+            else:
+                print("syntax error: invalid value:", param)
         else:
             print("syntax error: no parameter")
 
     def cb_spi_clock_phase(self, param, opt):
         """
-        - SPI[01]:MODE[?] 0/1/2/3
+        - SPI[01]:MODE[?] 0|1|2|3|DEFault
 
         :param param:
         :param opt:
         :return:
         """
+
+        query = (opt[-1] == "?")
+        bus_number = int(opt[0])
+        bus = self.spi[bus_number]
+        conf = self.spi_conf[bus_number]
+        mode = conf.mode
+
+        if query:
+            print("cb_spi_clock_phase", "Query", param)
+            print(mode)
+        elif mode is not None:
+            print("cb_spi_clock_phase", param)
+            if mode in ["0", "1"]:
+                self.spi_conf[bus_number] = conf._replace(mode=int(mode))
+            else:
+                print("syntax error: invalid value:", param)
+        else:
+            print("syntax error: no parameter")
 
     def cb_spi_freq(self, param, opt):
         """
