@@ -589,7 +589,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             if not scanned:
                 print("0")
             else:
-                print(",".join([s << shift for s in scanned]))
+                print(",".join([str(int(s) << shift) for s in scanned]))
         else:
             print("syntax error: query only")
 
