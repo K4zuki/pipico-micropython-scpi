@@ -697,7 +697,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 vals = list(conf)
                 vals[conf.index(conf.bit)] = int(param)
                 self.i2c_conf[bus_number] = I2cConfig(*vals)
-            elif self.kw_def.match(param):
+            elif self.kw_def.match(param).match:
                 vals = list(conf)
                 vals[conf.index(conf.bit)] = DEFAULT_I2C_BIT
                 self.i2c_conf[bus_number] = I2cConfig(*vals)
@@ -900,6 +900,10 @@ class RaspberryScpiPico(MicroScpiDevice):
                 vals = list(conf)
                 vals[conf.index(conf.cspol)] = int(cspol)
                 self.spi_conf[bus_number] = SpiConfig(*vals)
+            elif self.kw_def.match(param).match:
+                vals = list(conf)
+                vals[conf.index(conf.cspol)] = DEFAULT_SPI_CSPOL
+                self.spi_conf[bus_number] = SpiConfig(*vals)
             else:
                 print("syntax error: invalid value:", param)
         else:
@@ -918,17 +922,23 @@ class RaspberryScpiPico(MicroScpiDevice):
         bus_number = int(opt[0])
         bus = self.spi[bus_number]
         conf = self.spi_conf[bus_number]
-        mode = conf.mode
+        mode = param
 
         if query:
             print("cb_spi_clock_phase", "Query", param)
-            print(mode)
+            print(conf.mode)
         elif mode is not None:
             print("cb_spi_clock_phase", param)
-            if mode in ["0", "1"]:
+            if self.kw_def.match(param).match:
+                vals = list(conf)
+                vals[conf.index(conf.mode)] = DEFAULT_SPI_MODE
+                conf = SpiConfig(*vals)
+                self.spi_conf[bus_number] = conf
+            elif int(mode) in range(4):
                 vals = list(conf)
                 vals[conf.index(conf.mode)] = int(mode)
-                self.spi_conf[bus_number] = SpiConfig(*vals)
+                conf = SpiConfig(*vals)
+                self.spi_conf[bus_number] = conf
             else:
                 print("syntax error: invalid value:", param)
         else:
@@ -942,6 +952,33 @@ class RaspberryScpiPico(MicroScpiDevice):
         :param opt:
         :return:
         """
+
+        query = (opt[-1] == "?")
+        bus_number = int(opt[0])
+        bus = self.spi[bus_number]
+        bus_freq = param
+        conf = self.spi_conf[bus_number]
+
+        if query:
+            print("cb_spi_freq", bus_number, "Query", param)
+
+            bus_freq = conf.freq
+            print(f"{bus_freq}")
+        elif bus_freq is not None:
+            print("cb_spi_freq", bus_number, param)
+
+            bus_freq = int(float(bus_freq))
+
+            if MIN_SPI_CLOCK <= bus_freq <= MAX_SPI_CLOCK:
+                bus = machine.SPI(bus_number, baudrate=conf.freq, sck=conf.sck, mosi=conf.mosi, miso=conf.miso)
+                self.spi[bus_number] = bus
+                vals = list(conf)
+                vals[conf.index(conf.freq)] = bus_freq
+                self.spi_conf[bus_number] = SpiConfig(*vals)
+            else:
+                print("syntax error: out of range")
+        else:
+            print("syntax error: no parameter")
 
     def cb_spi_tx(self, param, opt):
         """
