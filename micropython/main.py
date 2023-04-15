@@ -6,6 +6,7 @@ from machine import I2C, Pin, PWM, SPI
 # import GpakMux
 # from EMU2751A import EMU2751A
 from RaspberryScpiPico import RaspberryScpiPico
+from raspberry_scpi_pico_test import scpi_commands
 
 gets = sys.stdin.readline
 
@@ -68,4 +69,11 @@ def pico_run():
             pico.parse_and_process(line)
 
 
+def pico_test():
+    for command in scpi_commands:
+        print(command)
+        pico.parse_and_process(command)
+
+
+pico_test()
 pico_run()
