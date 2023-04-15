@@ -270,9 +270,9 @@ class RaspberryScpiPico(MicroScpiDevice):
         i2c_write_memory = ScpiCommand((self.kw_i2c, self.kw_write, self.kw_memory), False, self.cb_i2c_write_memory)
         i2c_read_memory = ScpiCommand((self.kw_i2c, self.kw_read, self.kw_memory), True, self.cb_i2c_read_memory)
 
-        spi_cpol = ScpiCommand((self.kw_spi, self.kw_csel, self.kw_pol), False, cb_do_nothing)
-        spi_mode = ScpiCommand((self.kw_spi, self.kw_mode), False, cb_do_nothing)
-        spi_freq = ScpiCommand((self.kw_spi, self.kw_freq), False, cb_do_nothing)
+        spi_cpol = ScpiCommand((self.kw_spi, self.kw_csel, self.kw_pol), False, self.cb_spi_cs_pol)
+        spi_mode = ScpiCommand((self.kw_spi, self.kw_mode), False, self.cb_spi_clock_phase)
+        spi_freq = ScpiCommand((self.kw_spi, self.kw_freq), False, self.cb_spi_freq)
 
         adc_read = ScpiCommand((self.kw_adc, self.kw_read), True, self.cb_adc_read)
 
@@ -342,10 +342,14 @@ class RaspberryScpiPico(MicroScpiDevice):
             print("cb_pin_val", pin_number, param)
             if param == str(IO_ON) or self.kw_on.match(param).match:
                 pin.init(machine.Pin.OUT, value=IO_ON)
-                self.pin_conf[pin_number] = conf._replace(value=IO_ON)
+                vals = list(conf)
+                vals[conf.index(conf.value)] = IO_ON
+                self.pin_conf[pin_number] = PinConfig(*vals)
             elif param == str(IO_OFF) or self.kw_off.match(param).match:
                 pin.init(machine.Pin.OUT, value=IO_OFF)
-                self.pin_conf[pin_number] = conf._replace(value=IO_OFF)
+                vals = list(conf)
+                vals[conf.index(conf.value)] = IO_OFF
+                self.pin_conf[pin_number] = PinConfig(*vals)
             else:
                 print("syntax error: invalid value:", param)
         else:
@@ -386,7 +390,9 @@ class RaspberryScpiPico(MicroScpiDevice):
 
             pin.init(mode, alt=alt, pull=conf.pull)
             self.pins[pin_number] = pin
-            self.pin_conf[pin_number] = conf._replace(mode=mode)
+            vals = list(conf)
+            vals[conf.index(conf.mode)] = mode
+            self.pin_conf[pin_number] = PinConfig(*vals)
             print(pin)
         else:
             print("syntax error: no parameter")
@@ -458,7 +464,9 @@ class RaspberryScpiPico(MicroScpiDevice):
                 pwm.freq(conf.freq)
                 pwm.duty_u16(conf.duty_u16)
                 print(pwm)
-                self.pwm_conf[pin_number] = conf._replace(freq=pwm_freq)
+                vals = list(conf)
+                vals[conf.index(conf.freq)] = pwm_freq
+                self.pwm_conf[pin_number] = PwmConfig(*vals)
             else:
                 print("syntax error: out of range")
         else:
@@ -493,7 +501,9 @@ class RaspberryScpiPico(MicroScpiDevice):
                 pwm.freq(conf.freq)
                 pwm.duty_u16(conf.duty_u16)
                 print(pwm)
-                self.pwm_conf[pin_number] = conf._replace(duty_u16=pwm_duty)
+                vals = list(conf)
+                vals[conf.index(conf.duty_u16)] = pwm_duty
+                self.pwm_conf[pin_number] = PwmConfig(*vals)
             else:
                 print("syntax error: out of range")
         else:
@@ -653,7 +663,9 @@ class RaspberryScpiPico(MicroScpiDevice):
             if MIN_I2C_CLOCK <= bus_freq <= MAX_I2C_CLOCK:
                 bus = machine.I2C(bus_number, scl=conf.scl, sda=conf.sda, freq=bus_freq)
                 self.i2c[bus_number] = bus
-                self.i2c_conf[bus_number] = conf._replace(freq=bus_freq)
+                vals = list(conf)
+                vals[conf.index(conf.freq)] = bus_freq
+                self.i2c_conf[bus_number] = I2cConfig(*vals)
             else:
                 print("syntax error: out of range")
         else:
@@ -682,9 +694,13 @@ class RaspberryScpiPico(MicroScpiDevice):
         elif bit is not None:
             print("cb_i2c_address_bit", param)
             if param in ["0", "1"]:
-                self.i2c_conf[bus_number] = conf._replace(bit=int(param))
+                vals = list(conf)
+                vals[conf.index(conf.bit)] = int(param)
+                self.i2c_conf[bus_number] = I2cConfig(*vals)
             elif self.kw_def.match(param):
-                self.i2c_conf[bus_number] = conf._replace(bit=DEFAULT_I2C_BIT)
+                vals = list(conf)
+                vals[conf.index(conf.bit)] = DEFAULT_I2C_BIT
+                self.i2c_conf[bus_number] = I2cConfig(*vals)
             else:
                 print("syntax error: invalid value:", param)
         else:
@@ -881,7 +897,9 @@ class RaspberryScpiPico(MicroScpiDevice):
         elif cspol is not None:
             print("cb_spi_cs_pol", param)
             if cspol in ["0", "1"]:
-                self.spi_conf[bus_number] = conf._replace(cspol=int(cspol))
+                vals = list(conf)
+                vals[conf.index(conf.cspol)] = int(cspol)
+                self.spi_conf[bus_number] = SpiConfig(*vals)
             else:
                 print("syntax error: invalid value:", param)
         else:
@@ -908,7 +926,9 @@ class RaspberryScpiPico(MicroScpiDevice):
         elif mode is not None:
             print("cb_spi_clock_phase", param)
             if mode in ["0", "1"]:
-                self.spi_conf[bus_number] = conf._replace(mode=int(mode))
+                vals = list(conf)
+                vals[conf.index(conf.mode)] = int(mode)
+                self.spi_conf[bus_number] = SpiConfig(*vals)
             else:
                 print("syntax error: invalid value:", param)
         else:
