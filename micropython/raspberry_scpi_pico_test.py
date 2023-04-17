@@ -111,7 +111,6 @@ def send_test():
         for command in scpi_commands:
             print(command)
             s.write(bytes(command + "\n", encoding='utf8'))
-            time.sleep(0.01)
             lines = s.readlines()
             print("".join([line.decode("utf8") for line in lines]), file=sys.stderr)
 
