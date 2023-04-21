@@ -107,7 +107,13 @@ scpi_commands = [
 
 def send_test():
     import serial
+    from halo import Halo
     with serial.Serial(port=port, baudrate=1_000_000, timeout=0.1) as s:
+        s.write(bytes("*RST\n", encoding='utf8'))
+        with Halo("*RST"):
+            time.sleep(3)
+            lines = s.readlines()
+            print("".join([line.decode("utf8") for line in lines]), file=sys.stderr)
         for command in scpi_commands:
             print(command)
             s.write(bytes(command + "\n", encoding='utf8'))
