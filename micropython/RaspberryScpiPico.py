@@ -43,9 +43,10 @@
 
 """
 import sys
-import re
-
 import machine
+
+import re
+from math import ceil
 from collections import namedtuple
 from MicroScpiDevice import ScpiKeyword, ScpiCommand, MicroScpiDevice, cb_do_nothing
 
@@ -63,6 +64,9 @@ MAX_UART_BAUD = 500_000
 MIN_UART_BAUD = 300
 IO_ON = 1
 IO_OFF = 0
+IO_VALUE_STRINGS = {IO_ON: "ON", IO_OFF: "OFF"}
+IO_MODE_STRINGS = {machine.Pin.IN: "IN", machine.Pin.OUT: "OUT",
+                   machine.Pin.OPEN_DRAIN: "ODrain", machine.Pin.ALT: "PWM"}
 DEFAULT_I2C_BIT = 1
 SPI_MODE0 = 0
 SPI_MODE1 = 1
@@ -239,7 +243,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         cls = ScpiCommand((self.kw_cls,), False, cb_do_nothing)
         ese = ScpiCommand((self.kw_ese,), False, cb_do_nothing)
         opc = ScpiCommand((self.kw_opc,), False, cb_do_nothing)
-        rst = ScpiCommand((self.kw_rst,), False, cb_do_nothing)
+        rst = ScpiCommand((self.kw_rst,), False, self.cb_rst)
         sre = ScpiCommand((self.kw_sre,), False, cb_do_nothing)
         esr_q = ScpiCommand((self.kw_esr,), True, cb_do_nothing)
         idn_q = ScpiCommand((self.kw_idn,), True, self.cb_idn)
@@ -266,8 +270,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         i2c_abit = ScpiCommand((self.kw_i2c, self.kw_addr, self.kw_bit), False, self.cb_i2c_address_bit)
         i2c_write = ScpiCommand((self.kw_i2c, self.kw_write), False, self.cb_i2c_write)
         i2c_read_q = ScpiCommand((self.kw_i2c, self.kw_read), True, self.cb_i2c_read)
-        i2c_write_memory = ScpiCommand((self.kw_i2c, self.kw_write, self.kw_memory), False, self.cb_i2c_write_memory)
-        i2c_read_memory = ScpiCommand((self.kw_i2c, self.kw_read, self.kw_memory), True, self.cb_i2c_read_memory)
+        i2c_write_memory = ScpiCommand((self.kw_i2c, self.kw_memory, self.kw_write), False, self.cb_i2c_write_memory)
+        i2c_read_memory = ScpiCommand((self.kw_i2c, self.kw_memory, self.kw_read), True, self.cb_i2c_read_memory)
 
         spi_cpol = ScpiCommand((self.kw_spi, self.kw_csel, self.kw_pol), False, self.cb_spi_cs_pol)
         spi_mode = ScpiCommand((self.kw_spi, self.kw_mode), False, self.cb_spi_clock_phase)
@@ -290,6 +294,12 @@ class RaspberryScpiPico(MicroScpiDevice):
         """<Vendor name>,<Model number>,<Serial number>,<Firmware version>"""
         serial = machine.unique_id()
         print(f"RaspberryPiPico,RP001,{serial},0.0.1")
+
+    @staticmethod
+    def cb_rst(param="", opt=None):
+        """Hard reset"""
+        print(f"Reset")
+        machine.soft_reset()
 
     @staticmethod
     def cb_version(param="", opt=None):
@@ -336,7 +346,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         if query:
             print("cb_pin_val", pin_number, "Query", param)
             val = pin.value()
-            print(val)
+            print(IO_VALUE_STRINGS[val])
         elif param is not None:
             print("cb_pin_val", pin_number, param)
             if param == str(IO_ON) or self.kw_on.match(param).match:
@@ -372,7 +382,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             print("cb_pin_mode", pin_number, "Query", param)
-            print(conf.mode)
+            print(IO_MODE_STRINGS[conf.mode])
         elif param is not None:
             print("cb_pin_mode", pin_number, param)
             if self.kw_in.match(param).match:
@@ -789,7 +799,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         bus = self.i2c[bus_number]
         conf = self.i2c_conf[bus_number]
         shift = conf.bit
-        rstring = re.compile(r"^([0-9a-fA-F][1-9a-fA-F]),([0-9a-fA-F].|[0-9a-fA-F]...),([1-9][0-9]+),([01])$")
+        rstring = re.compile(r"^([1-9a-fA-F][0-9a-fA-F]),([0-9a-fA-F].|[0-9a-fA-F]...),([0-9a-fA-F]+),([01])$")
 
         if query:
             print("cb_i2c_write_memory", "Query", param)
@@ -800,13 +810,16 @@ class RaspberryScpiPico(MicroScpiDevice):
 
             if searched is not None:
                 address, memaddress, data, addrsize = searched.groups()
+                print(address, memaddress, data, addrsize)
 
                 address = int(f"0x{address}") >> shift
                 memaddress = int(f"0x{memaddress}")
-                data = bytes(data, encoding="utf-8")
+                data = int(f"0x{data}").to_bytes(ceil(len(data) / 2), "big")
                 addrsize = 8 * int(addrsize)
-
-                bus.writeto_mem(address, memaddress, data, addrsize)
+                try:
+                    bus.writeto_mem(address, memaddress, data)
+                except OSError:
+                    print("bus write failed")
             else:
                 print("syntax error: invalid parameters")
         else:
@@ -831,7 +844,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         bus = self.i2c[bus_number]
         conf = self.i2c_conf[bus_number]
         shift = conf.bit
-        rstring = re.compile(r"^([0-9a-fA-F][1-9a-fA-F]),([0-9a-fA-F].|[0-9a-fA-F]...),([1-9][0-9]+),([12])$")
+        rstring = re.compile(r"^([1-9a-fA-F][0-9a-fA-F]),([0-9a-fA-F].|[0-9a-fA-F]...),([1-9]|[1-9][0-9]+),([12])$")
 
         if query:
             print("cb_i2c_read_memory", "Query", param)
@@ -845,8 +858,11 @@ class RaspberryScpiPico(MicroScpiDevice):
                     length = int(f"0x{length}")
                     addrsize = 8 * int(addrsize)
 
-                    data = bus.readfrom_mem(address, memaddress, length, addrsize)
-                    print(data)
+                    try:
+                        data = bus.readfrom_mem(address, memaddress, length)
+                        print(data)
+                    except OSError:
+                        print("bus read failed")
                 else:
                     print("syntax error: invalid parameters")
             else:
