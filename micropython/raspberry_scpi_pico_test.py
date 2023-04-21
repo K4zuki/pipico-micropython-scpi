@@ -39,9 +39,10 @@ ADC[0123]:READ?
 import sys
 import time
 
-port = "com7"
+port = "/dev/cu.usbmodem14401"
 
 scpi_commands = [
+    "*IDN?",
     "MACHINE:FREQuency?",
     "MACHINE:FREQuency 250e6",
 
@@ -89,8 +90,12 @@ scpi_commands = [
 
     # "I2C[01]:WRITE address,buffer,stop",
     # "I2C[01]:READ address,length,stop",
-    # "I2C[01]:MEMory:WRITE address,memaddress,buffer,addrsize",
-    # "I2C[01]:MEMory:READ? address,memaddress,nbytes,addrsize",
+    "I2C0:MEMory:WRITE 10,7A,aa,1", "I2C1:MEMory:WRITE 10,7A,aa,1",
+    "I2C0:MEMory:READ? 10,7A,1,1", "I2C1:MEMory:READ? 10,7A,1,1",
+
+    "I2C1:MEMory:WRITE 10,7A,bb,1",
+    "I2C1:MEMory:READ? 10,00,256,1",
+
     "SPI0:CSEL:POLarity?", "SPI0:CSEL:POLarity 0", "SPI0:CSEL:POLarity 1", "SPI0:CSEL:POLarity DEFault",
     "SPI1:CSEL:POLarity?", "SPI1:CSEL:POLarity 0", "SPI1:CSEL:POLarity 1", "SPI1:CSEL:POLarity DEFault",
     "SPI0:MODE?", "SPI0:MODE 0", "SPI0:MODE 1", "SPI0:MODE?", "SPI0:MODE 2", "SPI0:MODE?", "SPI0:MODE 3", "SPI0:MODE?",
@@ -99,7 +104,6 @@ scpi_commands = [
     "SPI1:MODE DEFault", "SPI1:MODE?", "SPI1:MODE", "SPI1:MODE 5",
     "SPI0:FREQuency?", "SPI0:FREQuency 123456",
     "SPI1:FREQuency?", "SPI1:FREQuency 123456",
-    # "SPI0:FREQuency[?] num",
     # "SPI[01]:TRANSfer length,data",
 
 ]
