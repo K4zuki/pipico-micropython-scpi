@@ -34,8 +34,8 @@
 - I2C[01]:MEMory:WRITE address,memaddress,buffer,addrsize
 - I2C[01]:MEMory:READ address,memaddress,nbytes,addrsize
 
-- SPI[01]:CSEL:POLarity[?] 0/1
-- SPI[01]:MODE[?] 0/1/2/3
+- SPI[01]:CSEL:POLarity[?] 0|1|DEFault
+- SPI[01]:MODE[?] 0|1|2|3|DEFault
 - SPI[01]:FREQuency[?] num
 - SPI[01]:TRANSfer length,data
 
@@ -54,7 +54,7 @@ ABS_MAX_CLOCK = 275_000_000
 ABS_MIN_CLOCK = 100_000_000
 MAX_PWM_CLOCK = 100_000
 MIN_PWM_CLOCK = 1_000
-MAX_PWM_DUTY = 65536
+MAX_PWM_DUTY = 65535
 MIN_PWM_DUTY = 0
 MAX_I2C_CLOCK = 400_000
 MIN_I2C_CLOCK = 10_000
@@ -76,6 +76,15 @@ DEFAULT_SPI_MODE = SPI_MODE0
 SPI_CSPOL_HI = 1
 SPI_CSPOL_LO = 0
 DEFAULT_SPI_CSPOL = SPI_CSPOL_LO
+SPI_MASK_CKPOL = 0x02
+SPI_CKPOL_HI = 1
+SPI_CKPOL_LO = 0
+DEFAULT_SPI_CKPOL = SPI_CKPOL_LO
+SPI_MASK_CKPH = 0x01
+SPI_CKPH_HI = 1
+SPI_CKPH_LO = 0
+DEFAULT_SPI_CKPH = SPI_CKPH_LO
+
 uart0 = machine.UART(0, tx=machine.Pin(0), rx=machine.Pin(1))
 sda1 = machine.Pin(2)
 scl1 = machine.Pin(3)
@@ -938,6 +947,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         bus = self.spi[bus_number]
         conf = self.spi_conf[bus_number]
         mode = param
+        vals = list(conf)
 
         if query:
             print("cb_spi_clock_phase", "Query", param)
@@ -945,17 +955,25 @@ class RaspberryScpiPico(MicroScpiDevice):
         elif mode is not None:
             print("cb_spi_clock_phase", param)
             if self.kw_def.match(param).match:
-                vals = list(conf)
                 vals[conf.index(conf.mode)] = DEFAULT_SPI_MODE
                 conf = SpiConfig(*vals)
-                self.spi_conf[bus_number] = conf
+
+                bus = machine.SPI(bus_number, baudrate=conf.freq, sck=conf.sck, mosi=conf.mosi, miso=conf.miso,
+                                  polarity=DEFAULT_SPI_CKPOL, phase=DEFAULT_SPI_CKPH)
             elif int(mode) in range(4):
-                vals = list(conf)
+                ckpol = SPI_CKPOL_HI if mode & SPI_MASK_CKPOL else SPI_CKPOL_LO
+                ckph = SPI_CKPH_HI if mode & SPI_MASK_CKPH else SPI_CKPH_LO
+
                 vals[conf.index(conf.mode)] = int(mode)
                 conf = SpiConfig(*vals)
-                self.spi_conf[bus_number] = conf
+
+                bus = machine.SPI(bus_number, baudrate=conf.freq, sck=conf.sck, mosi=conf.mosi, miso=conf.miso,
+                                  polarity=ckpol, phase=ckph)
             else:
                 print("syntax error: invalid value:", param)
+
+            self.spi_conf[bus_number] = conf
+            self.spi[bus_number] = bus
         else:
             print("syntax error: no parameter")
 
