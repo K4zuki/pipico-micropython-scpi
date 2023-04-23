@@ -51,6 +51,7 @@ from collections import namedtuple
 from MicroScpiDevice import ScpiKeyword, ScpiCommand, MicroScpiDevice, cb_do_nothing
 
 ABS_MAX_CLOCK = 275_000_000
+DEFAULT_CPU_CLOCK = 125_000_000
 ABS_MIN_CLOCK = 100_000_000
 MAX_PWM_CLOCK = 100_000
 MIN_PWM_CLOCK = 1_000
@@ -306,8 +307,12 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     @staticmethod
     def cb_rst(param="", opt=None):
-        """Hard reset"""
+        """
+        - *RST <No Param>
+        """
+
         print(f"Reset")
+        machine.freq(DEFAULT_CPU_CLOCK)
         machine.soft_reset()
 
     @staticmethod
@@ -320,6 +325,7 @@ class RaspberryScpiPico(MicroScpiDevice):
     @staticmethod
     def cb_machine_freq(param="", opt=None):
         """
+        - MACHINE:FREQuency[?] num
 
         :return:
         """
@@ -331,12 +337,19 @@ class RaspberryScpiPico(MicroScpiDevice):
         if query:
             machine_freq = machine.freq()
             print(f"{machine_freq}")
+        elif machine_freq is not None:
+            print("cb_machine_freq", param)
+
+            try:
+                machine_freq = int(float(machine_freq))
+                if ABS_MIN_CLOCK < machine_freq < ABS_MAX_CLOCK:
+                    machine.freq(machine_freq)
+                else:
+                    print("syntax error: out of range")
+            except TypeError:
+                print("syntax error: invalid value:", param)
         else:
-            assert machine_freq is not None
-            machine_freq = int(float(machine_freq))
-            assert ABS_MIN_CLOCK < machine_freq < ABS_MAX_CLOCK
-            assert isinstance(machine_freq, (int, float))
-            machine.freq(machine_freq)
+            print("syntax error: no parameter")
 
     def cb_pin_val(self, param="", opt=None):
         """
@@ -991,6 +1004,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         bus = self.spi[bus_number]
         bus_freq = param
         conf = self.spi_conf[bus_number]
+        vals = list(conf)
 
         if query:
             print("cb_spi_freq", bus_number, "Query", param)
@@ -1003,9 +1017,13 @@ class RaspberryScpiPico(MicroScpiDevice):
             bus_freq = int(float(bus_freq))
 
             if MIN_SPI_CLOCK <= bus_freq <= MAX_SPI_CLOCK:
-                bus = machine.SPI(bus_number, baudrate=conf.freq, sck=conf.sck, mosi=conf.mosi, miso=conf.miso)
+                ckpol = SPI_CKPOL_HI if conf.mode & SPI_MASK_CKPOL else SPI_CKPOL_LO
+                ckph = SPI_CKPH_HI if conf.mode & SPI_MASK_CKPH else SPI_CKPH_LO
+
+                bus = machine.SPI(bus_number, baudrate=bus_freq, sck=conf.sck, mosi=conf.mosi, miso=conf.miso,
+                                  polarity=ckpol, phase=ckph)
                 self.spi[bus_number] = bus
-                vals = list(conf)
+
                 vals[conf.index(conf.freq)] = bus_freq
                 self.spi_conf[bus_number] = SpiConfig(*vals)
             else:
@@ -1015,12 +1033,20 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_spi_tx(self, param, opt):
         """
-        - ADC[012]:READ?
+        - SPI[01]:TRANSfer length,data
 
         :param param:
         :param opt:
         :return:
         """
+
+        query = (opt[-1] == "?")
+        bus_number = int(opt[0])
+        bus = self.spi[bus_number]
+        bus_freq = param
+        conf = self.spi_conf[bus_number]
+        cs = conf.csel
+        cspol = conf.cspol
 
     def cb_spi_write(self, param, opt):
         """
