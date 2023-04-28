@@ -39,7 +39,7 @@ ADC[0123]:READ?
 import sys
 import time
 
-port = "/dev/cu.usbmodem14401"
+port_name = "ASRL/dev/cu.usbmodem14101::INSTR"
 
 scpi_commands = [
     "*IDN?",
@@ -108,6 +108,11 @@ scpi_commands = [
     "SPI1:FREQuency?", "SPI1:FREQuency 123456",
     "SPI0:WRITE 12345", "SPI0:WRITE 123456",
     "SPI1:WRITE 12345", "SPI1:WRITE 123456",
+    "SPI0:READ? 1", "SPI0:READ? 10", "SPI0:READ? 100",
+    "SPI1:READ? 1", "SPI1:READ? 10", "SPI1:READ? 100",
+    "SPI0:READ? 1,aa", "SPI0:READ? 10,bb", "SPI0:READ? 100,gg",
+    "SPI1:READ? 1,aa", "SPI1:READ? 10,bb", "SPI1:READ? 100,gg",
+    "SPI0:READ? 1,00", "SPI0:READ? 10,11", "SPI0:READ? 100,99",
     # "SPI[01]:TRANSfer length,data",
 
 ]

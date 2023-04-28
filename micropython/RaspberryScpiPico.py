@@ -40,6 +40,7 @@
 - SPI[01]:FREQuency[?] num
 - SPI[01]:TRANSfer length,data
 - SPI[01]:WRITE data
+- SPI[01]:READ? length,mask
 
 - ADC[0123]:READ?
 
@@ -292,6 +293,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         spi_freq = ScpiCommand((self.kw_spi, self.kw_freq), False, self.cb_spi_freq)
         spi_transfer = ScpiCommand((self.kw_spi, self.kw_transfer), False, self.cb_spi_tx)
         spi_write = ScpiCommand((self.kw_spi, self.kw_write), False, self.cb_spi_write)
+        spi_read = ScpiCommand((self.kw_spi, self.kw_read), False, self.cb_spi_read)
 
         adc_read = ScpiCommand((self.kw_adc, self.kw_read), True, self.cb_adc_read)
 
@@ -301,7 +303,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                          led_val, led_on, led_off, led_pwm_freq, led_pwm_duty,
                          i2c_scan_q, i2c_freq, i2c_abit, i2c_write, i2c_read_q,
                          i2c_write_memory, i2c_read_memory,
-                         spi_cs_pol, spi_mode, spi_freq, spi_write, spi_cs_val,
+                         spi_cs_pol, spi_mode, spi_freq, spi_write, spi_read, spi_cs_val,
                          adc_read,
                          ]
 
@@ -1097,15 +1099,12 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
         bus_number = int(opt[0])
         bus = self.spi[bus_number]
-        bus_freq = param
         conf = self.spi_conf[bus_number]
-        cs_pin = conf.csel
-        cspol = conf.cspol ^ 1
         rstring = re.compile(r"^([0-9a-fA-F]+)$")
 
         if query:
             print("cb_spi_write", bus_number, "Query", param)
-        elif bus_freq is not None:
+        elif param is not None:
             print("cb_spi_write", bus_number, param)
             searched = rstring.search(param)
             if searched is not None:
@@ -1126,12 +1125,46 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_spi_read(self, param, opt):
         """
-        - ADC[012]:READ?
+        - SPI[01]:READ? length,mask
 
         :param param:
         :param opt:
         :return:
         """
+
+        query = (opt[-1] == "?")
+        bus_number = int(opt[0])
+        bus = self.spi[bus_number]
+        bus_freq = param
+        conf = self.spi_conf[bus_number]
+        rstring = re.compile(r"^([1-9]|[1-9][0-9]+),([0-9a-fA-F].)$")
+
+        if query:
+            print("cb_spi_read", bus_number, "Query", param)
+            searched = rstring.search(param)
+
+            if searched is not None:
+                length, mask = searched.groups()
+                print(length, mask)
+                try:
+                    data_array = bytearray([0] * int(length))
+                    if mask is not None:
+                        mask = int("0x" + mask)
+                    else:
+                        mask = 0x00
+                    bus.readinto(data_array, mask)
+                    data = "".join(f"{d:02x}" for d in data_array)
+                    print(data)
+                except OSError:
+                    print("bus read failed")
+                except ValueError:
+                    print("syntax error: invalid value:", param)
+            else:
+                print("syntax error: invalid parameters")
+        elif bus_freq is not None:
+            print("cb_spi_read", bus_number, param)
+        else:
+            print("syntax error: no parameter")
 
     def cb_spi_write_memory(self, param, opt):
         """
