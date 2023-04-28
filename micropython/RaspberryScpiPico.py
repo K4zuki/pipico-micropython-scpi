@@ -35,9 +35,11 @@
 - I2C[01]:MEMory:READ address,memaddress,nbytes,addrsize
 
 - SPI[01]:CSEL:POLarity[?] 0|1|DEFault
+- SPI[01]:CSEL:VALue 0|1|OFF|ON
 - SPI[01]:MODE[?] 0|1|2|3|DEFault
 - SPI[01]:FREQuency[?] num
 - SPI[01]:TRANSfer length,data
+- SPI[01]:WRITE data
 
 - ADC[0123]:READ?
 
@@ -192,6 +194,7 @@ class RaspberryScpiPico(MicroScpiDevice):
     kw_read = ScpiKeyword("READ", "READ", ["?"])
     kw_value = ScpiKeyword("VALue", "VAL", ["?"])
     kw_def = ScpiKeyword("DEFault", "DEF", None)
+    kw_transfer = ScpiKeyword("TRANSfer", "TRANS", None)
 
     "PIN[6|7|14|15|20|21|22|25"
     pins = {
@@ -283,9 +286,12 @@ class RaspberryScpiPico(MicroScpiDevice):
         i2c_write_memory = ScpiCommand((self.kw_i2c, self.kw_memory, self.kw_write), False, self.cb_i2c_write_memory)
         i2c_read_memory = ScpiCommand((self.kw_i2c, self.kw_memory, self.kw_read), True, self.cb_i2c_read_memory)
 
-        spi_cpol = ScpiCommand((self.kw_spi, self.kw_csel, self.kw_pol), False, self.cb_spi_cs_pol)
+        spi_cs_pol = ScpiCommand((self.kw_spi, self.kw_csel, self.kw_pol), False, self.cb_spi_cs_pol)
+        spi_cs_val = ScpiCommand((self.kw_spi, self.kw_csel, self.kw_value), False, self.cb_spi_cs_val)
         spi_mode = ScpiCommand((self.kw_spi, self.kw_mode), False, self.cb_spi_clock_phase)
         spi_freq = ScpiCommand((self.kw_spi, self.kw_freq), False, self.cb_spi_freq)
+        spi_transfer = ScpiCommand((self.kw_spi, self.kw_transfer), False, self.cb_spi_tx)
+        spi_write = ScpiCommand((self.kw_spi, self.kw_write), False, self.cb_spi_write)
 
         adc_read = ScpiCommand((self.kw_adc, self.kw_read), True, self.cb_adc_read)
 
@@ -295,7 +301,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                          led_val, led_on, led_off, led_pwm_freq, led_pwm_duty,
                          i2c_scan_q, i2c_freq, i2c_abit, i2c_write, i2c_read_q,
                          i2c_write_memory, i2c_read_memory,
-                         spi_cpol, spi_mode, spi_freq,
+                         spi_cs_pol, spi_mode, spi_freq, spi_write, spi_cs_val,
                          adc_read,
                          ]
 
@@ -946,6 +952,35 @@ class RaspberryScpiPico(MicroScpiDevice):
         else:
             print("syntax error: no parameter")
 
+    def cb_spi_cs_val(self, param, opt):
+        """
+        - SPI[01]:CSEL:VALue 0|1|OFF|ON
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        query = (opt[-1] == "?")
+        bus_number = int(opt[0])
+        bus = self.spi[bus_number]
+        conf = self.spi_conf[bus_number]
+        cs_pin = conf.csel
+        cs_pol = conf.cspol
+
+        if query:
+            print("cb_spi_cs_val", "Query", param)
+        elif param is not None:
+            print("cb_spi_cs_val", param)
+            if param == str(IO_ON) or self.kw_on.match(param).match:
+                cs_pin.value(cs_pol ^ 1)
+            elif param == str(IO_OFF) or self.kw_off.match(param).match:
+                cs_pin.value(cs_pol)
+            else:
+                print("syntax error: invalid value:", param)
+        else:
+            print("syntax error: no parameter")
+
     def cb_spi_clock_phase(self, param, opt):
         """
         - SPI[01]:MODE[?] 0|1|2|3|DEFault
@@ -973,7 +1008,8 @@ class RaspberryScpiPico(MicroScpiDevice):
 
                 bus = machine.SPI(bus_number, baudrate=conf.freq, sck=conf.sck, mosi=conf.mosi, miso=conf.miso,
                                   polarity=DEFAULT_SPI_CKPOL, phase=DEFAULT_SPI_CKPH)
-            elif int(mode) in range(4):
+            elif mode in ["0", "1", "2", "3"]:
+                mode = int(mode)
                 ckpol = SPI_CKPOL_HI if mode & SPI_MASK_CKPOL else SPI_CKPOL_LO
                 ckph = SPI_CKPH_HI if mode & SPI_MASK_CKPH else SPI_CKPH_LO
 
@@ -1013,21 +1049,23 @@ class RaspberryScpiPico(MicroScpiDevice):
             print(f"{bus_freq}")
         elif bus_freq is not None:
             print("cb_spi_freq", bus_number, param)
+            try:
+                bus_freq = int(float(bus_freq))
 
-            bus_freq = int(float(bus_freq))
+                if MIN_SPI_CLOCK <= bus_freq <= MAX_SPI_CLOCK:
+                    ckpol = SPI_CKPOL_HI if conf.mode & SPI_MASK_CKPOL else SPI_CKPOL_LO
+                    ckph = SPI_CKPH_HI if conf.mode & SPI_MASK_CKPH else SPI_CKPH_LO
 
-            if MIN_SPI_CLOCK <= bus_freq <= MAX_SPI_CLOCK:
-                ckpol = SPI_CKPOL_HI if conf.mode & SPI_MASK_CKPOL else SPI_CKPOL_LO
-                ckph = SPI_CKPH_HI if conf.mode & SPI_MASK_CKPH else SPI_CKPH_LO
+                    bus = machine.SPI(bus_number, baudrate=bus_freq, sck=conf.sck, mosi=conf.mosi, miso=conf.miso,
+                                      polarity=ckpol, phase=ckph)
+                    self.spi[bus_number] = bus
 
-                bus = machine.SPI(bus_number, baudrate=bus_freq, sck=conf.sck, mosi=conf.mosi, miso=conf.miso,
-                                  polarity=ckpol, phase=ckph)
-                self.spi[bus_number] = bus
-
-                vals[conf.index(conf.freq)] = bus_freq
-                self.spi_conf[bus_number] = SpiConfig(*vals)
-            else:
-                print("syntax error: out of range")
+                    vals[conf.index(conf.freq)] = bus_freq
+                    self.spi_conf[bus_number] = SpiConfig(*vals)
+                else:
+                    print("syntax error: out of range")
+            except ValueError:
+                print("syntax error: invalid value:", param)
         else:
             print("syntax error: no parameter")
 
@@ -1050,12 +1088,41 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_spi_write(self, param, opt):
         """
-        - ADC[012]:READ?
+        - SPI[01]:WRITE data
 
         :param param:
         :param opt:
         :return:
         """
+        query = (opt[-1] == "?")
+        bus_number = int(opt[0])
+        bus = self.spi[bus_number]
+        bus_freq = param
+        conf = self.spi_conf[bus_number]
+        cs_pin = conf.csel
+        cspol = conf.cspol ^ 1
+        rstring = re.compile(r"^([0-9a-fA-F]+)$")
+
+        if query:
+            print("cb_spi_write", bus_number, "Query", param)
+        elif bus_freq is not None:
+            print("cb_spi_write", bus_number, param)
+            searched = rstring.search(param)
+            if searched is not None:
+                data = searched.groups()[0]
+                print(f"0x{data}")
+                if len(data) / 2 != len(data) // 2:
+                    data = "0" + data
+                data_array = (int(data[i:i + 2], 16) for i in range(0, len(data), 2))
+                print([hex(c) for c in data_array])
+                try:
+                    bus.write(bytes(data_array))
+                except OSError:
+                    print("bus write failed")
+            else:
+                print("syntax error: invalid parameters")
+        else:
+            print("syntax error: no parameter")
 
     def cb_spi_read(self, param, opt):
         """
