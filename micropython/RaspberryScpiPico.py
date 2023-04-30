@@ -38,7 +38,7 @@
 - SPI[01]:CSEL:VALue 0|1|OFF|ON
 - SPI[01]:MODE[?] 0|1|2|3|DEFault
 - SPI[01]:FREQuency[?] num
-- SPI[01]:TRANSfer length,data
+- SPI[01]:TRANSfer data
 - SPI[01]:WRITE data
 - SPI[01]:READ? length,mask
 
@@ -303,7 +303,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                          led_val, led_on, led_off, led_pwm_freq, led_pwm_duty,
                          i2c_scan_q, i2c_freq, i2c_abit, i2c_write, i2c_read_q,
                          i2c_write_memory, i2c_read_memory,
-                         spi_cs_pol, spi_mode, spi_freq, spi_write, spi_read, spi_cs_val,
+                         spi_cs_pol, spi_mode, spi_freq, spi_write, spi_read, spi_cs_val, spi_transfer,
                          adc_read,
                          ]
 
@@ -1073,7 +1073,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_spi_tx(self, param, opt):
         """
-        - SPI[01]:TRANSfer length,data
+        - SPI[01]:TRANSfer data
 
         :param param:
         :param opt:
@@ -1087,6 +1087,33 @@ class RaspberryScpiPico(MicroScpiDevice):
         conf = self.spi_conf[bus_number]
         cs = conf.csel
         cspol = conf.cspol
+
+        rstring = re.compile(r"^([0-9a-fA-F]+)$")
+
+        if query:
+            print("cb_spi_tx", bus_number, "Query", param)
+        elif param is not None:
+            print("cb_spi_tx", bus_number, param)
+            searched = rstring.search(param)
+            if searched is not None:
+                data = searched.groups()[0]
+                print(f"0x{data}")
+                if len(data) / 2 != len(data) // 2:
+                    data = "0" + data
+                data_array = (int(data[i:i + 2], 16) for i in range(0, len(data), 2))
+                length = len(data_array)
+                read_data_array = bytearray([0] * length)
+                print([hex(c) for c in data_array])
+                try:
+                    bus.write_readinto(bytes(data_array), read_data_array)
+                    data = "".join(f"{d:02x}" for d in data_array)
+                    print(data)
+                except OSError:
+                    print("bus write failed")
+            else:
+                print("syntax error: invalid parameters")
+        else:
+            print("syntax error: no parameter")
 
     def cb_spi_write(self, param, opt):
         """
