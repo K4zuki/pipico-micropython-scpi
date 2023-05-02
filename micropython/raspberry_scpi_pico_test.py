@@ -88,8 +88,15 @@ scpi_commands = [
     "I2C0:ADDRess:BIT 1", "I2C0:ADDRess:BIT?", "I2C0:READ AA,10,1",
     "I2C1:ADDRess:BIT 1", "I2C1:ADDRess:BIT?", "I2C1:READ AA,10,1",
 
-    # "I2C[01]:WRITE address,buffer,stop",
-    # "I2C[01]:READ address,length,stop",
+    "I2C0:WRITE 10,7aAA,1",
+    "I2C0:READ? 10,1,1",
+    "I2C1:WRITE 10,7aAA,1",
+    "I2C1:READ? 10,1,1",
+    "I2C0:WRITE 10,0000,0", "I2C0:READ? 10,1,1",
+    "I2C1:WRITE 10,0000,0", "I2C1:READ? 10,1,1",
+    "I2C0:WRITE 10,0000,0", "I2C0:READ? 10,1,1",
+    "I2C1:WRITE 10,0000,0", "I2C1:READ? 10,256,1",
+
     "I2C0:MEMory:WRITE 10,7A,aa,1", "I2C1:MEMory:WRITE 10,7A,aa,1",
     "I2C0:MEMory:READ? 10,7A,1,1", "I2C1:MEMory:READ? 10,7A,1,1",
 
@@ -128,8 +135,8 @@ if __name__ == '__main__':
 
         print(rm.list_resources())
 
-        inst = rm.open_resource(port_name)
-        # inst = pyvisa.resources.SerialInstrument(rm, port_name)
+        # inst = rm.open_resource(port_name)
+        inst = pyvisa.resources.SerialInstrument(rm, port_name)
         inst.open()
 
         with Halo("*RST"):
