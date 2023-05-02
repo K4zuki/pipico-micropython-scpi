@@ -310,7 +310,8 @@ class RaspberryScpiPico(MicroScpiDevice):
     @staticmethod
     def cb_idn(param="", opt=None):
         """<Vendor name>,<Model number>,<Serial number>,<Firmware version>"""
-        serial = machine.unique_id()
+        serial = "".join(f"{d:02x}" for d in machine.unique_id())
+
         print(f"RaspberryPiPico,RP001,{serial},0.0.1")
 
     @staticmethod
@@ -804,7 +805,8 @@ class RaspberryScpiPico(MicroScpiDevice):
                 print(f"0x{address:02x}", length, stop)
                 try:
                     read = bus.readfrom(int(address), int(length), stop)
-                    print(",".join([str(r) for r in read]))
+                    data = "".join(f"{d:02x}" for d in read)
+                    print(data)
                 except OSError:
                     print("bus read failed")
         else:
@@ -889,7 +891,8 @@ class RaspberryScpiPico(MicroScpiDevice):
                     addrsize = 8 * int(addrsize)
 
                     try:
-                        data = bus.readfrom_mem(address, memaddress, length)
+                        read = bus.readfrom_mem(address, memaddress, length)
+                        data = "".join(f"{d:02x}" for d in read)
                         print(data)
                     except OSError:
                         print("bus read failed")
@@ -1100,13 +1103,13 @@ class RaspberryScpiPico(MicroScpiDevice):
                 print(f"0x{data}")
                 if len(data) / 2 != len(data) // 2:
                     data = "0" + data
-                data_array = (int(data[i:i + 2], 16) for i in range(0, len(data), 2))
+                data_array = tuple(int(data[i:i + 2], 16) for i in range(0, len(data), 2))
                 length = len(data_array)
                 read_data_array = bytearray([0] * length)
                 print([hex(c) for c in data_array])
                 try:
                     bus.write_readinto(bytes(data_array), read_data_array)
-                    data = "".join(f"{d:02x}" for d in data_array)
+                    data = "".join(f"{d:02x}" for d in read_data_array)
                     print(data)
                 except OSError:
                     print("bus write failed")
