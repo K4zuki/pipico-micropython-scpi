@@ -112,7 +112,8 @@ scpi_commands = [
     "SPI1:READ? 1,aa", "SPI1:READ? 10,bb", "SPI1:READ? 100,gg",
     "SPI0:READ? 1,00", "SPI0:READ? 10,11", "SPI0:READ? 100,99",
     "SPI1:READ? 1,00", "SPI0:READ? 10,11", "SPI0:READ? 100,99",
-    # "SPI[01]:TRANSfer length,data",
+    "SPI0:TRANSfer 12345", "SPI0:TRANSfer 123456",
+    "SPI1:TRANSfer 12345", "SPI1:TRANSfer 123456",
 
 ]
 
@@ -139,9 +140,11 @@ if __name__ == '__main__':
                 ret = inst.read().strip()
                 print(ret)
 
+        time.sleep(0.5)
         for command in scpi_commands:
+            print("- - " * 5)
             print(command)
-            inst.query(command)
+            print(inst.query(command).strip())
             time.sleep(0.5)
 
             while inst.bytes_in_buffer > 0:
