@@ -30,7 +30,7 @@
 - I2C[01]:FREQuency[?] num
 - I2C[01]:ADDRess:BIT[?] 0|1|DEFault
 - I2C[01]:WRITE address,buffer,stop
-- I2C[01]:READ address,length,stop
+- I2C[01]:READ? address,length,stop
 - I2C[01]:MEMory:WRITE address,memaddress,buffer,addrsize
 - I2C[01]:MEMory:READ address,memaddress,nbytes,addrsize
 
@@ -764,17 +764,34 @@ class RaspberryScpiPico(MicroScpiDevice):
         bus = self.i2c[bus_number]
         conf = self.i2c_conf[bus_number]
         shift = conf.bit
+        rstring = re.compile(r"^([1-9a-fA-F][0-9a-fA-F]),([0-9a-fA-F]+),([01])$")
 
         if query:
             print("cb_i2c_write", "Query", param)
         elif param is not None:
             print("cb_i2c_write", param)
+            searched = rstring.search(param)
+            if searched is not None:
+                address, data, stop = searched.groups()
+                stop = True if (int(stop) == 1) else False
+                address = int(f"0x{address}") >> shift
+                print(f"0x{address}")
+                if len(data) / 2 != len(data) // 2:
+                    data = "0" + data
+                data_array = (int(data[i:i + 2], 16) for i in range(0, len(data), 2))
+                print([hex(c) for c in data_array])
+                try:
+                    bus.writeto(address, bytes(data_array), stop)
+                except OSError:
+                    print("bus write failed")
+            else:
+                print("syntax error: invalid parameters")
         else:
             print("syntax error: no parameter")
 
     def cb_i2c_read(self, param, opt):
         """
-        - I2C[01]:READ address,length,stop
+        - I2C[01]:READ? address,length,stop
 
         address: 01-ff
         length: 1-99
@@ -790,27 +807,31 @@ class RaspberryScpiPico(MicroScpiDevice):
         bus = self.i2c[bus_number]
         conf = self.i2c_conf[bus_number]
         shift = conf.bit
-        rstring = re.compile(r"^([0-9a-fA-F][1-9a-fA-F]),([1-9][0-9]+),([01])$")
+        rstring = re.compile(r"^([1-9a-fA-F][0-9a-fA-F]),([1-9]|[1-9][0-9]+),([01])$")
 
         if query:
             print("cb_i2c_read", "Query", param)
-        elif param is not None:
-            print("cb_i2c_read", param)
+            if param is not None:
+                print("cb_i2c_read", param)
 
-            searched = rstring.search(param)
-            if searched is not None:
-                address, length, stop = searched.groups()
-                stop = True if (int(stop) == 1) else False
-                address = int(f"0x{address}") >> shift
-                print(f"0x{address:02x}", length, stop)
-                try:
-                    read = bus.readfrom(int(address), int(length), stop)
-                    data = "".join(f"{d:02x}" for d in read)
-                    print(data)
-                except OSError:
-                    print("bus read failed")
+                searched = rstring.search(param)
+                if searched is not None:
+                    address, length, stop = searched.groups()
+                    stop = True if (int(stop) == 1) else False
+                    address = int(f"0x{address}") >> shift
+                    print(f"0x{address:02x}", length, stop)
+                    try:
+                        read = bus.readfrom(int(address), int(length), stop)
+                        data = "".join(f"{d:02x}" for d in read)
+                        print(data, len(data))
+                    except OSError:
+                        print("bus read failed")
+                else:
+                    print("syntax error: invalid parameters")
+            else:
+                print("syntax error: no parameter")
         else:
-            print("syntax error: no parameter")
+            print("syntax error: query only")
 
     def cb_i2c_write_memory(self, param, opt):
         """
@@ -893,7 +914,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                     try:
                         read = bus.readfrom_mem(address, memaddress, length)
                         data = "".join(f"{d:02x}" for d in read)
-                        print(data)
+                        print(data, len(data))
                     except OSError:
                         print("bus read failed")
                 else:
@@ -1195,21 +1216,3 @@ class RaspberryScpiPico(MicroScpiDevice):
             print("cb_spi_read", bus_number, param)
         else:
             print("syntax error: no parameter")
-
-    def cb_spi_write_memory(self, param, opt):
-        """
-        - ADC[012]:READ?
-
-        :param param:
-        :param opt:
-        :return:
-        """
-
-    def cb_spi_read_memory(self, param, opt):
-        """
-        - ADC[012]:READ?
-
-        :param param:
-        :param opt:
-        :return:
-        """
