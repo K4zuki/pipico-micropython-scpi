@@ -99,26 +99,17 @@ class CrossBars(namedtuple("CrossBars", ["range", "start", "end", "single"])):
 
 
 class EMU2751A(MicroScpiDevice):
-    kw_route = ScpiKeyword("ROUTe", "ROUT")
-    kw_close = ScpiKeyword("CLOSe", "CLOS")
-    kw_open = ScpiKeyword("OPEN", "OPEN")
-    kw_diag = ScpiKeyword("DIAGnostic", "DIAG")
-    kw_relay = ScpiKeyword("RELay", "REL")
-    kw_cycles = ScpiKeyword("CYCLes", "CYCL")
-    kw_clear = ScpiKeyword("CLEar", "CLE")
-    kw_system = ScpiKeyword("SYSTem", "SYST")
-    kw_cdescription = ScpiKeyword("CDEScription", "CDES")
-    kw_error = ScpiKeyword("ERRor", "ERR")
-    kw_version = ScpiKeyword("VERSion", "VERS")
-    kw_cls = ScpiKeyword("*CLS", "*CLS")
-    kw_ese = ScpiKeyword("*ESE", "*ESE")
-    kw_esr = ScpiKeyword("*ESR", "*ESR")
-    kw_idn = ScpiKeyword("*IDN", "*IDN")
-    kw_opc = ScpiKeyword("*OPC", "*OPC")
-    kw_rst = ScpiKeyword("*RST", "*RST")
-    kw_sre = ScpiKeyword("*SRE", "*SRE")
-    kw_stb = ScpiKeyword("*STB", "*STB")
-    kw_tst = ScpiKeyword("*TST", "*TST")
+    kw_route = ScpiKeyword("ROUTe", "ROUT", None)
+    kw_close = ScpiKeyword("CLOSe", "CLOS", ["?"])
+    kw_open = ScpiKeyword("OPEN", "OPEN", ["?"])
+    kw_diag = ScpiKeyword("DIAGnostic", "DIAG", ["?"])
+    kw_relay = ScpiKeyword("RELay", "REL", None)
+    kw_cycles = ScpiKeyword("CYCLes", "CYCL", ["?"])
+    kw_clear = ScpiKeyword("CLEar", "CLE", None)
+    kw_system = ScpiKeyword("SYSTem", "SYST", None)
+    kw_cdescription = ScpiKeyword("CDEScription", "CDES", ["?"])
+    kw_error = ScpiKeyword("ERRor", "ERR", ["?"])
+    kw_version = ScpiKeyword("VERSion", "VERS", ["?"])
     bus = None
     mux = None
     relay_counter = 0
@@ -133,8 +124,6 @@ class EMU2751A(MicroScpiDevice):
                                                     False, cb_do_nothing)
         route_close = ScpiCommand((self.kw_route, self.kw_close), False, self.cb_relay_close)
         route_open = ScpiCommand((self.kw_route, self.kw_open), False, self.cb_relay_open)
-        route_close_q = ScpiCommand((self.kw_route, self.kw_close), True, self.cb_relay_close)
-        route_open_q = ScpiCommand((self.kw_route, self.kw_open), True, self.cb_relay_open)
         system_description = ScpiCommand((self.kw_system, self.kw_cdescription), False, cb_do_nothing)
         system_error = ScpiCommand((self.kw_system, self.kw_error), False, cb_do_nothing)
         system_version = ScpiCommand((self.kw_system, self.kw_version), False, self.cb_version)
@@ -143,21 +132,17 @@ class EMU2751A(MicroScpiDevice):
         opc = ScpiCommand((self.kw_opc,), False, cb_do_nothing)
         rst = ScpiCommand((self.kw_rst,), False, cb_do_nothing)
         sre = ScpiCommand((self.kw_sre,), False, cb_do_nothing)
-        ese_q = ScpiCommand((self.kw_ese,), True, cb_do_nothing)
         esr_q = ScpiCommand((self.kw_esr,), True, cb_do_nothing)
         idn_q = ScpiCommand((self.kw_idn,), True, self.cb_idn)
-        opc_q = ScpiCommand((self.kw_opc,), True, cb_do_nothing)
-        sre_q = ScpiCommand((self.kw_sre,), True, cb_do_nothing)
         stb_q = ScpiCommand((self.kw_stb,), True, cb_do_nothing)
         tst_q = ScpiCommand((self.kw_tst,), True, cb_do_nothing)
 
-        self.commands_write = [cls, ese, opc, rst, sre,
-                               route_close, route_open,
-                               diagnostic_relay_cycles_clear]
-        self.commands_query = [ese_q, esr_q, idn_q, opc_q, sre_q, stb_q, tst_q,
-                               route_close_q, route_open_q,
-                               diagnostic_relay_cycles,
-                               system_description, system_error, system_version]
+        self.commands = [cls, ese, opc, rst, sre, esr_q, idn_q, stb_q, tst_q,
+                         diagnostic_relay_cycles, diagnostic_relay_cycles_clear,
+                         route_close, route_open,
+                         system_description, system_error,
+                         system_version,
+                         ]
 
     rstring = re.compile(r"((\d..)?:(\d..)?),?|(\d..),?")
 
@@ -188,11 +173,18 @@ class EMU2751A(MicroScpiDevice):
                     self.relay_counter += 1
             return crossbars
 
-    def cb_relay_close(self, param="(@101)", query=False):
-        param = param.strip()
-        crossbars = self.channel_parser(param)
-        if crossbars is not None:
-            stat = []
+    def cb_relay_close(self, param, opt):
+        query = (opt[-1] == "?")
+
+        if query:
+            print("cb_relay_close", "Query", param)
+        elif param is not None:
+            print("cb_relay_close", param)
+
+            param = param.strip()
+            crossbars = self.channel_parser(param)
+            if crossbars is not None:
+                stat = []
             for crossbar in crossbars:
                 for cross in crossbar.range:
                     rowcol = self.mux.int_to_rowcol(cross)
@@ -202,32 +194,41 @@ class EMU2751A(MicroScpiDevice):
                         self.mux.connect(*rowcol)
                 print("Close:", "?" if query is True else "-", crossbar.range)
             print("{}".format(",".join(stat)))
-        return
+        else:
+            print("syntax error: no parameter")
 
-    def cb_relay_open(self, param="(@101)", query=False):
-        param = param.strip()
-        crossbars = self.channel_parser(param)
-        if crossbars is not None:
-            stat = []
-            for crossbar in crossbars:
-                for cross in crossbar.range:
-                    rowcol = self.mux.int_to_rowcol(cross)
-                    if query is True:
-                        stat.append("0" if self.mux.query(*rowcol) == 1 else "1")
-                    else:
-                        self.mux.disconnect(*rowcol)
-                print("Open:", "?" if query is True else "-", crossbar.range)
-            print("{}".format(",".join(stat)))
-        return
+    def cb_relay_open(self, param, opt):
+        query = (opt[-1] == "?")
+
+        if query:
+            print("cb_relay_open", "Query", param)
+        elif param is not None:
+            print("cb_relay_open", param)
+
+            param = param.strip()
+            crossbars = self.channel_parser(param)
+            if crossbars is not None:
+                stat = []
+                for crossbar in crossbars:
+                    for cross in crossbar.range:
+                        rowcol = self.mux.int_to_rowcol(cross)
+                        if query is True:
+                            stat.append("0" if self.mux.query(*rowcol) == 1 else "1")
+                        else:
+                            self.mux.disconnect(*rowcol)
+                    print("Open:", "?" if query is True else "-", crossbar.range)
+                print("{}".format(",".join(stat)))
+        else:
+            print("syntax error: no parameter")
 
     @staticmethod
     def cb_idn(param="", query=False):
         """<Vendor name>,<Model number>,<Serial number>,<Firmware version>"""
-        print("MicroScpiDevice,EMU2751A,C0FEE,0.0.1")
+        print("MicroScpiDevice,EMU2751A,C0FEE,0.0.2")
 
     @staticmethod
     def cb_version(param="", query=False):
         """The command returns a string in the form of “YYYY.V”, where “YYYY” represents
         the year of the version and “V” represents a version for that year (e.g. 1997.0).
         """
-        print("2022.12")
+        print("2023.04")
