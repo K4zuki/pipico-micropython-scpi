@@ -798,11 +798,10 @@ class RaspberryScpiPico(MicroScpiDevice):
                 address, data, stop = searched.groups()
                 stop = True if (int(stop) == 1) else False
                 address = int(f"0x{address}") >> shift
-                print(f"0x{address}")
                 if len(data) / 2 != len(data) // 2:
                     data = "0" + data
-                data_array = (int(data[i:i + 2], 16) for i in range(0, len(data), 2))
-                print([hex(c) for c in data_array])
+                data_array = int(f"0x{data}").to_bytes(ceil(len(data) / 2), "big")
+                print(f"0x{address:02x}", [f"0x{c:02x}" for c in data_array], stop)
                 try:
                     bus.writeto(address, bytes(data_array), stop)
                 except OSError:
@@ -890,10 +889,13 @@ class RaspberryScpiPico(MicroScpiDevice):
 
                 address = int(f"0x{address}") >> shift
                 memaddress = int(f"0x{memaddress}")
-                data = int(f"0x{data}").to_bytes(ceil(len(data) / 2), "big")
+                if len(data) / 2 != len(data) // 2:
+                    data = "0" + data
+                data_array = int(f"0x{data}").to_bytes(ceil(len(data) / 2), "big")
                 addrsize = 8 * int(addrsize)
+                print(f"0x{address:02x}", f"0x{memaddress:02x}", [f"0x{c:02x}" for c in data_array], addrsize)
                 try:
-                    bus.writeto_mem(address, memaddress, data)
+                    bus.writeto_mem(address, memaddress, data_array)
                 except OSError:
                     print("bus write failed")
             else:
