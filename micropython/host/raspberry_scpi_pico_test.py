@@ -145,6 +145,11 @@ scpi_commands = [
     "SPI0:TRANSfer 12345", "SPI0:TRANSfer 123456",
     "SPI1:TRANSfer 12345", "SPI1:TRANSfer 123456",
 
+    "I2C0:WRITE 78,0001020f2a7981ff7828,0",
+    "I2C0:WRITE 78,403031323334,1",
+
+    "I2C1:MEMory:WRITE 78,00,01020f2a7981ff7828,1",
+    "I2C1:MEMory:WRITE 78,40,b1b2b3b4b5,1",
 ]
 
 if __name__ == '__main__':
