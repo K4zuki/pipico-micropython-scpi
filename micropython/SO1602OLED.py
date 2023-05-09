@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 from hd44780compat import BitField, Register, HD44780Instructions
-import AQM0802
+from AQM0802 import AQM0802, DataCommandSelect
 
 SO1602A_ADDR = 0x3c  # 7-bit address
 
@@ -213,7 +213,7 @@ class FunctionSelectB(LongRegister):
         return (self.OPR,
                 self.ROM,
                 BitField("CONST", 4, 4, 0b0000, True),
-                BitField("CONST", 8, 8, 0x71, True),
+                BitField("CONST", 8, 8, 0x72, True),
                 )
 
 
@@ -281,7 +281,7 @@ class FadeOutBlinkingConfig(LongRegister):
 
 
 class SO1602Instructions(HD44780Instructions):
-    DataCommandSelect = AQM0802.DataCommandSelect()
+    DataCommandSelect = DataCommandSelect()
     DisplayStatusExtra = DisplayStatusExtra()
     Function = Function()
     FunctionExtra = FunctionExtra()
@@ -302,7 +302,7 @@ class SO1602Instructions(HD44780Instructions):
     FadeOutBlinkingConfig = FadeOutBlinkingConfig()
 
 
-class SO1602OLED(AQM0802.AQM0802):
+class SO1602OLED(AQM0802):
     slave_address = SO1602A_ADDR
     instructions = SO1602Instructions()
     line_counter_const = 1
