@@ -35,7 +35,7 @@ class BitField(namedtuple("BitField", ["name", "size", "offset", "por", "const"]
     """
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__()
         self.val = self.por
 
     @property
