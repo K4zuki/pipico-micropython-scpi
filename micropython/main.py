@@ -28,12 +28,7 @@ from RaspberryScpiPico import RaspberryScpiPico
 gets = sys.stdin.readline
 pico = RaspberryScpiPico()
 
-
-def pico_run():
-    while True:
-        line = gets().strip()
-        if len(line) > 0:
-            pico.parse_and_process(line)
-
-
-pico_run()
+while True:
+    line = gets().strip()
+    if len(line) > 0:
+        pico.parse_and_process(line)
