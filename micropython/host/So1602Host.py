@@ -23,6 +23,7 @@ SOFTWARE.
 """
 
 import time
+from halo import Halo
 
 from SO1602OLED import SO1602OLED
 
@@ -92,24 +93,26 @@ class So1602Host(SO1602OLED):
 if __name__ == '__main__':
     import pyvisa
 
-    port_name = "ASRL/dev/cu.usbmodem14101::INSTR"
+    port_name = "ASRL7::INSTR"
 
     rm = pyvisa.ResourceManager("@py")
     inst = pyvisa.resources.SerialInstrument(rm, port_name)
 
     oled = So1602Host(inst, 1)
     oled.reset()
+    oled.send_command(oled.instructions.ClearDisplay.val)
 
     oled.instructions.DisplayStatus.CURSOR_BLINK_ENABLE.val = 0
     oled.send_command(oled.instructions.DisplayStatus.val)
-    for rom in range(3):
-        oled.rom_select(rom)
-        time.sleep(0)
-        for d in range(256):
-            oled.instructions.DDRamAddress.AC.val = 0
-            oled.send_command(oled.instructions.DDRamAddress.val)
-            time.sleep(0.02)
-            oled.send_data(d)
-            time.sleep(0.02)
+    with Halo():
+        for rom in range(3):
+            oled.rom_select(rom)
+            time.sleep(0.1)
+            for d in range(256):
+                oled.instructions.DDRamAddress.AC.val = 0
+                oled.send_command(oled.instructions.DDRamAddress.val)
+                time.sleep(0.02)
+                oled.send_data(d)
+                time.sleep(0.02)
     oled.instructions.DisplayStatus.CURSOR_BLINK_ENABLE.val = 1
     oled.send_command(oled.instructions.DisplayStatus.val)
