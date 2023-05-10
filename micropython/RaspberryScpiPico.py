@@ -630,7 +630,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             # print("cb_led_state", "Query", param)
             pass
         elif param is not None:
-            print("cb_led_state", param)
+            # print("cb_led_state", param)
             pass
         else:
             print("syntax error: no parameter")
