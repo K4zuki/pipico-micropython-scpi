@@ -62,7 +62,7 @@ ADC[0123]:READ?
 import sys
 import time
 
-port_name = "ASRL/dev/cu.usbmodem14101::INSTR"
+port_name = "ASRL7::INSTR"
 
 scpi_commands = [
     "*IDN?",
@@ -179,8 +179,11 @@ if __name__ == '__main__':
         for command in scpi_commands:
             print("- - " * 5)
             print(command)
-            print(inst.query(command).strip())
-            time.sleep(0.5)
+            inst.write(command)
+            time.sleep(0.3)
+            if inst.bytes_in_buffer > 0:
+                ret = inst.read().strip()
+                print(ret)
 
             while inst.bytes_in_buffer > 0:
                 time.sleep(0.01)
