@@ -60,7 +60,7 @@ import time
 - I2C[01]:MEMory:READ address,memaddress,nbytes,addrsize
 
 - SPI[01]:CSEL:POLarity[?] 0|1|DEFault
-- SPI[01]:CSEL:VALue 0|1|OFF|ON
+- SPI[01]:CSEL:VALue[?] 0|1|OFF|ON
 - SPI[01]:MODE[?] 0|1|2|3|DEFault
 - SPI[01]:FREQuency[?] num
 - SPI[01]:TRANSfer data
@@ -1019,7 +1019,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_spi_cs_val(self, param, opt):
         """
-        - SPI[01]:CSEL:VALue 0|1|OFF|ON
+        - SPI[01]:CSEL:VALue[?] 0|1|OFF|ON
 
         :param param:
         :param opt:
@@ -1035,7 +1035,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_spi_cs_val", "Query", param)
-            pass
+            print(IO_VALUE_STRINGS[cs_pin.value() ^ cs_pol])
         elif param is not None:
             # print("cb_spi_cs_val", param)
             if param == str(IO_ON) or self.kw_on.match(param).match:
