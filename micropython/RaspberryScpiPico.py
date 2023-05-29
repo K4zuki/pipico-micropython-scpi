@@ -1038,9 +1038,9 @@ class RaspberryScpiPico(MicroScpiDevice):
             print(IO_VALUE_STRINGS[cs_pin.value() ^ cs_pol])
         elif param is not None:
             # print("cb_spi_cs_val", param)
-            if param == str(IO_ON) or self.kw_on.match(param).match:
+            if param == str(SPI_CSPOL_HI) or self.kw_on.match(param).match:
                 cs_pin.value(cs_pol ^ 1)
-            elif param == str(IO_OFF) or self.kw_off.match(param).match:
+            elif param == str(SPI_CSPOL_LO) or self.kw_off.match(param).match:
                 cs_pin.value(cs_pol)
             else:
                 print("syntax error: invalid value:", param)
