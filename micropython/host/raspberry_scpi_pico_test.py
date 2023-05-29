@@ -62,7 +62,7 @@ ADC[0123]:READ?
 import sys
 import time
 
-port_name = "ASRL/dev/cu.usbmodem14101::INSTR"
+port_name = "ASRL7::INSTR"
 
 scpi_commands = [
     "*IDN?",
@@ -128,8 +128,10 @@ scpi_commands = [
 
     "SPI0:CSEL:POLarity?", "SPI0:CSEL:POLarity 0", "SPI0:CSEL:POLarity 1", "SPI0:CSEL:POLarity DEFault",
     "SPI1:CSEL:POLarity?", "SPI1:CSEL:POLarity 0", "SPI1:CSEL:POLarity 1", "SPI1:CSEL:POLarity DEFault",
-    "SPI0:CSEL:VALue 0", "SPI0:CSEL:VALue 1", "SPI0:CSEL:VALue OFF", "SPI0:CSEL:VALue ON",
-    "SPI1:CSEL:VALue 0", "SPI1:CSEL:VALue 1", "SPI1:CSEL:VALue OFF", "SPI1:CSEL:VALue ON",
+    "SPI0:CSEL:VALue 0", "SPI0:CSEL:VALue?", "SPI0:CSEL:VALue 1", "SPI0:CSEL:VALue?", "SPI0:CSEL:VALue OFF",
+    "SPI0:CSEL:VALue?", "SPI0:CSEL:VALue ON", "SPI0:CSEL:VALue?",
+    "SPI1:CSEL:VALue 0", "SPI1:CSEL:VALue?", "SPI1:CSEL:VALue 1", "SPI1:CSEL:VALue?", "SPI1:CSEL:VALue OFF",
+    "SPI1:CSEL:VALue?", "SPI1:CSEL:VALue ON", "SPI1:CSEL:VALue?",
     "SPI0:MODE?", "SPI0:MODE 0", "SPI0:MODE 1", "SPI0:MODE?", "SPI0:MODE 2", "SPI0:MODE?", "SPI0:MODE 3", "SPI0:MODE?",
     "SPI0:MODE DEFault", "SPI0:MODE?", "SPI0:MODE", "SPI0:MODE 5", "SPI0:MODE A",
     "SPI1:MODE?", "SPI1:MODE 0", "SPI1:MODE 1", "SPI1:MODE?", "SPI1:MODE 2", "SPI1:MODE?", "SPI1:MODE 3", "SPI1:MODE?",
@@ -179,8 +181,11 @@ if __name__ == '__main__':
         for command in scpi_commands:
             print("- - " * 5)
             print(command)
-            print(inst.query(command).strip())
-            time.sleep(0.5)
+            inst.write(command)
+            time.sleep(0.3)
+            if inst.bytes_in_buffer > 0:
+                ret = inst.read().strip()
+                print(ret)
 
             while inst.bytes_in_buffer > 0:
                 time.sleep(0.01)
