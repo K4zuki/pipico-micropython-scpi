@@ -1,6 +1,6 @@
 ---
 title: "**ラズピコ計測器コマンドマニュアル**"
-subtitle:
+subtitle: "Ｋーサイト風"
 circle: KY技研
 author: K4ZUKI
 comiket: コミケ
@@ -84,4 +84,5 @@ docx_coreprop:
   #    "Normal": "Body Text"
   #    "First Paragraph": "Body Text"
   character:
+    "Verbatim Char": "NormalTok"
 ...
