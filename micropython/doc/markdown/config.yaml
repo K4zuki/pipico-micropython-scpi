@@ -1,9 +1,9 @@
 ---
-title: "**ラズピコ計測器コマンドマニュアル**"
-subtitle: "Ｋーサイト風"
+title: "Raspberry Pi Pico as a SCPI instrument"
+subtitle:
 circle: KY技研
 author: K4ZUKI
-comiket: コミケ
+comiket: C102
 year: 2023
 publisher: 印刷会社で印刷製本
 docrevision: "1.0"
