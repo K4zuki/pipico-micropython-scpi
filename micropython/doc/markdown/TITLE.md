@@ -81,9 +81,9 @@
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                      | Type          | Range of values                                                                    | Default value |
-|-------------------------------------------|---------------|------------------------------------------------------------------------------------|---------------|
-| [\<frequency\>]{custom-style="NormalTok"} | [`NR1`](#nr1) | [100_000_000]{custom-style="NormalTok"} to [275_000_000]{custom-style="NormalTok"} | N/A           |
+| Item                                      | Type                                    | Range of values                                                                    | Default value |
+|-------------------------------------------|-----------------------------------------|------------------------------------------------------------------------------------|---------------|
+| [\<frequency\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [100_000_000]{custom-style="NormalTok"} to [275_000_000]{custom-style="NormalTok"} | N/A           |
 
 </div>
 
@@ -97,11 +97,11 @@
 
 #### Returned Query Format {-}
 
-`<NR1>`
+[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
 
 #### Example {-}
 
-Typical Response: `125000000`
+Typical Response: _`125000000`_
 
 # PIN Subsystem
 
@@ -131,10 +131,10 @@ Typical Response: `125000000`
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                 | Type        | Values                                              | Default value |
-|--------------------------------------|-------------|-----------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"}  | [NR1](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"}   | N/A           |
-| [\<mode\>]{custom-style="NormalTok"} | [CRD](#crd) | [INput/OUTput/ODrain/PWM]{custom-style="NormalTok"} | N/A           |
+| Item                                 | Type                                    | Values                                              | Default value |
+|--------------------------------------|-----------------------------------------|-----------------------------------------------------|---------------|
+| [\<pin\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"}   | N/A           |
+| [\<mode\>]{custom-style="NormalTok"} | [[CRD]{custom-style="NormalTok"}](#crd) | [INput/OUTput/ODrain/PWM]{custom-style="NormalTok"} | N/A           |
 
 </div>
 
@@ -148,19 +148,19 @@ Typical Response: `125000000`
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type          | Values                                            | Default value |
-|-------------------------------------|---------------|---------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"} | [`NR1`](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
+| Item                                | Type                                    | Values                                            | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------|---------------|
+| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
 
 </div>
 
 #### Returned Query Format {-}
 
-[`<CRD>`](#crd)
+[[\<CRD\>]{custom-style="NormalTok"}](#crd)
 
 #### Example {-}
 
-Typical Response: `INput`
+Typical Response: _`INput`_
 
 ## PIN:VALue {-}
 
@@ -172,10 +172,10 @@ Typical Response: `INput`
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                  | Type            | Values                                            | Default value |
-|---------------------------------------|-----------------|---------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"}   | [`NR1`](#nr1)   | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
-| [\<value\>]{custom-style="NormalTok"} | [`Bool`](#bool) |                                                   | N/A           |
+| Item                                  | Type                                      | Values                                            | Default value |
+|---------------------------------------|-------------------------------------------|---------------------------------------------------|---------------|
+| [\<pin\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1)   | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
+| [\<value\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool) |                                                   | N/A           |
 
 </div>
 
@@ -189,15 +189,19 @@ Typical Response: `INput`
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type          | Values                                            | Default value |
-|-------------------------------------|---------------|---------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"} | [`NR1`](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
+| Item                                | Type                                    | Values                                            | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------|---------------|
+| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
 
 </div>
 
+#### Returned Query Format {-}
+
+[[\<CRD\>]{custom-style="NormalTok"}](#crd)
+
 #### Example {-}
 
-Typical Response: `ON`
+Typical Response: _`ON`_
 
 ## PIN:ON {-}
 
@@ -209,9 +213,9 @@ Typical Response: `ON`
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type          | Values                                            | Default value |
-|-------------------------------------|---------------|---------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"} | [`NR1`](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
+| Item                                | Type                                    | Values                                            | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------|---------------|
+| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
 
 </div>
 
@@ -225,9 +229,9 @@ Typical Response: `ON`
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type          | Values                                            | Default value |
-|-------------------------------------|---------------|---------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"} | [`NR1`](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
+| Item                                | Type                                    | Values                                            | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------|---------------|
+| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
 
 </div>
 
@@ -241,10 +245,10 @@ Typical Response: `ON`
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                      | Type          | Values                                                                             | Default value |
-|-------------------------------------------|---------------|------------------------------------------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"}       | [`NR1`](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"}                                  | N/A           |
-| [\<frequency\>]{custom-style="NormalTok"} | [`NR1`](#nr1) | [100_000_000]{custom-style="NormalTok"} to [275_000_000]{custom-style="NormalTok"} | N/A           |
+| Item                                      | Type                                    | Values                                                                  | Default value |
+|-------------------------------------------|-----------------------------------------|-------------------------------------------------------------------------|---------------|
+| [\<pin\>]{custom-style="NormalTok"}       | [[NR1]{custom-style="NormalTok"}](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"}                       | N/A           |
+| [\<frequency\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [1000]{custom-style="NormalTok"} to [100_000]{custom-style="NormalTok"} | N/A           |
 
 </div>
 
@@ -258,29 +262,34 @@ Typical Response: `ON`
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type          | Values                                            | Default value |
-|-------------------------------------|---------------|---------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"} | [`NR1`](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
+| Item                                | Type                                    | Values                                            | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------|---------------|
+| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
 
 </div>
 
+#### Returned Query Format {-}
+
+[[\<CRD\>]{custom-style="NormalTok"}](#crd)
+
 #### Example {-}
 
-Typical Response: `125000000`
+Typical Response: _`500000`_
 
 ## PIN:PWM:DUTY {-}
 
 #### Syntax {-}
 
-`PIN<pin>:PWM:DUTY num`
+`PIN<pin>:PWM:DUTY <duty>`
 
 #### Parameter {-}
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type          | Values                                            | Default value |
-|-------------------------------------|---------------|---------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"} | [`NR1`](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
+| Item                                 | Type                                    | Values                                                             | Default value |
+|--------------------------------------|-----------------------------------------|--------------------------------------------------------------------|---------------|
+| [\<pin\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"}                  | N/A           |
+| [\<duty\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [1]{custom-style="NormalTok"} to [65535]{custom-style="NormalTok"} | N/A           |
 
 </div>
 
@@ -294,11 +303,19 @@ Typical Response: `125000000`
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type          | Values                                            | Default value |
-|-------------------------------------|---------------|---------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"} | [`NR1`](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
+| Item                                | Type                                    | Values                                            | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------|---------------|
+| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
 
 </div>
+
+#### Returned Query Format {-}
+
+[[\<CRD\>]{custom-style="NormalTok"}](#crd)
+
+#### Example {-}
+
+Typical Response: _`500000`_
 
 # LED Subsystem
 
