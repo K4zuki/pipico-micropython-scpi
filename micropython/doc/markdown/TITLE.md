@@ -1,5 +1,7 @@
 \toc
 
+# Raspberry Pi Pico as SCPI instrument
+
 # Parameter types
 
 [`<NR1>`]{#nr1}
@@ -77,6 +79,8 @@
 
 `MACHINE:FREQuency <frequency>`
 
+This command sets Pico's CPU clock frequency in Hz. `<frequency>` must be between 100MHz and 275MHz inclusive.
+
 #### Parameter {-}
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
@@ -94,6 +98,8 @@
 #### Syntax {-}
 
 `MACHINE:FREQuency?`
+
+This query returns Pico's CPU clock frequency in Hz.
 
 #### Returned Query Format {-}
 
@@ -127,6 +133,8 @@ Typical Response: _`125000000`_
 
 `PIN<pin>:MODE <mode>`
 
+This command sets mode of specified IO pin.
+
 #### Parameter {-}
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
@@ -143,6 +151,8 @@ Typical Response: _`125000000`_
 #### Syntax {-}
 
 `PIN<pin>:MODE?`
+
+This query returns status of specified IO pin's mode.
 
 #### Parameter {-}
 
@@ -168,6 +178,9 @@ Typical Response: _`INput`_
 
 `PIN<pin>:VALue <value>`
 
+This command sets logical value of of specified IO pin. Numeric `1` and string `ON` sets logic HI.
+Numeric `0` and string `OFF` sets logic LO.
+
 #### Parameter {-}
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
@@ -184,6 +197,8 @@ Typical Response: _`INput`_
 #### Syntax {-}
 
 `PIN<pin>:VALue?`
+
+This query returns logical value of specified IO pin. `ON` is a logic HI, `OFF` is a logic LO.
 
 #### Parameter {-}
 
@@ -209,6 +224,8 @@ Typical Response: _`ON`_
 
 `PIN<pin>:ON`
 
+This command sets logical value of specified IO pin to logic HI.
+
 #### Parameter {-}
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
@@ -224,6 +241,8 @@ Typical Response: _`ON`_
 #### Syntax {-}
 
 `PIN<pin>:OFF`
+
+This command sets logical value of specified IO pin to logic LO.
 
 #### Parameter {-}
 
@@ -241,6 +260,8 @@ Typical Response: _`ON`_
 
 `PIN<pin>:PWM:FREQuency <frequency>`
 
+This command sets PWM frequency of specified IO pin in Hz.
+
 #### Parameter {-}
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
@@ -257,6 +278,8 @@ Typical Response: _`ON`_
 #### Syntax {-}
 
 `PIN<pin>:PWM:FREQuency?`
+
+This query returns PWM frequency of specified IO pin in Hz.
 
 #### Parameter {-}
 
@@ -282,6 +305,8 @@ Typical Response: _`500000`_
 
 `PIN<pin>:PWM:DUTY <duty>`
 
+This command sets PWM duty of specified IO pin in range of 1 to 65535.
+
 #### Parameter {-}
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
@@ -299,6 +324,8 @@ Typical Response: _`500000`_
 
 `PIN<pin>:PWM:DUTY?`
 
+This query returns PWM duty of specified IO pin in range of 1 to 65535
+
 #### Parameter {-}
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
@@ -311,33 +338,150 @@ Typical Response: _`500000`_
 
 #### Returned Query Format {-}
 
+[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
+
+#### Example {-}
+
+Typical Response: _`32768`_
+
+# LED Subsystem
+
+```{=openxml}
+<w:sdt>
+    <w:sdtContent xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <w:p>
+            <w:r>
+                <w:fldChar w:fldCharType="begin" w:dirty="true" />
+                <w:instrText xml:space="preserve">TOC \o "2-2" \h \b ”led-subsystem” \u</w:instrText>
+                <w:fldChar w:fldCharType="separate" />
+                <w:fldChar w:fldCharType="end" />
+            </w:r>
+        </w:p>
+    </w:sdtContent>
+</w:sdt>
+
+```
+
+## LED:ON {-}
+
+#### Syntax {-}
+
+`LED:ON`
+
+This command turns onboard LED on.
+
+## LED:OFF {-}
+
+#### Syntax {-}
+
+`LED:OFF`
+
+This command turns onboard LED off.
+
+## LED:VALue {-}
+
+#### Syntax {-}
+
+`LED:VALue <value>`
+
+This command sets logical value of onboard LED. Numeric `1` and string `ON` turns on.
+Numeric `0` and string `OFF` turns off.
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                  | Type                                      | Values | Default value |
+|---------------------------------------|-------------------------------------------|--------|---------------|
+| [\<value\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool) |        | N/A           |
+
+</div>
+
+## LED:VALue? {-}
+
+#### Syntax {-}
+
+This query returns logical value of onboard LED.
+
+#### Returned Query Format {-}
+
+[[\<CRD\>]{custom-style="NormalTok"}](#crd)
+
+#### Example {-}
+
+Typical Response: _`ON`_
+
+## LED:PWM:ENable {-}
+
+#### Syntax {-}
+
+This command enables PWM output for onboard LED.
+
+## LED:PWM:DISable {-}
+
+#### Syntax {-}
+
+This command disables PWM output for onboard LED.
+
+## LED:PWM:FREQuency {-}
+
+#### Syntax {-}
+
+This command sets PWM frequency of onboard LED in Hz.
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                      | Type                                    | Values                                                                  | Default value |
+|-------------------------------------------|-----------------------------------------|-------------------------------------------------------------------------|---------------|
+| [\<frequency\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [1000]{custom-style="NormalTok"} to [100_000]{custom-style="NormalTok"} | N/A           |
+
+</div>
+
+## LED:PWM:FREQuency? {-}
+
+#### Syntax {-}
+
+This query returns PWM frequency of onboard LED in Hz.
+
+#### Returned Query Format {-}
+
 [[\<CRD\>]{custom-style="NormalTok"}](#crd)
 
 #### Example {-}
 
 Typical Response: _`500000`_
 
-# LED Subsystem
-
-## LED:ON {-}
-
-## LED:OFF {-}
-
-## LED:VALue {-}
-
-## LED:VALue? {-}
-
-## LED:PWM:ENable {-}
-
-## LED:PWM:DISable {-}
-
-## LED:PWM:FREQuency {-}
-
-## LED:PWM:FREQuency? {-}
-
 ## LED:PWM:DUTY {-}
 
+#### Syntax {-}
+
+This command sets PWM duty of onboard LED in range of 1 to 65535.
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                 | Type                                    | Values                                                             | Default value |
+|--------------------------------------|-----------------------------------------|--------------------------------------------------------------------|---------------|
+| [\<duty\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [1]{custom-style="NormalTok"} to [65535]{custom-style="NormalTok"} | N/A           |
+
+</div>
+
 ## LED:PWM:DUTY? {-}
+
+#### Syntax {-}
+
+This query returns PWM duty of onboard LED in range of 1 to 65535.
+
+#### Returned Query Format {-}
+
+[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
+
+#### Example {-}
+
+Typical Response: _`32768`_
 
 # I2C Subsystem
 
