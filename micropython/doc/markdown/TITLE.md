@@ -18,6 +18,10 @@
 
 :   Digits with an explicit decimal point and an exponent. Example: `2.73E+02`
 
+[`<NR4>`]{#nr4}
+
+:   Hexadecimal, even number of digits without a negative sign `"-"`. Example: `DEAD BEAF C00F3E`
+
 [`<NRf>`]{#nrf}
 
 :   Extended format that includes `<NR1>`, `<NR2>`, and `<NR3>`. Examples: `273 27.3 2.73E+02`
@@ -293,7 +297,7 @@ This query returns PWM frequency of specified IO pin in Hz.
 
 #### Returned Query Format {-}
 
-[[\<CRD\>]{custom-style="NormalTok"}](#crd)
+[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
 
 #### Example {-}
 
@@ -401,6 +405,8 @@ Numeric `0` and string `OFF` turns off.
 
 #### Syntax {-}
 
+`LED:VALue?`
+
 This query returns logical value of onboard LED.
 
 #### Returned Query Format {-}
@@ -415,17 +421,23 @@ Typical Response: _`ON`_
 
 #### Syntax {-}
 
+`LED:PWM:ENable`
+
 This command enables PWM output for onboard LED.
 
 ## LED:PWM:DISable {-}
 
 #### Syntax {-}
 
+`LED:PWM:DISable`
+
 This command disables PWM output for onboard LED.
 
 ## LED:PWM:FREQuency {-}
 
 #### Syntax {-}
+
+`LED:PWM:FREQuency <frequency>`
 
 This command sets PWM frequency of onboard LED in Hz.
 
@@ -443,11 +455,13 @@ This command sets PWM frequency of onboard LED in Hz.
 
 #### Syntax {-}
 
+`LED:PWM:FREQuency?`
+
 This query returns PWM frequency of onboard LED in Hz.
 
 #### Returned Query Format {-}
 
-[[\<CRD\>]{custom-style="NormalTok"}](#crd)
+[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
 
 #### Example {-}
 
@@ -456,6 +470,8 @@ Typical Response: _`500000`_
 ## LED:PWM:DUTY {-}
 
 #### Syntax {-}
+
+`LED:PWM:DUTY <duty>`
 
 This command sets PWM duty of onboard LED in range of 1 to 65535.
 
@@ -473,6 +489,8 @@ This command sets PWM duty of onboard LED in range of 1 to 65535.
 
 #### Syntax {-}
 
+`LED:PWM:DUTY?`
+
 This query returns PWM duty of onboard LED in range of 1 to 65535.
 
 #### Returned Query Format {-}
@@ -485,23 +503,239 @@ Typical Response: _`32768`_
 
 # I2C Subsystem
 
+```{=openxml}
+<w:sdt>
+    <w:sdtContent xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <w:p>
+            <w:r>
+                <w:fldChar w:fldCharType="begin" w:dirty="true" />
+                <w:instrText xml:space="preserve">TOC \o "2-2" \h \b ”i2c-subsystem” \u</w:instrText>
+                <w:fldChar w:fldCharType="separate" />
+                <w:fldChar w:fldCharType="end" />
+            </w:r>
+        </w:p>
+    </w:sdtContent>
+</w:sdt>
+
+```
+
 ## I2C:SCAN? {-}
+
+#### Syntax {-}
+
+`I2C<bus>:SCAN?`
+
+This query returns list of I2C slave device on the specified bus.
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                | Type                                    | Values                                                                    | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+
+</div>
+
+#### Returned Query Format {-}
+
+[`NR4[,NR4]`](#nr4)
+
+#### Example {-}
+
+Typical Response: _`A6,5A,80,EE`_ when 8-bit addressing. _`53,2D,40,77`_ when 7-bit addressing
 
 ## I2C:FREQuency {-}
 
+#### Syntax {-}
+
+`I2C<bus>:FREQuency <frequency>`
+
+This command sets clock frequency of specified bus.
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                      | Type                                    | Values                                                                    | Default value |
+|-------------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}       | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| [\<frequency\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [10_000]{custom-style="NormalTok"} to [400_000]{custom-style="NormalTok"} | N/A           |
+
+</div>
+
 ## I2C:FREQuency? {-}
+
+#### Syntax {-}
+
+`I2C<bus>:FREQuency?`
+
+This query returns clock frequency of specified bus.
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                | Type                                    | Values                                                                    | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+
+</div>
+
+#### Returned Query Format {-}
+
+[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
+
+#### Example {-}
+
+Typical Response: _`400000`_
 
 ## I2C:ADDRess:BIT {-}
 
+#### Syntax {-}
+
+`I2C<bus>:ADDRess:BIT <bit>`
+
+This command sets addressing of specified bus.
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                | Type                                    | Values                                                                                         | Default value |
+|-------------------------------------|-----------------------------------------|------------------------------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                      | N/A           |
+| [\<bit\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus addressing. [0]{custom-style="NormalTok"} is 7-bit, [1]{custom-style="NormalTok"} is 8-bit | N/A           |
+
+</div>
+
 ## I2C:ADDRess:BIT? {-}
+
+#### Syntax {-}
+
+`I2C<bus>:ADDRess:BIT?`
+
+This query returns addressing of specified bus.
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                | Type                                    | Values                                                                    | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+
+</div>
+
+#### Returned Query Format {-}
+
+[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
+
+#### Example {-}
+
+Typical Response: _`0`_
 
 ## I2C:WRITE {-}
 
+#### Syntax {-}
+
+`I2C<bus>:WRITE <address>,<buffer>,<stop>`
+
+This command sets list of hexadecimal to specified slave device on the bus.
+Stop bit condition is configured by `<stop>`
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                    | Type                                    | Values                                                                    | Default value |
+|-----------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}     | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| [\<address\>]{custom-style="NormalTok"} | [[NR4]{custom-style="NormalTok"}](#nr4) | [01]{custom-style="NormalTok"} to [FF]{custom-style="NormalTok"}          | N/A           |
+| [\<buffer\>]{custom-style="NormalTok"}  | [[NR4]{custom-style="NormalTok"}](#nr4) |                                                                           | N/A           |
+| [\<stop\>]{custom-style="NormalTok"}    | [[NR1]{custom-style="NormalTok"}](#nr1) | [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}`           | N/A           |
+
+</div>
+
 ## I2C:READ? {-}
+
+#### Syntax {-}
+
+`I2C<bus>:READ? <address>,<length>,<stop>`
+
+This query returns
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                   | Type                                    | Values                                                                    | Default value |
+|----------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}    | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| [\<length\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | 1 or larger                                                               | N/A           |
+| [\<stop\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1) | [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}            | N/A           |
+
+</div>
+
+#### Returned Query Format {-}
+
+[`NR4 [,NR4]`](#nr4)
+
+#### Example {-}
+
+Typical Response: _`DE,AD,BE,EF`_
 
 ## I2C:MEMory:WRITE {-}
 
+#### Syntax {-}
+
+`I2C<bus>:MEMory:WRITE <address>,<memaddress>,<buffer>,<addrsize>`
+
+This command sets
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                       | Type                                    | Values                                                                    | Default value |
+|--------------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}        | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| [\<address\>]{custom-style="NormalTok"}    | [[NR4]{custom-style="NormalTok"}](#nr4) | [01]{custom-style="NormalTok"} to [FF]{custom-style="NormalTok"}          | N/A           |
+| [\<memaddress\>]{custom-style="NormalTok"} | [[NR4]{custom-style="NormalTok"}](#nr4) | [00]{custom-style="NormalTok"} to [FF]{custom-style="NormalTok"}          | N/A           |
+| [\<buffer\>]{custom-style="NormalTok"}     | [[NR4]{custom-style="NormalTok"}](#nr4) |                                                                           | N/A           |
+| [\<addrsize\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1) | [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}            | N/A           |
+
+</div>
+
 ## I2C:MEMory:READ {-}
+
+#### Syntax {-}
+
+`I2C<bus>:MEMory:READ? <address>,<memaddress>,<nbytes>,<addrsize>`
+
+This query returns
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                       | Type                                    | Values                                                                    | Default value |
+|--------------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}        | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| [\<address\>]{custom-style="NormalTok"}    | [[NR4]{custom-style="NormalTok"}](#nr4) | [01]{custom-style="NormalTok"} to [FF]{custom-style="NormalTok"}          | N/A           |
+| [\<memaddress\>]{custom-style="NormalTok"} | [[NR4]{custom-style="NormalTok"}](#nr4) | [00]{custom-style="NormalTok"} to [FF]{custom-style="NormalTok"}          | N/A           |
+| [\<nbytes\>]{custom-style="NormalTok"}     | [[NR1]{custom-style="NormalTok"}](#nr4) | 1 or larger                                                               | N/A           |
+| [\<addrsize\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1) | [1]{custom-style="NormalTok"} or [2]{custom-style="NormalTok"}            | N/A           |
+
+</div>
+
+#### Returned Query Format {-}
+
+[`NR4 [,NR4]`](#nr4)
+
+#### Example {-}
+
+Typical Response: _`DE,AD,BE,EF`_
 
 # SPI Subsystem
 
@@ -537,16 +771,16 @@ Typical Response: _`32768`_
 
 #### Syntax {-}
 
-- \*IDN?
+`*IDN?`
 
-This command reads the instrument's identification string which contains four\
-comma-separated fields. The first field is the manufacturer's name, the second is\
-the model number of the instrument, the third is the serial number, and the fourth\
+This command reads the instrument's identification string which contains four
+comma-separated fields. The first field is the manufacturer's name, the second is
+the model number of the instrument, the third is the serial number, and the fourth
 is the firmware revision which contains three firmwares separated by dashes.
 
 #### Returned Query Format {-}
 
-- \<AARD\>
+`<AARD>`
 
 > The command returns a string with the following format.
 >
@@ -565,3 +799,5 @@ The following query returns the instrument's identification string.
 If the system is unable to recognize the model number or serial number,
 the \*IDN? command will return the default value of the model and serial number.
 Please perform self-test for error check.
+
+## \*RST
