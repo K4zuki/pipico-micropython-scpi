@@ -43,10 +43,6 @@
 
 :   Character Program Data. Programs discrete parameters. Accepts both the short form and long form.
 
-[`<SRD>`]{#srd}
-
-:   String Response Data. Returns string parameters enclosed in single or double quotes.
-
 [`<CRD>`]{#crd}
 
 :   Character Response Data. Returns discrete parameters. Only the short form of the parameter is returned.
@@ -83,7 +79,7 @@
 
 `MACHINE:FREQuency <frequency>`
 
-This command sets Pico's CPU clock frequency in Hz. `<frequency>` must be between 100MHz and 275MHz inclusive.
+:   This command sets Pico's CPU clock frequency in Hz. `<frequency>` must be between 100MHz and 275MHz inclusive.
 
 #### Parameter {-}
 
@@ -97,13 +93,17 @@ This command sets Pico's CPU clock frequency in Hz. `<frequency>` must be betwee
 
 #### Example {-}
 
+:::{custom-style="Definition Term"}
+`MACHINE:FREQ 250e6` [// CPU is overclocking at 250MHz]{custom-style="CommentTok"}
+:::
+
 ## MACHINE:FREQuency? {-}
 
 #### Syntax {-}
 
 `MACHINE:FREQuency?`
 
-This query returns Pico's CPU clock frequency in Hz.
+:   This query returns Pico's CPU clock frequency in Hz.
 
 #### Returned Query Format {-}
 
@@ -111,7 +111,9 @@ This query returns Pico's CPU clock frequency in Hz.
 
 #### Example {-}
 
-Typical Response: _`125000000`_
+`MACHINE:FREQ?` [// Returns frequency in Hz]{custom-style="CommentTok"}
+
+:   Typical Response: _`125000000`_
 
 # PIN Subsystem
 
@@ -137,7 +139,7 @@ Typical Response: _`125000000`_
 
 `PIN<pin>:MODE <mode>`
 
-This command sets mode of specified IO pin.
+:   This command sets mode of specified IO pin.
 
 #### Parameter {-}
 
@@ -150,13 +152,19 @@ This command sets mode of specified IO pin.
 
 </div>
 
+#### Example {-}
+
+:::{custom-style="Definition Term"}
+`PIN14:MODE OUTput` [// Sets Pin14 to output mode]{custom-style="CommentTok"}
+:::
+
 ## PIN:MODE? {-}
 
 #### Syntax {-}
 
 `PIN<pin>:MODE?`
 
-This query returns status of specified IO pin's mode.
+:   This query returns status of specified IO pin's mode.
 
 #### Parameter {-}
 
@@ -174,7 +182,9 @@ This query returns status of specified IO pin's mode.
 
 #### Example {-}
 
-Typical Response: _`INput`_
+`PIN14:MODE?` [// Returns Pin14 pin mode]{custom-style="CommentTok"}
+
+:   Typical Response: _`INput`_
 
 ## PIN:VALue {-}
 
@@ -182,8 +192,8 @@ Typical Response: _`INput`_
 
 `PIN<pin>:VALue <value>`
 
-This command sets logical value of of specified IO pin. Numeric `1` and string `ON` sets logic HI.
-Numeric `0` and string `OFF` sets logic LO.
+:   This command sets logical value of of specified IO pin.
+Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets logic LO.
 
 #### Parameter {-}
 
@@ -196,13 +206,20 @@ Numeric `0` and string `OFF` sets logic LO.
 
 </div>
 
+#### Example {-}
+
+:::{custom-style="Definition Term"}
+`PIN14:VAL ON` [// Sets Pin14 to logic HI]{custom-style="CommentTok"} \
+`PIN14:VALue 0` [// Sets Pin14 to logic LO]{custom-style="CommentTok"}
+:::
+
 ## PIN:VALue? {-}
 
 #### Syntax {-}
 
 `PIN<pin>:VALue?`
 
-This query returns logical value of specified IO pin. `ON` is a logic HI, `OFF` is a logic LO.
+:   This query returns logical value of specified IO pin. `ON` is a logic HI, `OFF` is a logic LO.
 
 #### Parameter {-}
 
@@ -220,7 +237,9 @@ This query returns logical value of specified IO pin. `ON` is a logic HI, `OFF` 
 
 #### Example {-}
 
-Typical Response: _`ON`_
+`PIN14:VAL?` [// Returns Pin14 pin value]{custom-style="CommentTok"}
+
+:   Typical Response: _`ON`_
 
 ## PIN:ON {-}
 
@@ -228,7 +247,7 @@ Typical Response: _`ON`_
 
 `PIN<pin>:ON`
 
-This command sets logical value of specified IO pin to logic HI.
+:   This command sets logical value of specified IO pin to logic HI.
 
 #### Parameter {-}
 
@@ -246,7 +265,7 @@ This command sets logical value of specified IO pin to logic HI.
 
 `PIN<pin>:OFF`
 
-This command sets logical value of specified IO pin to logic LO.
+:   This command sets logical value of specified IO pin to logic LO.
 
 #### Parameter {-}
 
@@ -264,7 +283,7 @@ This command sets logical value of specified IO pin to logic LO.
 
 `PIN<pin>:PWM:FREQuency <frequency>`
 
-This command sets PWM frequency of specified IO pin in Hz.
+:   This command sets PWM frequency of specified IO pin in Hz.
 
 #### Parameter {-}
 
@@ -277,13 +296,19 @@ This command sets PWM frequency of specified IO pin in Hz.
 
 </div>
 
+#### Example {-}
+
+:::{custom-style="Definition Term"}
+`PIN14:FREQ 55555` [// Pin14 PWM frequency is set at 55555Hz]{custom-style="CommentTok"}
+:::
+
 ## PIN:PWM:FREQuency? {-}
 
 #### Syntax {-}
 
 `PIN<pin>:PWM:FREQuency?`
 
-This query returns PWM frequency of specified IO pin in Hz.
+:   This query returns PWM frequency of specified IO pin in Hz.
 
 #### Parameter {-}
 
@@ -301,7 +326,9 @@ This query returns PWM frequency of specified IO pin in Hz.
 
 #### Example {-}
 
-Typical Response: _`500000`_
+`PIN14:PWM:FREQ?` [// Returns Pin14 PWM frequency in Hz]{custom-style="CommentTok"}
+
+:   Typical Response: _`500000`_
 
 ## PIN:PWM:DUTY {-}
 
@@ -309,7 +336,7 @@ Typical Response: _`500000`_
 
 `PIN<pin>:PWM:DUTY <duty>`
 
-This command sets PWM duty of specified IO pin in range of 1 to 65535.
+:   This command sets PWM duty of specified IO pin in range of 1 to 65535.
 
 #### Parameter {-}
 
@@ -322,13 +349,19 @@ This command sets PWM duty of specified IO pin in range of 1 to 65535.
 
 </div>
 
+#### Example {-}
+
+:::{custom-style="Definition Term"}
+`PIN14:DUTY 25252` [// Pin14 PWM duty is set at 25252 out of 65535]{custom-style="CommentTok"}
+:::
+
 ## PIN:PWM:DUTY? {-}
 
 #### Syntax {-}
 
 `PIN<pin>:PWM:DUTY?`
 
-This query returns PWM duty of specified IO pin in range of 1 to 65535
+:   This query returns PWM duty of specified IO pin in range of 1 to 65535
 
 #### Parameter {-}
 
@@ -346,7 +379,9 @@ This query returns PWM duty of specified IO pin in range of 1 to 65535
 
 #### Example {-}
 
-Typical Response: _`32768`_
+`PIN14:DUTY?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
+
+:   Typical Response: _`32768`_
 
 # LED Subsystem
 
@@ -372,7 +407,7 @@ Typical Response: _`32768`_
 
 `LED:ON`
 
-This command turns onboard LED on.
+:   This command turns onboard LED on.
 
 ## LED:OFF {-}
 
@@ -380,7 +415,7 @@ This command turns onboard LED on.
 
 `LED:OFF`
 
-This command turns onboard LED off.
+:   This command turns onboard LED off.
 
 ## LED:VALue {-}
 
@@ -388,7 +423,7 @@ This command turns onboard LED off.
 
 `LED:VALue <value>`
 
-This command sets logical value of onboard LED. Numeric `1` and string `ON` turns on.
+:   This command sets logical value of onboard LED. Numeric `1` and string `ON` turns on.
 Numeric `0` and string `OFF` turns off.
 
 #### Parameter {-}
@@ -407,7 +442,7 @@ Numeric `0` and string `OFF` turns off.
 
 `LED:VALue?`
 
-This query returns logical value of onboard LED.
+:   This query returns logical value of onboard LED.
 
 #### Returned Query Format {-}
 
@@ -415,7 +450,9 @@ This query returns logical value of onboard LED.
 
 #### Example {-}
 
-Typical Response: _`ON`_
+`LED:VALue?`
+
+:   Typical Response: _`ON`_
 
 ## LED:PWM:ENable {-}
 
@@ -423,7 +460,7 @@ Typical Response: _`ON`_
 
 `LED:PWM:ENable`
 
-This command enables PWM output for onboard LED.
+:   This command enables PWM output for onboard LED.
 
 ## LED:PWM:DISable {-}
 
@@ -431,7 +468,7 @@ This command enables PWM output for onboard LED.
 
 `LED:PWM:DISable`
 
-This command disables PWM output for onboard LED.
+:   This command disables PWM output for onboard LED.
 
 ## LED:PWM:FREQuency {-}
 
@@ -439,7 +476,7 @@ This command disables PWM output for onboard LED.
 
 `LED:PWM:FREQuency <frequency>`
 
-This command sets PWM frequency of onboard LED in Hz.
+:   This command sets PWM frequency of onboard LED in Hz.
 
 #### Parameter {-}
 
@@ -457,7 +494,7 @@ This command sets PWM frequency of onboard LED in Hz.
 
 `LED:PWM:FREQuency?`
 
-This query returns PWM frequency of onboard LED in Hz.
+:   This query returns PWM frequency of onboard LED in Hz.
 
 #### Returned Query Format {-}
 
@@ -473,7 +510,7 @@ Typical Response: _`500000`_
 
 `LED:PWM:DUTY <duty>`
 
-This command sets PWM duty of onboard LED in range of 1 to 65535.
+:   This command sets PWM duty of onboard LED in range of 1 to 65535.
 
 #### Parameter {-}
 
@@ -491,7 +528,7 @@ This command sets PWM duty of onboard LED in range of 1 to 65535.
 
 `LED:PWM:DUTY?`
 
-This query returns PWM duty of onboard LED in range of 1 to 65535.
+:   This query returns PWM duty of onboard LED in range of 1 to 65535.
 
 #### Returned Query Format {-}
 
@@ -525,7 +562,7 @@ Typical Response: _`32768`_
 
 `I2C<bus>:SCAN?`
 
-This query returns list of I2C slave device on the specified bus.
+:   This query returns list of I2C slave device on the specified bus.
 
 #### Parameter {-}
 
@@ -539,7 +576,7 @@ This query returns list of I2C slave device on the specified bus.
 
 #### Returned Query Format {-}
 
-[`NR4[,NR4]`](#nr4)
+[`<NR4>[,<NR4>]`](#nr4)
 
 #### Example {-}
 
@@ -551,7 +588,7 @@ Typical Response: _`A6,5A,80,EE`_ when 8-bit addressing. _`53,2D,40,77`_ when 7-
 
 `I2C<bus>:FREQuency <frequency>`
 
-This command sets clock frequency of specified bus.
+:   This command sets clock frequency of specified bus.
 
 #### Parameter {-}
 
@@ -570,7 +607,7 @@ This command sets clock frequency of specified bus.
 
 `I2C<bus>:FREQuency?`
 
-This query returns clock frequency of specified bus.
+:   This query returns clock frequency of specified bus.
 
 #### Parameter {-}
 
@@ -596,7 +633,7 @@ Typical Response: _`400000`_
 
 `I2C<bus>:ADDRess:BIT <bit>`
 
-This command sets addressing of specified bus.
+:   This command sets addressing of specified bus.
 
 #### Parameter {-}
 
@@ -615,7 +652,7 @@ This command sets addressing of specified bus.
 
 `I2C<bus>:ADDRess:BIT?`
 
-This query returns addressing of specified bus.
+:   This query returns addressing of specified bus.
 
 #### Parameter {-}
 
@@ -641,8 +678,8 @@ Typical Response: _`0`_
 
 `I2C<bus>:WRITE <address>,<buffer>,<stop>`
 
-This command sets list of hexadecimal to specified slave device on the bus.
-Stop bit condition is configured by `<stop>`
+:   This command writes list of hexadecimal to specified slave device on the bus.
+Stop condition is configured by `<stop>`.
 
 #### Parameter {-}
 
@@ -663,7 +700,8 @@ Stop bit condition is configured by `<stop>`
 
 `I2C<bus>:READ? <address>,<length>,<stop>`
 
-This query returns
+:   This query reads `<length>` bytes of data from specified slave device on the bus. \
+Stop condition is configured by `<stop>`.
 
 #### Parameter {-}
 
@@ -679,7 +717,7 @@ This query returns
 
 #### Returned Query Format {-}
 
-[`NR4 [,NR4]`](#nr4)
+[`<NR4>[,<NR4>]`](#nr4)
 
 #### Example {-}
 
@@ -731,7 +769,7 @@ This query returns
 
 #### Returned Query Format {-}
 
-[`NR4 [,NR4]`](#nr4)
+[`<NR4>[,<NR4>]`](#nr4)
 
 #### Example {-}
 
