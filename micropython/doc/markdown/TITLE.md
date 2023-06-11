@@ -777,6 +777,22 @@ Typical Response: _`DE,AD,BE,EF`_
 
 # SPI Subsystem
 
+```{=openxml}
+<w:sdt>
+    <w:sdtContent xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <w:p>
+            <w:r>
+                <w:fldChar w:fldCharType="begin" w:dirty="true" />
+                <w:instrText xml:space="preserve">TOC \o "2-2" \h \b ”spi-subsystem” \u</w:instrText>
+                <w:fldChar w:fldCharType="separate" />
+                <w:fldChar w:fldCharType="end" />
+            </w:r>
+        </w:p>
+    </w:sdtContent>
+</w:sdt>
+
+```
+
 ## SPI:CSEL:POLarity {-}
 
 ## SPI:CSEL:POLarity? {-}
@@ -800,6 +816,22 @@ Typical Response: _`DE,AD,BE,EF`_
 ## SPI:READ? {-}
 
 # ADC Subsystem
+
+```{=openxml}
+<w:sdt>
+    <w:sdtContent xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <w:p>
+            <w:r>
+                <w:fldChar w:fldCharType="begin" w:dirty="true" />
+                <w:instrText xml:space="preserve">TOC \o "2-2" \h \b ”adc-subsystem” \u</w:instrText>
+                <w:fldChar w:fldCharType="separate" />
+                <w:fldChar w:fldCharType="end" />
+            </w:r>
+        </w:p>
+    </w:sdtContent>
+</w:sdt>
+
+```
 
 ## ADC:READ? {-}
 
