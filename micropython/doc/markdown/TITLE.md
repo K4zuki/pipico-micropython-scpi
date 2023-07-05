@@ -2,6 +2,53 @@
 
 # Raspberry Pi Pico as SCPI instrument
 
+```{=openxml}
+<w:p>
+    <w:r>
+        <w:rPr>
+            <w:color w:val="4F81BD" w:themeColor="accent1"/>
+        </w:rPr>
+        <w:t>Theme color Accent 1.</w:t>
+    </w:r>
+    <w:r>
+        <w:fldChar w:fldCharType="begin" w:dirty="true" />
+        <w:instrText xml:space="preserve">TOC \o "2-2" \h \b ”machine-subsystem” \u</w:instrText>
+        <w:fldChar w:fldCharType="separate" />
+        <w:fldChar w:fldCharType="end" />
+    </w:r>
+</w:p>
+
+```
+
+\newpage
+
+<div class="table" widths="[0.25,0.1,0.1,0.25]">
+
+|                                                                                    Function | Pin | Pin | Function                                                 |
+|--------------------------------------------------------------------------------------------:|:---:|:---:|:---------------------------------------------------------|
+|                                                 [UART0 TX]{.highlight background="default"} |  1  | 40  | [VBUS]{custom-style="PowerPinStyle"}                     |
+|                                                 [UART0 RX]{.highlight background="default"} |  2  | 39  | [VSYS]{custom-style="PowerPinStyle"}                     |
+|                                                        [GND]{custom-style="GroundPinStyle"} |  3  | 38  | [GND]{custom-style="GroundPinStyle"}                     |
+| [[[I2C1 SDA]{custom-style="I2CPinStyle"}]{.highlight background="default"}](#i2c-subsystem) |  4  | 37  | 3V3 EN                                                   |
+| [[[I2C1 SCL]{custom-style="I2CPinStyle"}]{.highlight background="default"}](#i2c-subsystem) |  5  | 36  | 3V3 OUT                                                  |
+| [[[I2C0 SDA]{custom-style="I2CPinStyle"}]{.highlight background="default"}](#i2c-subsystem) |  6  | 35  | [[ADC VREF]{custom-style="ADCPinStyle"}](#adc-subsystem) |
+| [[[I2C0 SCL]{custom-style="I2CPinStyle"}]{.highlight background="default"}](#i2c-subsystem) |  7  | 34  | [[ADC2]{custom-style="ADCPinStyle"}](#adc-subsystem)     |
+|                                                        [GND]{custom-style="GroundPinStyle"} |  8  | 33  | [GND]{custom-style="GroundPinStyle"}                     |
+|                                      [[PIN 6]{custom-style="GPIOPinStyle"}](#pin-subsystem) |  9  | 32  | [[ADC1]{custom-style="ADCPinStyle"}](#adc-subsystem)     |
+|                                      [[PIN 7]{custom-style="GPIOPinStyle"}](#pin-subsystem) | 10  | 31  | [[ADC0]{custom-style="ADCPinStyle"}](#adc-subsystem)     |
+|                                                                                    UART1 TX | 11  | 30  | RUN                                                      |
+|                                                                                    UART1 RX | 12  | 20  | [[PIN 22]{custom-style="GPIOPinStyle"}](#pin-subsystem)  |
+|                                                        [GND]{custom-style="GroundPinStyle"} | 13  | 29  | [GND]{custom-style="GroundPinStyle"}                     |
+|                                    [[SPI1 SCK]{custom-style="SPIPinStyle"}](#spi-subsystem) | 14  | 28  | [[PIN 21]{custom-style="GPIOPinStyle"}](#pin-subsystem)  |
+|                                     [[SPI1 TX]{custom-style="SPIPinStyle"}](#spi-subsystem) | 15  | 27  | [[PIN 20]{custom-style="GPIOPinStyle"}](#pin-subsystem)  |
+|                                     [[SPI1 RX]{custom-style="SPIPinStyle"}](#spi-subsystem) | 16  | 26  | [[SPI0 TX]{custom-style="SPIPinStyle"}](#spi-subsystem)  |
+|                                     [[SPI1 CS]{custom-style="SPIPinStyle"}](#spi-subsystem) | 17  | 25  | [[SPI0 SCK]{custom-style="SPIPinStyle"}](#spi-subsystem) |
+|                                                        [GND]{custom-style="GroundPinStyle"} | 18  | 24  | [GND]{custom-style="GroundPinStyle"}                     |
+|                                     [[PIN 14]{custom-style="GPIOPinStyle"}](#pin-subsystem) | 19  | 23  | [[SPI0 CS]{custom-style="SPIPinStyle"}](#spi-subsystem)  |
+|                                     [[PIN 15]{custom-style="GPIOPinStyle"}](#pin-subsystem) | 20  | 22  | [[SPI0 RX]{custom-style="SPIPinStyle"}](#spi-subsystem)  |
+
+</div>
+
 # Parameter types
 
 [`<NR1>`]{#nr1}
@@ -192,7 +239,7 @@
 
 `PIN<pin>:VALue <value>`
 
-:   This command sets logical value of of specified IO pin.
+:   This command sets logical value of specified IO pin.
 Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets logic LO.
 
 #### Parameter {-}
@@ -454,6 +501,11 @@ Numeric `0` and string `OFF` turns off.
 
 :   Typical Response: _`ON`_
 
+LED:VALue <value>`
+
+:   This command sets logical value of onboard LED.
+Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets logic LO.
+
 ## LED:PWM:ENable {-}
 
 #### Syntax {-}
@@ -502,7 +554,9 @@ Numeric `0` and string `OFF` turns off.
 
 #### Example {-}
 
-Typical Response: _`500000`_
+`LED:PWM:FREQ?` [// Returns Pin14 PWM frequency in Hz]{custom-style="CommentTok"}
+
+:   Typical Response: _`500000`_
 
 ## LED:PWM:DUTY {-}
 
@@ -536,7 +590,9 @@ Typical Response: _`500000`_
 
 #### Example {-}
 
-Typical Response: _`32768`_
+`LED:DUTY?` [// Returns LED PWM duty in integer]{custom-style="CommentTok"}
+
+:   Typical Response: _`32768`_
 
 # I2C Subsystem
 
@@ -580,7 +636,9 @@ Typical Response: _`32768`_
 
 #### Example {-}
 
-Typical Response: _`A6,5A,80,EE`_ when 8-bit addressing. _`53,2D,40,77`_ when 7-bit addressing
+`I2C0:SCAN?` [// Scans slave devices on I2C0 bus]{custom-style="CommentTok"}
+
+:   Typical Response: _`A6,5A,80,EE`_ when 8-bit addressing. _`53,2D,40,77`_ when 7-bit addressing
 
 ## I2C:FREQuency {-}
 
@@ -639,10 +697,10 @@ Typical Response: _`400000`_
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type                                    | Values                                                                                         | Default value |
-|-------------------------------------|-----------------------------------------|------------------------------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                      | N/A           |
-| [\<bit\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus addressing. [0]{custom-style="NormalTok"} is 7-bit, [1]{custom-style="NormalTok"} is 8-bit | N/A           |
+| Item                                | Type                                    | Values                                                                                                    | Default value |
+|-------------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                 | N/A           |
+| [\<bit\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus addressing. [0]{custom-style="NormalTok"} is 7-bit addressing, [1]{custom-style="NormalTok"} is 8-bit | N/A           |
 
 </div>
 
@@ -700,7 +758,7 @@ Stop condition is configured by `<stop>`.
 
 `I2C<bus>:READ? <address>,<length>,<stop>`
 
-:   This query reads `<length>` bytes of data from specified slave device on the bus. \
+:   This query reads `<length>` bytes of data from specified slave device on the bus.
 Stop condition is configured by `<stop>`.
 
 #### Parameter {-}
@@ -717,7 +775,7 @@ Stop condition is configured by `<stop>`.
 
 #### Returned Query Format {-}
 
-[`<NR4>[,<NR4>]`](#nr4)
+[[\<NR4\>\[,\<NR4\>\]]{custom-style="NormalTok"}](#nr4)
 
 #### Example {-}
 
@@ -729,7 +787,7 @@ Typical Response: _`DE,AD,BE,EF`_
 
 `I2C<bus>:MEMory:WRITE <address>,<memaddress>,<buffer>,<addrsize>`
 
-This command sets
+:   This command sets
 
 #### Parameter {-}
 
@@ -745,13 +803,13 @@ This command sets
 
 </div>
 
-## I2C:MEMory:READ {-}
+## I2C:MEMory:READ? {-}
 
 #### Syntax {-}
 
 `I2C<bus>:MEMory:READ? <address>,<memaddress>,<nbytes>,<addrsize>`
 
-This query returns
+:   This query returns
 
 #### Parameter {-}
 
@@ -769,7 +827,7 @@ This query returns
 
 #### Returned Query Format {-}
 
-[`<NR4>[,<NR4>]`](#nr4)
+[[\<NR4\>\[,\<NR4\>\]]{custom-style="NormalTok"}](#nr4)
 
 #### Example {-}
 
@@ -795,25 +853,296 @@ Typical Response: _`DE,AD,BE,EF`_
 
 ## SPI:CSEL:POLarity {-}
 
+#### Syntax {-}
+
+`SPI<bus>:CSEL:POLarity <polarity>`
+
+:   This command sets chip select polarity for specified SPI bus
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                | Type                                    | Values                                                                    | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+
+</div>
+
+#### Example {-}
+
+`SPI0:CSEL:POLarity 1` [// Sets SPI0 chip select to HI-active]{custom-style="CommentTok"}
+
 ## SPI:CSEL:POLarity? {-}
+
+#### Syntax {-}
+
+`SPI<bus>:CSEL:POLarity?`
+
+:   This query returns chip select pin polarity for specified SPI bus
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                | Type                                    | Values                                                                    | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+
+</div>
+
+#### Returned Query Format {-}
+
+[[\<Bool\>]{custom-style="NormalTok"}](#bool)
+
+#### Example {-}
+
+`SPI0:CSEL:POLarity?` [// Returns SPI0 chip select polarity]{custom-style="CommentTok"}
+
+:   Typical Response: _`1`_
 
 ## SPI:CSEL:VALue {-}
 
+#### Syntax {-}
+
+`SPI<bus>:CSEL:VALue <value>`
+
+:   This command sets logical value of chip select pin for specified bus.
+Numeric `1` and string `ON` turns on. Numeric `0` and string `OFF` turns off.
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                | Type                                    | Values                                                                    | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+
+</div>
+
 ## SPI:CSEL:VALue? {-}
+
+#### Syntax {-}
+
+`SPI<bus>:CSEL:VALue?`
+
+:   This query returns logical value of specified IO pin. `ON` is selecting bus, `OFF` is a logic LO.
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                | Type                                    | Values                                                                    | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+
+</div>
+
+#### Returned Query Format {-}
+
+[[\<CRD\>]{custom-style="NormalTok"}](#crd)
+
+#### Example {-}
+
+`SPI0:CSEL:VALue?` [// Returns chip select pin value]{custom-style="CommentTok"}
+
+:   Typical Response: _`0`_
 
 ## SPI:MODE {-}
 
+#### Syntax {-}
+
+`SPI:MODE`
+
+:   This query returns PWM duty of specified IO pin in range of 1 to 65535
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                | Type                                    | Values                                                                    | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+
+</div>
+
+#### Returned Query Format {-}
+
+[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
+
+#### Example {-}
+
+`PIN14:DUTY?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
+
+:   Typical Response: _`32768`_
+
 ## SPI:MODE? {-}
+
+#### Syntax {-}
+
+`PIN<pin>:PWM:DUTY?`
+
+:   This query returns PWM duty of specified IO pin in range of 1 to 65535
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                | Type                                    | Values                                                                    | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+
+</div>
+
+#### Returned Query Format {-}
+
+[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
+
+#### Example {-}
+
+`PIN14:DUTY?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
+
+:   Typical Response: _`32768`_
 
 ## SPI:FREQuency {-}
 
+#### Syntax {-}
+
+`PIN<pin>:PWM:DUTY?`
+
+:   This query returns PWM duty of specified IO pin in range of 1 to 65535
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                | Type                                    | Values                                                                    | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+
+</div>
+
+#### Returned Query Format {-}
+
+[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
+
+#### Example {-}
+
+`PIN14:DUTY?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
+
+:   Typical Response: _`32768`_
+
 ## SPI:FREQuency? {-}
+
+#### Syntax {-}
+
+`PIN<pin>:PWM:DUTY?`
+
+:   This query returns PWM duty of specified IO pin in range of 1 to 65535
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                | Type                                    | Values                                                                    | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+
+</div>
+
+#### Returned Query Format {-}
+
+[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
+
+#### Example {-}
+
+`PIN14:DUTY?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
+
+:   Typical Response: _`32768`_
 
 ## SPI:TRANSfer {-}
 
+#### Syntax {-}
+
+`PIN<pin>:PWM:DUTY?`
+
+:   This query returns PWM duty of specified IO pin in range of 1 to 65535
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                | Type                                    | Values                                                                    | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+
+</div>
+
+#### Returned Query Format {-}
+
+[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
+
+#### Example {-}
+
+`PIN14:DUTY?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
+
+:   Typical Response: _`32768`_
+
 ## SPI:WRITE {-}
 
+#### Syntax {-}
+
+`PIN<pin>:PWM:DUTY?`
+
+:   This query returns PWM duty of specified IO pin in range of 1 to 65535
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                | Type                                    | Values                                                                    | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+
+</div>
+
+#### Returned Query Format {-}
+
+[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
+
+#### Example {-}
+
+`PIN14:DUTY?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
+
+:   Typical Response: _`32768`_
+
 ## SPI:READ? {-}
+
+#### Syntax {-}
+
+`PIN<pin>:PWM:DUTY?`
+
+:   This query returns PWM duty of specified IO pin in range of 1 to 65535
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                | Type                                    | Values                                                                    | Default value |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+
+</div>
+
+#### Returned Query Format {-}
+
+[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
+
+#### Example {-}
+
+`PIN14:DUTY?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
+
+:   Typical Response: _`32768`_
 
 # ADC Subsystem
 
@@ -835,7 +1164,49 @@ Typical Response: _`DE,AD,BE,EF`_
 
 ## ADC:READ? {-}
 
-# IEEE-488.2 Common Commands
+#### Syntax {-}
+
+`ADC<channel>:READ?`
+
+:   This query returns ADC conversion value in range of 0 to 65535
+
+#### Parameter {-}
+
+<div class="table" widths="[0.25,0.1,0.35,0.25]">
+
+| Item                                    | Type                                    | Values                              | Default value |
+|-----------------------------------------|-----------------------------------------|-------------------------------------|---------------|
+| [\<channel\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [0/1/2/3]{custom-style="NormalTok"} | N/A           |
+
+</div>
+
+#### Returned Query Format {-}
+
+[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
+
+#### Example {-}
+
+`ADC2:READ?` [// Returns voltage at ADC2 in 16bit unsigned integer]{custom-style="CommentTok"}
+
+:   Typical Response: _`32768`_
+
+# IEEE-488.2 Common Commands {#ieee4882-common-commands}
+
+```{=openxml}
+<w:sdt>
+    <w:sdtContent xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <w:p>
+            <w:r>
+                <w:fldChar w:fldCharType="begin" w:dirty="true" />
+                <w:instrText xml:space="preserve">TOC \o "2-2" \h \b ”ieee4882-common-commands” \u</w:instrText>
+                <w:fldChar w:fldCharType="separate" />
+                <w:fldChar w:fldCharType="end" />
+            </w:r>
+        </w:p>
+    </w:sdtContent>
+</w:sdt>
+
+```
 
 ## \*IDN? {-}
 
@@ -870,4 +1241,4 @@ If the system is unable to recognize the model number or serial number,
 the \*IDN? command will return the default value of the model and serial number.
 Please perform self-test for error check.
 
-## \*RST
+## \*RST {-}
