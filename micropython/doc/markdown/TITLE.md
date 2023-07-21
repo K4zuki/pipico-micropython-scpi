@@ -2,24 +2,6 @@
 
 # Raspberry Pi Pico as SCPI instrument
 
-```{=openxml}
-<w:p>
-    <w:r>
-        <w:rPr>
-            <w:color w:val="4F81BD" w:themeColor="accent1"/>
-        </w:rPr>
-        <w:t>Theme color Accent 1.</w:t>
-    </w:r>
-    <w:r>
-        <w:fldChar w:fldCharType="begin" w:dirty="true" />
-        <w:instrText xml:space="preserve">TOC \o "2-2" \h \b ”machine-subsystem” \u</w:instrText>
-        <w:fldChar w:fldCharType="separate" />
-        <w:fldChar w:fldCharType="end" />
-    </w:r>
-</w:p>
-
-```
-
 \newpage
 
 <div class="table" widths="[0.25,0.1,0.1,0.25]">
@@ -120,7 +102,7 @@
 
 ```
 
-## MACHINE:FREQuency {-}
+## MACHINE:FREQuency {.unnumbered #machine-frequency}
 
 #### Syntax {-}
 
@@ -144,7 +126,7 @@
 `MACHINE:FREQ 250e6` [// CPU is overclocking at 250MHz]{custom-style="CommentTok"}
 :::
 
-## MACHINE:FREQuency? {-}
+## MACHINE:FREQuency? {.unnumbered #machine-frequency-query}
 
 #### Syntax {-}
 
@@ -180,7 +162,7 @@
 
 ```
 
-## PIN:MODE {-}
+## PIN:MODE {.unnumbered #pin-mode}
 
 #### Syntax {-}
 
@@ -205,7 +187,7 @@
 `PIN14:MODE OUTput` [// Sets Pin14 to output mode]{custom-style="CommentTok"}
 :::
 
-## PIN:MODE? {-}
+## PIN:MODE? {.unnumbered #pin-mode-query}
 
 #### Syntax {-}
 
@@ -233,7 +215,7 @@
 
 :   Typical Response: _`INput`_
 
-## PIN:VALue {-}
+## PIN:VALue {.unnumbered #pin-value}
 
 #### Syntax {-}
 
@@ -260,7 +242,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 `PIN14:VALue 0` [// Sets Pin14 to logic LO]{custom-style="CommentTok"}
 :::
 
-## PIN:VALue? {-}
+## PIN:VALue? {.unnumbered #pin-value-query}
 
 #### Syntax {-}
 
@@ -288,7 +270,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 :   Typical Response: _`ON`_
 
-## PIN:ON {-}
+## PIN:ON {.unnumbered #pin-on}
 
 #### Syntax {-}
 
@@ -306,7 +288,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 </div>
 
-## PIN:OFF {-}
+## PIN:OFF {.unnumbered #pin-off}
 
 #### Syntax {-}
 
@@ -324,7 +306,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 </div>
 
-## PIN:PWM:FREQuency {-}
+## PIN:PWM:FREQuency {.unnumbered #pin-pwm-frequency}
 
 #### Syntax {-}
 
@@ -349,7 +331,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 `PIN14:FREQ 55555` [// Pin14 PWM frequency is set at 55555Hz]{custom-style="CommentTok"}
 :::
 
-## PIN:PWM:FREQuency? {-}
+## PIN:PWM:FREQuency? {.unnumbered #pin-pwm-frequency-query}
 
 #### Syntax {-}
 
@@ -377,7 +359,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 :   Typical Response: _`500000`_
 
-## PIN:PWM:DUTY {-}
+## PIN:PWM:DUTY {.unnumbered #pin-pwm-duty}
 
 #### Syntax {-}
 
@@ -402,7 +384,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 `PIN14:DUTY 25252` [// Pin14 PWM duty is set at 25252 out of 65535]{custom-style="CommentTok"}
 :::
 
-## PIN:PWM:DUTY? {-}
+## PIN:PWM:DUTY? {.unnumbered #pin-pwm-duty-query}
 
 #### Syntax {-}
 
@@ -448,7 +430,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 ```
 
-## LED:ON {-}
+## LED:ON {.unnumbered #led-on}
 
 #### Syntax {-}
 
@@ -456,7 +438,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 :   This command turns onboard LED on.
 
-## LED:OFF {-}
+## LED:OFF {.unnumbered #led-off}
 
 #### Syntax {-}
 
@@ -464,7 +446,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 :   This command turns onboard LED off.
 
-## LED:VALue {-}
+## LED:VALue {.unnumbered #led-value}
 
 #### Syntax {-}
 
@@ -483,7 +465,7 @@ Numeric `0` and string `OFF` turns off.
 
 </div>
 
-## LED:VALue? {-}
+## LED:VALue? {.unnumbered #led-value-query}
 
 #### Syntax {-}
 
@@ -501,12 +483,7 @@ Numeric `0` and string `OFF` turns off.
 
 :   Typical Response: _`ON`_
 
-LED:VALue <value>`
-
-:   This command sets logical value of onboard LED.
-Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets logic LO.
-
-## LED:PWM:ENable {-}
+## LED:PWM:ENable {.unnumbered #led-pwm-enable}
 
 #### Syntax {-}
 
@@ -514,7 +491,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 :   This command enables PWM output for onboard LED.
 
-## LED:PWM:DISable {-}
+## LED:PWM:DISable {.unnumbered #led-pwm-disable}
 
 #### Syntax {-}
 
@@ -522,7 +499,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 :   This command disables PWM output for onboard LED.
 
-## LED:PWM:FREQuency {-}
+## LED:PWM:FREQuency {.unnumbered #led-pwm-frequency}
 
 #### Syntax {-}
 
@@ -540,7 +517,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 </div>
 
-## LED:PWM:FREQuency? {-}
+## LED:PWM:FREQuency? {.unnumbered #led-pwm-frequency-query}
 
 #### Syntax {-}
 
@@ -558,7 +535,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 :   Typical Response: _`500000`_
 
-## LED:PWM:DUTY {-}
+## LED:PWM:DUTY {.unnumbered #led-pwm-duty}
 
 #### Syntax {-}
 
@@ -576,7 +553,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 </div>
 
-## LED:PWM:DUTY? {-}
+## LED:PWM:DUTY? {.unnumbered #led-pwm-duty-query}
 
 #### Syntax {-}
 
@@ -612,7 +589,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 ```
 
-## I2C:SCAN? {-}
+## I2C:SCAN? {.unnumbered #i2c-scan-query}
 
 #### Syntax {-}
 
@@ -640,7 +617,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 :   Typical Response: _`A6,5A,80,EE`_ when 8-bit addressing. _`53,2D,40,77`_ when 7-bit addressing
 
-## I2C:FREQuency {-}
+## I2C:FREQuency {.unnumbered #i2c-frequency}
 
 #### Syntax {-}
 
@@ -659,7 +636,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 </div>
 
-## I2C:FREQuency? {-}
+## I2C:FREQuency? {.unnumbered #i2c-frequency-query}
 
 #### Syntax {-}
 
@@ -683,9 +660,11 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Example {-}
 
-Typical Response: _`400000`_
+`I2C1:FREQuency?` [// Returns bus clock frequency setting in Hz]{custom-style="CommentTok"}
 
-## I2C:ADDRess:BIT {-}
+:   Typical Response: _`400000`_
+
+## I2C:ADDRess:BIT {.unnumbered #i2c-address-bit}
 
 #### Syntax {-}
 
@@ -704,7 +683,7 @@ Typical Response: _`400000`_
 
 </div>
 
-## I2C:ADDRess:BIT? {-}
+## I2C:ADDRess:BIT? {.unnumbered #i2c-address-bit-query}
 
 #### Syntax {-}
 
@@ -728,9 +707,11 @@ Typical Response: _`400000`_
 
 #### Example {-}
 
-Typical Response: _`0`_
+`I2C0:ADDRess:BIT?` [// Returns addressing setting in integer]{custom-style="CommentTok"}
 
-## I2C:WRITE {-}
+:   Typical Response: _`0`_
+
+## I2C:WRITE {.unnumbered #i2c-write}
 
 #### Syntax {-}
 
@@ -743,16 +724,16 @@ Stop condition is configured by `<stop>`.
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                    | Type                                    | Values                                                                    | Default value |
-|-----------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"}     | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
-| [\<address\>]{custom-style="NormalTok"} | [[NR4]{custom-style="NormalTok"}](#nr4) | [01]{custom-style="NormalTok"} to [FF]{custom-style="NormalTok"}          | N/A           |
-| [\<buffer\>]{custom-style="NormalTok"}  | [[NR4]{custom-style="NormalTok"}](#nr4) |                                                                           | N/A           |
-| [\<stop\>]{custom-style="NormalTok"}    | [[NR1]{custom-style="NormalTok"}](#nr1) | [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}`           | N/A           |
+| Item                                    | Type                                    | Values                                                                                                                                                                   | Default value |
+|-----------------------------------------|-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}     | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                | N/A           |
+| [\<address\>]{custom-style="NormalTok"} | [[NR4]{custom-style="NormalTok"}](#nr4) | [02]{custom-style="NormalTok"} to [FC]{custom-style="NormalTok"} (8-bit addressing); [01]{custom-style="NormalTok"} to [7E]{custom-style="NormalTok"} (7-bit addressing) | N/A           |
+| [\<buffer\>]{custom-style="NormalTok"}  | [[NR4]{custom-style="NormalTok"}](#nr4) |                                                                                                                                                                          | N/A           |
+| [\<stop\>]{custom-style="NormalTok"}    | [[NR1]{custom-style="NormalTok"}](#nr1) | [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                           | N/A           |
 
 </div>
 
-## I2C:READ? {-}
+## I2C:READ? {.unnumbered #i2c-read-query}
 
 #### Syntax {-}
 
@@ -765,11 +746,12 @@ Stop condition is configured by `<stop>`.
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                   | Type                                    | Values                                                                    | Default value |
-|----------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"}    | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
-| [\<length\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | 1 or larger                                                               | N/A           |
-| [\<stop\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1) | [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}            | N/A           |
+| Item                                    | Type                                    | Values                                                                                                                                                                   | Default value |
+|-----------------------------------------|-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}     | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                | N/A           |
+| [\<address\>]{custom-style="NormalTok"} | [[NR4]{custom-style="NormalTok"}](#nr4) | [02]{custom-style="NormalTok"} to [FC]{custom-style="NormalTok"} (8-bit addressing); [01]{custom-style="NormalTok"} to [7E]{custom-style="NormalTok"} (7-bit addressing) | N/A           |
+| [\<length\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | 1 or larger                                                                                                                                                              | N/A           |
+| [\<stop\>]{custom-style="NormalTok"}    | [[NR1]{custom-style="NormalTok"}](#nr1) | [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                           | N/A           |
 
 </div>
 
@@ -779,9 +761,11 @@ Stop condition is configured by `<stop>`.
 
 #### Example {-}
 
-Typical Response: _`DE,AD,BE,EF`_
+`I2C0:READ? AA,4,1` [// Returns 4-bytes of data from slave device in list of hexadecimal texts]{custom-style="CommentTok"}
 
-## I2C:MEMory:WRITE {-}
+:   Typical Response: _`DE,AD,BE,EF`_
+
+## I2C:MEMory:WRITE {.unnumbered #i2c-memory-write}
 
 #### Syntax {-}
 
@@ -793,17 +777,17 @@ Typical Response: _`DE,AD,BE,EF`_
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                       | Type                                    | Values                                                                    | Default value |
-|--------------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"}        | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
-| [\<address\>]{custom-style="NormalTok"}    | [[NR4]{custom-style="NormalTok"}](#nr4) | [01]{custom-style="NormalTok"} to [FF]{custom-style="NormalTok"}          | N/A           |
-| [\<memaddress\>]{custom-style="NormalTok"} | [[NR4]{custom-style="NormalTok"}](#nr4) | [00]{custom-style="NormalTok"} to [FF]{custom-style="NormalTok"}          | N/A           |
-| [\<buffer\>]{custom-style="NormalTok"}     | [[NR4]{custom-style="NormalTok"}](#nr4) |                                                                           | N/A           |
-| [\<addrsize\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1) | [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}            | N/A           |
+| Item                                       | Type                                    | Values                                                                                                                                                                   | Default value |
+|--------------------------------------------|-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}        | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                | N/A           |
+| [\<address\>]{custom-style="NormalTok"}    | [[NR4]{custom-style="NormalTok"}](#nr4) | [02]{custom-style="NormalTok"} to [FC]{custom-style="NormalTok"} (8-bit addressing); [01]{custom-style="NormalTok"} to [7E]{custom-style="NormalTok"} (7-bit addressing) | N/A           |
+| [\<memaddress\>]{custom-style="NormalTok"} | [[NR4]{custom-style="NormalTok"}](#nr4) | [00]{custom-style="NormalTok"} to [FF]{custom-style="NormalTok"}                                                                                                         | N/A           |
+| [\<buffer\>]{custom-style="NormalTok"}     | [[NR4]{custom-style="NormalTok"}](#nr4) |                                                                                                                                                                          | N/A           |
+| [\<addrsize\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1) | [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                           | N/A           |
 
 </div>
 
-## I2C:MEMory:READ? {-}
+## I2C:MEMory:READ? {.unnumbered #i2c-memory-read-query}
 
 #### Syntax {-}
 
@@ -815,13 +799,13 @@ Typical Response: _`DE,AD,BE,EF`_
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                       | Type                                    | Values                                                                    | Default value |
-|--------------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"}        | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
-| [\<address\>]{custom-style="NormalTok"}    | [[NR4]{custom-style="NormalTok"}](#nr4) | [01]{custom-style="NormalTok"} to [FF]{custom-style="NormalTok"}          | N/A           |
-| [\<memaddress\>]{custom-style="NormalTok"} | [[NR4]{custom-style="NormalTok"}](#nr4) | [00]{custom-style="NormalTok"} to [FF]{custom-style="NormalTok"}          | N/A           |
-| [\<nbytes\>]{custom-style="NormalTok"}     | [[NR1]{custom-style="NormalTok"}](#nr4) | 1 or larger                                                               | N/A           |
-| [\<addrsize\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1) | [1]{custom-style="NormalTok"} or [2]{custom-style="NormalTok"}            | N/A           |
+| Item                                       | Type                                    | Values                                                                                                                                                                   | Default value |
+|--------------------------------------------|-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}        | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                | N/A           |
+| [\<address\>]{custom-style="NormalTok"}    | [[NR4]{custom-style="NormalTok"}](#nr4) | [02]{custom-style="NormalTok"} to [FC]{custom-style="NormalTok"} (8-bit addressing); [01]{custom-style="NormalTok"} to [7E]{custom-style="NormalTok"} (7-bit addressing) | N/A           |
+| [\<memaddress\>]{custom-style="NormalTok"} | [[NR4]{custom-style="NormalTok"}](#nr4) | [00]{custom-style="NormalTok"} to [FF]{custom-style="NormalTok"}                                                                                                         | N/A           |
+| [\<nbytes\>]{custom-style="NormalTok"}     | [[NR1]{custom-style="NormalTok"}](#nr4) | 1 or larger                                                                                                                                                              | N/A           |
+| [\<addrsize\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1) | [1]{custom-style="NormalTok"} or [2]{custom-style="NormalTok"}                                                                                                           | N/A           |
 
 </div>
 
@@ -831,7 +815,9 @@ Typical Response: _`DE,AD,BE,EF`_
 
 #### Example {-}
 
-Typical Response: _`DE,AD,BE,EF`_
+`I2C1:MEMory:READ? 55,AA,4,1`  [// Returns 4-bytes of data from slave device, register 0xAA in list of hexadecimal texts]{custom-style="CommentTok"}
+
+:   Typical Response: _`DE,AD,BE,EF`_
 
 # SPI Subsystem
 
@@ -851,7 +837,7 @@ Typical Response: _`DE,AD,BE,EF`_
 
 ```
 
-## SPI:CSEL:POLarity {-}
+## SPI:CSEL:POLarity {.unnumbered #spi-csel-polarity}
 
 #### Syntax {-}
 
@@ -873,7 +859,7 @@ Typical Response: _`DE,AD,BE,EF`_
 
 `SPI0:CSEL:POLarity 1` [// Sets SPI0 chip select to HI-active]{custom-style="CommentTok"}
 
-## SPI:CSEL:POLarity? {-}
+## SPI:CSEL:POLarity? {.unnumbered #spi-csel-polarity-query}
 
 #### Syntax {-}
 
@@ -908,15 +894,17 @@ Typical Response: _`DE,AD,BE,EF`_
 `SPI<bus>:CSEL:VALue <value>`
 
 :   This command sets logical value of chip select pin for specified bus.
-Numeric `1` and string `ON` turns on. Numeric `0` and string `OFF` turns off.
+Numeric `1` and string `ON` selects bus. Numeric `0` and string `OFF` deselects bus.
+Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#spi-csel-polarity) command
 
 #### Parameter {-}
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type                                    | Values                                                                    | Default value |
-|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| Item                                  | Type                                      | Values                                                                    | Default value |
+|---------------------------------------|-------------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1)   | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| [\<value\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool) | Logical value of CS pin.                                                  | N/A           |
 
 </div>
 
@@ -926,7 +914,7 @@ Numeric `1` and string `ON` turns on. Numeric `0` and string `OFF` turns off.
 
 `SPI<bus>:CSEL:VALue?`
 
-:   This query returns logical value of specified IO pin. `ON` is selecting bus, `OFF` is a logic LO.
+:   This query returns logical value of CS pin. `ON` is selecting bus, `OFF` is deselecting.
 
 #### Parameter {-}
 
@@ -946,43 +934,34 @@ Numeric `1` and string `ON` turns on. Numeric `0` and string `OFF` turns off.
 
 `SPI0:CSEL:VALue?` [// Returns chip select pin value]{custom-style="CommentTok"}
 
-:   Typical Response: _`0`_
+:   Typical Response: _`OFF`_
 
 ## SPI:MODE {-}
 
 #### Syntax {-}
 
-`SPI:MODE`
+`SPI<bus>:MODE <mode>`
 
-:   This query returns PWM duty of specified IO pin in range of 1 to 65535
+:   This command sets bus clock and phase mode for specified SPI bus
 
 #### Parameter {-}
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type                                    | Values                                                                    | Default value |
-|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| Item                                 | Type                                    | Values                                                                    | Default value |
+|--------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| [\<mode\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus clock and phase mode `0/1/2/3` or `DEFault`                           | N/A           |
 
 </div>
-
-#### Returned Query Format {-}
-
-[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
-
-#### Example {-}
-
-`PIN14:DUTY?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
-
-:   Typical Response: _`32768`_
 
 ## SPI:MODE? {-}
 
 #### Syntax {-}
 
-`PIN<pin>:PWM:DUTY?`
+`SPI<bus>:MODE?`
 
-:   This query returns PWM duty of specified IO pin in range of 1 to 65535
+:   This query returns bus clock and phase mode for specified SPI bus
 
 #### Parameter {-}
 
@@ -1000,45 +979,36 @@ Numeric `1` and string `ON` turns on. Numeric `0` and string `OFF` turns off.
 
 #### Example {-}
 
-`PIN14:DUTY?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
+`SPI1:MODE?` [// Returns clock and phase mode for bus 1]{custom-style="CommentTok"}
 
-:   Typical Response: _`32768`_
+:   Typical Response: _`2`_
 
 ## SPI:FREQuency {-}
 
 #### Syntax {-}
 
-`PIN<pin>:PWM:DUTY?`
+`SPI<bus>:FREQuency <frequency>`
 
-:   This query returns PWM duty of specified IO pin in range of 1 to 65535
+:   This command sets bus clock frequency for specied bus.
 
 #### Parameter {-}
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type                                    | Values                                                                    | Default value |
-|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| Item                                      | Type                                    | Values                                                                    | Default value |
+|-------------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}       | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| [\<frequency\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
 
 </div>
-
-#### Returned Query Format {-}
-
-[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
-
-#### Example {-}
-
-`PIN14:DUTY?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
-
-:   Typical Response: _`32768`_
 
 ## SPI:FREQuency? {-}
 
 #### Syntax {-}
 
-`PIN<pin>:PWM:DUTY?`
+`SPI<bus>:FREQuency?`
 
-:   This query returns PWM duty of specified IO pin in range of 1 to 65535
+:   This query returns
 
 #### Parameter {-}
 
@@ -1056,7 +1026,7 @@ Numeric `1` and string `ON` turns on. Numeric `0` and string `OFF` turns off.
 
 #### Example {-}
 
-`PIN14:DUTY?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
+`SPI0:FREQuency?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
 
 :   Typical Response: _`32768`_
 
@@ -1064,37 +1034,28 @@ Numeric `1` and string `ON` turns on. Numeric `0` and string `OFF` turns off.
 
 #### Syntax {-}
 
-`PIN<pin>:PWM:DUTY?`
+`SPI<bus>:TRANSfer <data>`
 
-:   This query returns PWM duty of specified IO pin in range of 1 to 65535
+:   This command
 
 #### Parameter {-}
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type                                    | Values                                                                    | Default value |
-|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| Item                                 | Type                                    | Values                                                                    | Default value |
+|--------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| [\<data\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) |                                                                           | N/A           |
 
 </div>
-
-#### Returned Query Format {-}
-
-[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
-
-#### Example {-}
-
-`PIN14:DUTY?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
-
-:   Typical Response: _`32768`_
 
 ## SPI:WRITE {-}
 
 #### Syntax {-}
 
-`PIN<pin>:PWM:DUTY?`
+`SPI<bus>:WRITE <data>`
 
-:   This query returns PWM duty of specified IO pin in range of 1 to 65535
+:   This command
 
 #### Parameter {-}
 
@@ -1105,32 +1066,24 @@ Numeric `1` and string `ON` turns on. Numeric `0` and string `OFF` turns off.
 | [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
 
 </div>
-
-#### Returned Query Format {-}
-
-[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
-
-#### Example {-}
-
-`PIN14:DUTY?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
-
-:   Typical Response: _`32768`_
 
 ## SPI:READ? {-}
 
 #### Syntax {-}
 
-`PIN<pin>:PWM:DUTY?`
+`SPI<bus>:READ? <length>,<mask>`
 
-:   This query returns PWM duty of specified IO pin in range of 1 to 65535
+:   This query returns
 
 #### Parameter {-}
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type                                    | Values                                                                    | Default value |
-|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| Item                                   | Type                                    | Values                                                                    | Default value |
+|----------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}    | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| [\<length\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) |                                                                           | N/A           |
+| [\<mask\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1) |                                                                           | N/A           |
 
 </div>
 
@@ -1140,7 +1093,7 @@ Numeric `1` and string `ON` turns on. Numeric `0` and string `OFF` turns off.
 
 #### Example {-}
 
-`PIN14:DUTY?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
+`SPI<bus>:READ? <length>,<mask>` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
 
 :   Typical Response: _`32768`_
 
@@ -1162,7 +1115,7 @@ Numeric `1` and string `ON` turns on. Numeric `0` and string `OFF` turns off.
 
 ```
 
-## ADC:READ? {-}
+## ADC:READ? {.unnumbered #adc-read-query}
 
 #### Syntax {-}
 
