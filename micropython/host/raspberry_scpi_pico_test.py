@@ -62,7 +62,7 @@ ADC[0123]:READ?
 import sys
 import time
 
-port_name = "ASRL7::INSTR"
+from port_config import port_name
 
 scpi_commands = [
     "*IDN?",
