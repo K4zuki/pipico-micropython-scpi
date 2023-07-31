@@ -36,6 +36,8 @@ import time
 
 - MACHINE:FREQuency[?] num
 
+- SYSTem:ERRor?
+
 - PIN[6|7|14|15|20|21|22|25]:MODE[?] INput|OUTput|ODrain|PWM
 - PIN[6|7|14|15|20|21|22|25]:VALue[?] 0|1|OFF|ON
 - PIN[6|7|14|15|20|21|22|25]:ON
@@ -221,6 +223,8 @@ class RaspberryScpiPico(MicroScpiDevice):
     kw_value = ScpiKeyword("VALue", "VAL", ["?"])
     kw_def = ScpiKeyword("DEFault", "DEF", None)
     kw_transfer = ScpiKeyword("TRANSfer", "TRANS", None)
+    kw_system = ScpiKeyword("SYSTem", "SYST", None)
+    kw_error = ScpiKeyword("ERRor", "ERR", None)
 
     "PIN[6|7|14|15|20|21|22|25"
     pins = {
@@ -291,6 +295,8 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         machine_freq = ScpiCommand((self.kw_machine, self.kw_freq), False, self.cb_machine_freq)
 
+        system_error = ScpiCommand((self.kw_system, self.kw_error), True, self.cb_system_error)
+
         pin_mode = ScpiCommand((self.kw_pin, self.kw_mode), False, self.cb_pin_mode)
         pin_val = ScpiCommand((self.kw_pin, self.kw_value), False, self.cb_pin_val)
         pin_on = ScpiCommand((self.kw_pin, self.kw_on), False, self.cb_pin_on)
@@ -324,6 +330,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         self.commands = [cls, ese, opc, rst, sre, esr_q, idn_q, stb_q, tst_q,
                          machine_freq,
+                         system_error,
                          pin_mode, pin_val, pin_on, pin_off, pin_pwm_freq, pin_pwm_duty,
                          led_val, led_on, led_off, led_pwm_freq, led_pwm_duty,
                          i2c_scan_q, i2c_freq, i2c_abit, i2c_write, i2c_read_q,
@@ -384,6 +391,9 @@ class RaspberryScpiPico(MicroScpiDevice):
                 print("syntax error: invalid value:", param)
         else:
             print("syntax error: no parameter")
+
+    def cb_system_error(self, param="", opt=None):
+        pass
 
     def cb_pin_val(self, param="", opt=None):
         """
@@ -452,6 +462,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 alt = machine.Pin.ALT_PWM
             else:
                 print("syntax error: invalid value:", param)
+                return
 
             pin.init(mode, alt=alt, pull=conf.pull)
             self.pins[pin_number] = pin

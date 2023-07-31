@@ -262,7 +262,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Returned Query Format {-}
 
-[[\<CRD\>]{custom-style="NormalTok"}](#crd)
+[[\<Bool\>]{custom-style="NormalTok"}](#bool)
 
 #### Example {-}
 
@@ -475,7 +475,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Returned Query Format {-}
 
-[[\<CRD\>]{custom-style="NormalTok"}](#crd)
+[[\<Bool\>]{custom-style="NormalTok"}](#bool)
 
 #### Example {-}
 
@@ -724,12 +724,12 @@ Stop condition is configured by `<stop>`.
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                    | Type                                    | Values                                                                                                                                                                   | Default value |
-|-----------------------------------------|-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"}     | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                | N/A           |
-| [\<address\>]{custom-style="NormalTok"} | [[NR4]{custom-style="NormalTok"}](#nr4) | [02]{custom-style="NormalTok"} to [FC]{custom-style="NormalTok"} (8-bit addressing); [01]{custom-style="NormalTok"} to [7E]{custom-style="NormalTok"} (7-bit addressing) | N/A           |
-| [\<buffer\>]{custom-style="NormalTok"}  | [[NR4]{custom-style="NormalTok"}](#nr4) |                                                                                                                                                                          | N/A           |
-| [\<stop\>]{custom-style="NormalTok"}    | [[NR1]{custom-style="NormalTok"}](#nr1) | [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                           | N/A           |
+| Item                                    | Type                                                   | Values                                                                                                                                                                   | Default value |
+|-----------------------------------------|--------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}     | [[NR1]{custom-style="NormalTok"}](#nr1)                | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                | N/A           |
+| [\<address\>]{custom-style="NormalTok"} | [[NR4]{custom-style="NormalTok"}](#nr4)                | [02]{custom-style="NormalTok"} to [FC]{custom-style="NormalTok"} (8-bit addressing); [01]{custom-style="NormalTok"} to [7E]{custom-style="NormalTok"} (7-bit addressing) | N/A           |
+| [\<buffer\>]{custom-style="NormalTok"}  | [[\<NR4\>\[\<NR4\>\]]{custom-style="NormalTok"}](#nr4) |                                                                                                                                                                          | N/A           |
+| [\<stop\>]{custom-style="NormalTok"}    | [[NR1]{custom-style="NormalTok"}](#nr1)                | [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                           | N/A           |
 
 </div>
 
@@ -777,13 +777,13 @@ Stop condition is configured by `<stop>`.
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                       | Type                                    | Values                                                                                                                                                                   | Default value |
-|--------------------------------------------|-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"}        | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                | N/A           |
-| [\<address\>]{custom-style="NormalTok"}    | [[NR4]{custom-style="NormalTok"}](#nr4) | [02]{custom-style="NormalTok"} to [FC]{custom-style="NormalTok"} (8-bit addressing); [01]{custom-style="NormalTok"} to [7E]{custom-style="NormalTok"} (7-bit addressing) | N/A           |
-| [\<memaddress\>]{custom-style="NormalTok"} | [[NR4]{custom-style="NormalTok"}](#nr4) | [00]{custom-style="NormalTok"} to [FF]{custom-style="NormalTok"}                                                                                                         | N/A           |
-| [\<buffer\>]{custom-style="NormalTok"}     | [[NR4]{custom-style="NormalTok"}](#nr4) |                                                                                                                                                                          | N/A           |
-| [\<addrsize\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1) | [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                           | N/A           |
+| Item                                       | Type                                                   | Values                                                                                                                                                                   | Default value |
+|--------------------------------------------|--------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}        | [[NR1]{custom-style="NormalTok"}](#nr1)                | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                | N/A           |
+| [\<address\>]{custom-style="NormalTok"}    | [[NR4]{custom-style="NormalTok"}](#nr4)                | [02]{custom-style="NormalTok"} to [FC]{custom-style="NormalTok"} (8-bit addressing); [01]{custom-style="NormalTok"} to [7E]{custom-style="NormalTok"} (7-bit addressing) | N/A           |
+| [\<memaddress\>]{custom-style="NormalTok"} | [[NR4]{custom-style="NormalTok"}](#nr4)                | [00]{custom-style="NormalTok"} to [FF]{custom-style="NormalTok"}                                                                                                         | N/A           |
+| [\<buffer\>]{custom-style="NormalTok"}     | [[\<NR4\>\[\<NR4\>\]]{custom-style="NormalTok"}](#nr4) |                                                                                                                                                                          | N/A           |
+| [\<addrsize\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1)                | [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                           | N/A           |
 
 </div>
 
@@ -793,7 +793,8 @@ Stop condition is configured by `<stop>`.
 
 `I2C<bus>:MEMory:READ? <address>,<memaddress>,<nbytes>,<addrsize>`
 
-:   This query returns
+:   This query returns comma separated list of hexadecimal data stored in specific memory address of
+the target I2C slave slave device.
 
 #### Parameter {-}
 
@@ -815,7 +816,7 @@ Stop condition is configured by `<stop>`.
 
 #### Example {-}
 
-`I2C1:MEMory:READ? 55,AA,4,1`  [// Returns 4-bytes of data from slave device, register 0xAA in list of hexadecimal texts]{custom-style="CommentTok"}
+`I2C1:MEMory:READ? 55,AA,4,1`  [// Returns 4-bytes of data from register 0xAA of slave device]{custom-style="CommentTok"}
 
 :   Typical Response: _`DE,AD,BE,EF`_
 
@@ -849,9 +850,10 @@ Stop condition is configured by `<stop>`.
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type                                    | Values                                                                    | Default value |
-|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| Item                                     | Type                                      | Values                                                                                                        | Default value |
+|------------------------------------------|-------------------------------------------|---------------------------------------------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}      | [[NR1]{custom-style="NormalTok"}](#nr1)   | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                     | N/A           |
+| [\<polarity\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool) | Chip select polarity. [1]{custom-style="NormalTok"} is Hi-active; [0]{custom-style="NormalTok"} is low-active | N/A           |
 
 </div>
 
@@ -944,14 +946,21 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 :   This command sets bus clock and phase mode for specified SPI bus
 
+    | Mode  | CPOL |  CPHA   |
+    |:-----:|:----:|:-------:|
+    | **0** | Low  | Rising  |
+    | **1** | Low  | Falling |
+    | **2** | High | Rising  |
+    | **3** | High | Falling |
+
 #### Parameter {-}
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                 | Type                                    | Values                                                                    | Default value |
-|--------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
-| [\<mode\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus clock and phase mode `0/1/2/3` or `DEFault`                           | N/A           |
+| Item                                 | Type                                    | Values                                                                                              | Default value |
+|--------------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                           | N/A           |
+| [\<mode\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus clock and phase mode [0/1/2/3]{custom-style="NormalTok"} or [DEFault]{custom-style="NormalTok"} | N/A           |
 
 </div>
 
@@ -989,16 +998,16 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 `SPI<bus>:FREQuency <frequency>`
 
-:   This command sets bus clock frequency for specied bus.
+:   This command sets bus clock frequency for specified bus.
 
 #### Parameter {-}
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                      | Type                                    | Values                                                                    | Default value |
-|-------------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"}       | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
-| [\<frequency\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| Item                                      | Type                                    | Values                                                                       | Default value |
+|-------------------------------------------|-----------------------------------------|------------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}       | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}    | N/A           |
+| [\<frequency\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [10_000]{custom-style="NormalTok"} to [10_000_000]{custom-style="NormalTok"} | N/A           |
 
 </div>
 
@@ -1008,7 +1017,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 `SPI<bus>:FREQuency?`
 
-:   This query returns
+:   This query returns bus clock frequency for specified bus.
 
 #### Parameter {-}
 
@@ -1026,9 +1035,9 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Example {-}
 
-`SPI0:FREQuency?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
+`SPI0:FREQuency?` [// Returns SPI0 bus clock frequency in integer]{custom-style="CommentTok"}
 
-:   Typical Response: _`32768`_
+:   Typical Response: _`5000000`_
 
 ## SPI:TRANSfer {-}
 
@@ -1036,7 +1045,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 `SPI<bus>:TRANSfer <data>`
 
-:   This command
+:   This command transfers
 
 #### Parameter {-}
 
@@ -1061,9 +1070,10 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 <div class="table" widths="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type                                    | Values                                                                    | Default value |
-|-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| Item                                 | Type                                    | Values                                                                    | Default value |
+|--------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| [\<data\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) |                                                                           | N/A           |
 
 </div>
 
@@ -1093,7 +1103,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Example {-}
 
-`SPI<bus>:READ? <length>,<mask>` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
+`SPI0:READ? 1,AA` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
 
 :   Typical Response: _`32768`_
 
@@ -1161,37 +1171,42 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 ```
 
-## \*IDN? {-}
+## \*IDN? {.unnumbered #idn}
 
 #### Syntax {-}
 
 `*IDN?`
 
-This command reads the instrument's identification string which contains four
+:   This command reads the instrument's identification string which contains four
 comma-separated fields. The first field is the manufacturer's name, the second is
 the model number of the instrument, the third is the serial number, and the fourth
 is the firmware revision which contains three firmwares separated by dashes.
 
 #### Returned Query Format {-}
 
-`<AARD>`
-
-> The command returns a string with the following format.
->
-> `KEYSIGHT TECHNOLOGIES,U2751A,<Serial Number>,Va.aa-b.bb-c.cc`
+[[\<AARD\>]{custom-style="NormalTok"}](#aard)
 
 #### Example {-}
 
-The following query returns the instrument's identification string.
+`*IDN?` [// Returns the instrument's identification string]{custom-style="CommentTok"}
 
-`*IDN?`
+:   Typical Response: `"RaspberryPiPico,RP001,{serial},0.0.1"`
 
-#### Typical Response {-}
+## \*RST {.unnumbered #rst}
 
-`"RaspberryPiPico,RP001,{serial},0.0.1"`
+#### Syntax {-}
 
-If the system is unable to recognize the model number or serial number,
-the \*IDN? command will return the default value of the model and serial number.
-Please perform self-test for error check.
+`*RST`
 
-## \*RST {-}
+:   This command reads the instrument's identification string which contains four
+comma-separated fields. The first field is the manufacturer's name, the second is
+the model number of the instrument, the third is the serial number, and the fourth
+is the firmware revision which contains three firmwares separated by dashes.
+
+#### Returned Query Format {-}
+
+#### Example {-}
+
+`*RST` [// Resets the target device including CPU clock.]{custom-style="CommentTok"}
+
+:   Typical Response: `"RaspberryPiPico,RP001,{serial},0.0.1"`
