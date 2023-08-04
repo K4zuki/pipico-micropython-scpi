@@ -117,35 +117,46 @@ SPI_CKPH_LO = 0
 DEFAULT_SPI_CKPH = SPI_CKPH_LO
 
 uart0 = machine.UART(0, tx=machine.Pin(0), rx=machine.Pin(1))
-sda1 = machine.Pin(2)
-scl1 = machine.Pin(3)
+
+sck0 = machine.Pin(2)
+mosi0 = machine.Pin(3)
+miso0 = machine.Pin(4)
+spi0 = machine.SPI(0, sck=sck0, mosi=mosi0, miso=miso0)
+cs0 = machine.Pin(5, mode=machine.Pin.OUT, value=IO_ON)
+
+sda1 = machine.Pin(6)
+scl1 = machine.Pin(7)
 i2c1 = machine.I2C(1, scl=scl1, sda=sda1)
-sda0 = machine.Pin(4)
-scl0 = machine.Pin(5)
+
+sda0 = machine.Pin(8)
+scl0 = machine.Pin(9)
 i2c0 = machine.I2C(0, scl=scl0, sda=sda0)
-pin6 = machine.Pin(6, machine.Pin.IN)
-pin7 = machine.Pin(7, machine.Pin.IN)
-uart1 = machine.UART(1, tx=machine.Pin(8), rx=machine.Pin(9))
+
 sck1 = machine.Pin(10)
 mosi1 = machine.Pin(11)
 miso1 = machine.Pin(12)
 spi1 = machine.SPI(1, sck=sck1, mosi=mosi1, miso=miso1)
 cs1 = machine.Pin(13, mode=machine.Pin.OUT, value=IO_ON)
+
 pin14 = machine.Pin(14, machine.Pin.IN)
 pin15 = machine.Pin(15, machine.Pin.IN)
-miso0 = machine.Pin(16)
-cs0 = machine.Pin(17, mode=machine.Pin.OUT, value=IO_ON)
-sck0 = machine.Pin(18)
-mosi0 = machine.Pin(19)
-spi0 = machine.SPI(0, sck=sck0, mosi=mosi0, miso=miso0)
+pin16 = machine.Pin(16, machine.Pin.IN)
+pin17 = machine.Pin(17, machine.Pin.IN)
+pin18 = machine.Pin(18, machine.Pin.IN)
+pin19 = machine.Pin(19, machine.Pin.IN)
 pin20 = machine.Pin(20, machine.Pin.IN)
 pin21 = machine.Pin(21, machine.Pin.IN)
 pin22 = machine.Pin(22, machine.Pin.IN)
-pin25 = machine.Pin(25, machine.Pin.OUT, value=IO_OFF)
+
+pin23 = machine.Pin(23)  # Regulator PWM(Hi)-PFM(Lo) switch
+pin24 = machine.Pin(24)  # VBUS sense
+
+pin25 = machine.Pin(25, machine.Pin.OUT, value=IO_OFF)  # Onboard LED
+
 adc0 = machine.ADC(machine.Pin(26))
 adc1 = machine.ADC(machine.Pin(27))
 adc2 = machine.ADC(machine.Pin(28))
-adc3 = machine.ADC(machine.Pin(29))
+adc3 = machine.ADC(machine.Pin(29))  # VSYS/3
 
 
 class PinConfig(namedtuple("PinConfig", ["mode", "value", "pull"])):
@@ -226,12 +237,14 @@ class RaspberryScpiPico(MicroScpiDevice):
     kw_system = ScpiKeyword("SYSTem", "SYST", None)
     kw_error = ScpiKeyword("ERRor", "ERR", None)
 
-    "PIN[6|7|14|15|20|21|22|25"
+    "PIN[14|15|16|17|18|19|20|21|22|25]"
     pins = {
-        6: pin6,
-        7: pin7,
         14: pin14,
         15: pin15,
+        16: pin16,
+        17: pin17,
+        18: pin18,
+        19: pin19,
         20: pin20,
         21: pin21,
         22: pin22,
@@ -252,20 +265,24 @@ class RaspberryScpiPico(MicroScpiDevice):
         1: spi1
     }
     pin_conf = {
-        6: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
-        7: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
         14: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
         15: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
+        16: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
+        17: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
+        18: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
+        19: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
         20: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
         21: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
         22: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
         25: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN)
     }
     pwm_conf = {
-        6: PwmConfig(1000, 32768),
-        7: PwmConfig(1000, 32768),
         14: PwmConfig(1000, 32768),
         15: PwmConfig(1000, 32768),
+        16: PwmConfig(1000, 32768),
+        17: PwmConfig(1000, 32768),
+        18: PwmConfig(1000, 32768),
+        19: PwmConfig(1000, 32768),
         20: PwmConfig(1000, 32768),
         21: PwmConfig(1000, 32768),
         22: PwmConfig(1000, 32768),
@@ -397,7 +414,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_pin_val(self, param="", opt=None):
         """
-        - PIN[6|7|14|15|20|21|22|25]:VALue[?] 0|1|OFF|ON
+        - PIN[14|15|16|17|18|19|20|21|22|25]:VALue[?] 0|1|OFF|ON
 
         :param param:
         :param opt:
@@ -432,7 +449,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_pin_mode(self, param="", opt=None):
         """
-        - PIN[6|7|14|15|20|21|22|25]:MODE INput|OUTput|ODrain|PWM
+        - PIN[14|15|16|17|18|19|20|21|22|25]:MODE INput|OUTput|ODrain|PWM
 
         :param param:
         :param opt:
@@ -475,8 +492,8 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_pin_on(self, param="", opt=None):
         """
-        - PIN[6|7|14|15|20|21|22|25]:ON
-        - PIN[6|7|14|15|20|21|22|25]:OFF
+        - PIN[14|15|16|17|18|19|20|21|22|25]:ON
+        - PIN[14|15|16|17|18|19|20|21|22|25]:OFF
 
         :param param:
         :param opt:
@@ -495,8 +512,8 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_pin_off(self, param="", opt=None):
         """
-        - PIN[6|7|14|15|20|21|22|25]:ON
-        - PIN[6|7|14|15|20|21|22|25]:OFF
+        - PIN[14|15|16|17|18|19|20|21|22|25]:ON
+        - PIN[14|15|16|17|18|19|20|21|22|25]:OFF
 
         :param param:
         :param opt:
@@ -515,7 +532,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_pin_pwm_freq(self, param="", opt=None):
         """
-        - PIN[6|7|14|15|20|21|22]:PWM:FREQuency[?] num
+        - PIN[14|15|16|17|18|19|20|21|22|25]:PWM:FREQuency[?] num
 
         :param param:
         :param opt:
@@ -552,7 +569,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_pin_pwm_duty(self, param="", opt=None):
         """
-        - PIN[6|7|14|15|20|21|22]:PWM:DUTY[?] num
+        - PIN[14|15|16|17|18|19|20|21|22|25]:PWM:DUTY[?] num
 
         :param param:
         :param opt:
