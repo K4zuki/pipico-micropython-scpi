@@ -1,35 +1,81 @@
 \toc
 
+# Description {-}
+
+This document is an API reference for an SCPI-ish device implemented on Raspberry Pi Pico or
+any RP2040 based microcontroller boards. The device has programmed as a library for Micropython.
+
+The RP2040 microcontroller has 2x I2C, 2x SPI, 2x UART, 16x PWM and 4x ADC peripherals multiplexed to 30x GPIOs.
+In this implementation GPIO is limited down to 9, and there is no command for UART.
+This primarily targets the Pico board and so that some GPIOs are reserved for other purpose and
+no access from the API.
+
+#### Tested devices {-}
+
+- Raspberry Pi Pico
+- Raspberry Pi Pico H
+
+#### Untested devices {-}
+
+- Raspberry Pi Pico W
+- Raspberry Pi Pico WH
+
 # Raspberry Pi Pico as SCPI instrument
+
+#### Pico pinout {-}
+
+Following table [@tbl:pico-pinout] shows function assignment for Pico case.
+There is also RP2040 GPIO# column applies to other third party boards.
 
 \newpage
 
-<div class="table" widths="[0.25,0.1,0.1,0.25]">
+<div class="table" width="[0.2,0.15,0.15,0.15,0.15,0.2]" id="tbl:pico-pinout">
 
-|                                                                                    Function | Pin | Pin | Function                                                 |
-|--------------------------------------------------------------------------------------------:|:---:|:---:|:---------------------------------------------------------|
-|                                                 [UART0 TX]{.highlight background="default"} |  1  | 40  | [VBUS]{custom-style="PowerPinStyle"}                     |
-|                                                 [UART0 RX]{.highlight background="default"} |  2  | 39  | [VSYS]{custom-style="PowerPinStyle"}                     |
-|                                                        [GND]{custom-style="GroundPinStyle"} |  3  | 38  | [GND]{custom-style="GroundPinStyle"}                     |
-| [[[I2C1 SDA]{custom-style="I2CPinStyle"}]{.highlight background="default"}](#i2c-subsystem) |  4  | 37  | 3V3 EN                                                   |
-| [[[I2C1 SCL]{custom-style="I2CPinStyle"}]{.highlight background="default"}](#i2c-subsystem) |  5  | 36  | 3V3 OUT                                                  |
-| [[[I2C0 SDA]{custom-style="I2CPinStyle"}]{.highlight background="default"}](#i2c-subsystem) |  6  | 35  | [[ADC VREF]{custom-style="ADCPinStyle"}](#adc-subsystem) |
-| [[[I2C0 SCL]{custom-style="I2CPinStyle"}]{.highlight background="default"}](#i2c-subsystem) |  7  | 34  | [[ADC2]{custom-style="ADCPinStyle"}](#adc-subsystem)     |
-|                                                        [GND]{custom-style="GroundPinStyle"} |  8  | 33  | [GND]{custom-style="GroundPinStyle"}                     |
-|                                      [[PIN 6]{custom-style="GPIOPinStyle"}](#pin-subsystem) |  9  | 32  | [[ADC1]{custom-style="ADCPinStyle"}](#adc-subsystem)     |
-|                                      [[PIN 7]{custom-style="GPIOPinStyle"}](#pin-subsystem) | 10  | 31  | [[ADC0]{custom-style="ADCPinStyle"}](#adc-subsystem)     |
-|                                                                                    UART1 TX | 11  | 30  | RUN                                                      |
-|                                                                                    UART1 RX | 12  | 20  | [[PIN 22]{custom-style="GPIOPinStyle"}](#pin-subsystem)  |
-|                                                        [GND]{custom-style="GroundPinStyle"} | 13  | 29  | [GND]{custom-style="GroundPinStyle"}                     |
-|                                    [[SPI1 SCK]{custom-style="SPIPinStyle"}](#spi-subsystem) | 14  | 28  | [[PIN 21]{custom-style="GPIOPinStyle"}](#pin-subsystem)  |
-|                                     [[SPI1 TX]{custom-style="SPIPinStyle"}](#spi-subsystem) | 15  | 27  | [[PIN 20]{custom-style="GPIOPinStyle"}](#pin-subsystem)  |
-|                                     [[SPI1 RX]{custom-style="SPIPinStyle"}](#spi-subsystem) | 16  | 26  | [[SPI0 TX]{custom-style="SPIPinStyle"}](#spi-subsystem)  |
-|                                     [[SPI1 CS]{custom-style="SPIPinStyle"}](#spi-subsystem) | 17  | 25  | [[SPI0 SCK]{custom-style="SPIPinStyle"}](#spi-subsystem) |
-|                                                        [GND]{custom-style="GroundPinStyle"} | 18  | 24  | [GND]{custom-style="GroundPinStyle"}                     |
-|                                     [[PIN 14]{custom-style="GPIOPinStyle"}](#pin-subsystem) | 19  | 23  | [[SPI0 CS]{custom-style="SPIPinStyle"}](#spi-subsystem)  |
-|                                     [[PIN 15]{custom-style="GPIOPinStyle"}](#pin-subsystem) | 20  | 22  | [[SPI0 RX]{custom-style="SPIPinStyle"}](#spi-subsystem)  |
+Table: Raspberry Pi Pico pinout and function assignment
+
+|                                            Pico Function | RP2040 GPIO# | Pico Pin | Pico Pin | RP2040 GPIO# | Pico Function                                            |
+|---------------------------------------------------------:|:------------:|:--------:|:--------:|:------------:|:---------------------------------------------------------|
+|                                                 UART0 TX |      0       |    1     |    40    |              | [VBUS]{custom-style="PowerPinStyle"}                     |
+|                                                 UART0 RX |      1       |    2     |    39    |              | [VSYS]{custom-style="PowerPinStyle"}                     |
+|                     [GND]{custom-style="GroundPinStyle"} |              |    3     |    38    |              | [GND]{custom-style="GroundPinStyle"}                     |
+| [[SPI0 SCK]{custom-style="SPIPinStyle"}](#spi-subsystem) |      2       |    4     |    37    |              | 3V3 EN                                                   |
+|  [[SPI0 TX]{custom-style="SPIPinStyle"}](#spi-subsystem) |      3       |    5     |    36    |              | 3V3 OUT                                                  |
+|  [[SPI0 RX]{custom-style="SPIPinStyle"}](#spi-subsystem) |      4       |    6     |    35    |              | [[ADC VREF]{custom-style="ADCPinStyle"}](#adc-subsystem) |
+|  [[SPI0 CS]{custom-style="SPIPinStyle"}](#spi-subsystem) |      5       |    7     |    34    |      28      | [[ADC2]{custom-style="ADCPinStyle"}](#adc-subsystem)     |
+|                     [GND]{custom-style="GroundPinStyle"} |              |    8     |    33    |              | [[ADC GND]{custom-style="ADCPinStyle"}](#adc-subsystem)  |
+| [[I2C1 SDA]{custom-style="I2CPinStyle"}](#i2c-subsystem) |      6       |    9     |    32    |      27      | [[ADC1]{custom-style="ADCPinStyle"}](#adc-subsystem)     |
+| [[I2C1 SCL]{custom-style="I2CPinStyle"}](#i2c-subsystem) |      7       |    10    |    31    |      26      | [[ADC0]{custom-style="ADCPinStyle"}](#adc-subsystem)     |
+| [[I2C0 SDA]{custom-style="I2CPinStyle"}](#i2c-subsystem) |      8       |    11    |    30    |              | RUN                                                      |
+| [[I2C0 SCL]{custom-style="I2CPinStyle"}](#i2c-subsystem) |      9       |    12    |    20    |      22      | [[PIN 22]{custom-style="GPIOPinStyle"}](#pin-subsystem)  |
+|                     [GND]{custom-style="GroundPinStyle"} |              |    13    |    29    |              | [GND]{custom-style="GroundPinStyle"}                     |
+| [[SPI1 SCK]{custom-style="SPIPinStyle"}](#spi-subsystem) |      10      |    14    |    28    |      21      | [[PIN 21]{custom-style="GPIOPinStyle"}](#pin-subsystem)  |
+|  [[SPI1 TX]{custom-style="SPIPinStyle"}](#spi-subsystem) |      11      |    15    |    27    |      20      | [[PIN 20]{custom-style="GPIOPinStyle"}](#pin-subsystem)  |
+|  [[SPI1 RX]{custom-style="SPIPinStyle"}](#spi-subsystem) |      12      |    16    |    26    |      19      | [[PIN 19]{custom-style="GPIOPinStyle"}](#pin-subsystem)  |
+|  [[SPI1 CS]{custom-style="SPIPinStyle"}](#spi-subsystem) |      13      |    17    |    25    |      18      | [[PIN 18]{custom-style="GPIOPinStyle"}](#pin-subsystem)  |
+|                     [GND]{custom-style="GroundPinStyle"} |              |    18    |    24    |              | [GND]{custom-style="GroundPinStyle"}                     |
+|  [[PIN 14]{custom-style="GPIOPinStyle"}](#pin-subsystem) |      14      |    19    |    23    |      17      | [[PIN 17]{custom-style="GPIOPinStyle"}](#pin-subsystem)  |
+|  [[PIN 15]{custom-style="GPIOPinStyle"}](#pin-subsystem) |      15      |    20    |    22    |      16      | [[PIN 16]{custom-style="GPIOPinStyle"}](#pin-subsystem)  |
 
 </div>
+
+\newpage
+
+#### Exceptions for Pico GPIO usage {-}
+
+::: {.table #tbl:special-functions}
+
+Table: API unavailable or special functioned GPIO pins
+
+| RP2040 GPIO# | API subsystem | Note                                   |
+|:------------:|:-------------:|----------------------------------------|
+|      0       |      NA       | UART0 TX (not implemented)             |
+|      1       |      NA       | UART0 RX (not implemented)             |
+|      23      |      NA       | (Pico) Onboard DC-DC converter control |
+|      24      |      NA       | (Pico) VBUS status readout             |
+|      25      | LED, PIN, PWM | (Pico) Onboard LED                     |
+|      29      |      ADC      | (Pico) VSYS/3 voltage readout          |
+
+:::
 
 # Parameter types
 
@@ -112,7 +158,7 @@
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                      | Type                                    | Range of values                                                                    | Default value |
 |-------------------------------------------|-----------------------------------------|------------------------------------------------------------------------------------|---------------|
@@ -172,12 +218,12 @@
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
-| Item                                 | Type                                    | Values                                              | Default value |
-|--------------------------------------|-----------------------------------------|-----------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"}   | N/A           |
-| [\<mode\>]{custom-style="NormalTok"} | [[CRD]{custom-style="NormalTok"}](#crd) | [INput/OUTput/ODrain/PWM]{custom-style="NormalTok"} | N/A           |
+| Item                                 | Type                                    | Values                                                    | Default value |
+|--------------------------------------|-----------------------------------------|-----------------------------------------------------------|---------------|
+| [\<pin\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"} | N/A           |
+| [\<mode\>]{custom-style="NormalTok"} | [[CRD]{custom-style="NormalTok"}](#crd) | [INput/OUTput/ODrain/PWM]{custom-style="NormalTok"}       | N/A           |
 
 </div>
 
@@ -197,11 +243,11 @@
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type                                    | Values                                            | Default value |
-|-------------------------------------|-----------------------------------------|---------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
+| Item                                | Type                                    | Values                                                    | Default value |
+|-------------------------------------|-----------------------------------------|-----------------------------------------------------------|---------------|
+| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"} | N/A           |
 
 </div>
 
@@ -226,12 +272,12 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
-| Item                                  | Type                                      | Values                                            | Default value |
-|---------------------------------------|-------------------------------------------|---------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1)   | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
-| [\<value\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool) |                                                   | N/A           |
+| Item                                  | Type                                      | Values                                                    | Default value |
+|---------------------------------------|-------------------------------------------|-----------------------------------------------------------|---------------|
+| [\<pin\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1)   | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"} | N/A           |
+| [\<value\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool) |                                                           | N/A           |
 
 </div>
 
@@ -252,11 +298,11 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type                                    | Values                                            | Default value |
-|-------------------------------------|-----------------------------------------|---------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
+| Item                                | Type                                    | Values                                                    | Default value |
+|-------------------------------------|-----------------------------------------|-----------------------------------------------------------|---------------|
+| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"} | N/A           |
 
 </div>
 
@@ -280,11 +326,11 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type                                    | Values                                            | Default value |
-|-------------------------------------|-----------------------------------------|---------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
+| Item                                | Type                                    | Values                                                    | Default value |
+|-------------------------------------|-----------------------------------------|-----------------------------------------------------------|---------------|
+| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"} | N/A           |
 
 </div>
 
@@ -298,11 +344,11 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type                                    | Values                                            | Default value |
-|-------------------------------------|-----------------------------------------|---------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
+| Item                                | Type                                    | Values                                                    | Default value |
+|-------------------------------------|-----------------------------------------|-----------------------------------------------------------|---------------|
+| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"} | N/A           |
 
 </div>
 
@@ -316,11 +362,11 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                      | Type                                    | Values                                                                  | Default value |
 |-------------------------------------------|-----------------------------------------|-------------------------------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"}       | [[NR1]{custom-style="NormalTok"}](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"}                       | N/A           |
+| [\<pin\>]{custom-style="NormalTok"}       | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"}               | N/A           |
 | [\<frequency\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [1000]{custom-style="NormalTok"} to [100_000]{custom-style="NormalTok"} | N/A           |
 
 </div>
@@ -341,11 +387,11 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type                                    | Values                                            | Default value |
-|-------------------------------------|-----------------------------------------|---------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
+| Item                                | Type                                    | Values                                                    | Default value |
+|-------------------------------------|-----------------------------------------|-----------------------------------------------------------|---------------|
+| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"} | N/A           |
 
 </div>
 
@@ -369,11 +415,11 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                 | Type                                    | Values                                                             | Default value |
 |--------------------------------------|-----------------------------------------|--------------------------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"}                  | N/A           |
+| [\<pin\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"}          | N/A           |
 | [\<duty\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [1]{custom-style="NormalTok"} to [65535]{custom-style="NormalTok"} | N/A           |
 
 </div>
@@ -394,11 +440,11 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
-| Item                                | Type                                    | Values                                            | Default value |
-|-------------------------------------|-----------------------------------------|---------------------------------------------------|---------------|
-| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [6/7/14/15/20/21/22/25]{custom-style="NormalTok"} | N/A           |
+| Item                                | Type                                    | Values                                                    | Default value |
+|-------------------------------------|-----------------------------------------|-----------------------------------------------------------|---------------|
+| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"} | N/A           |
 
 </div>
 
@@ -457,7 +503,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                  | Type                                      | Values | Default value |
 |---------------------------------------|-------------------------------------------|--------|---------------|
@@ -509,7 +555,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                      | Type                                    | Values                                                                  | Default value |
 |-------------------------------------------|-----------------------------------------|-------------------------------------------------------------------------|---------------|
@@ -545,7 +591,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                 | Type                                    | Values                                                             | Default value |
 |--------------------------------------|-----------------------------------------|--------------------------------------------------------------------|---------------|
@@ -599,7 +645,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                | Type                                    | Values                                                                    | Default value |
 |-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
@@ -627,7 +673,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                      | Type                                    | Values                                                                    | Default value |
 |-------------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
@@ -646,7 +692,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                | Type                                    | Values                                                                    | Default value |
 |-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
@@ -674,7 +720,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                | Type                                    | Values                                                                                                    | Default value |
 |-------------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------------------|---------------|
@@ -693,7 +739,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                | Type                                    | Values                                                                    | Default value |
 |-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
@@ -722,7 +768,7 @@ Stop condition is configured by `<stop>`.
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                    | Type                                                   | Values                                                                                                                                                                   | Default value |
 |-----------------------------------------|--------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
@@ -744,7 +790,7 @@ Stop condition is configured by `<stop>`.
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                    | Type                                    | Values                                                                                                                                                                   | Default value |
 |-----------------------------------------|-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
@@ -775,7 +821,7 @@ Stop condition is configured by `<stop>`.
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                       | Type                                                   | Values                                                                                                                                                                   | Default value |
 |--------------------------------------------|--------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
@@ -798,7 +844,7 @@ the target I2C slave slave device.
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                       | Type                                    | Values                                                                                                                                                                   | Default value |
 |--------------------------------------------|-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
@@ -848,7 +894,7 @@ the target I2C slave slave device.
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                     | Type                                      | Values                                                                                                        | Default value |
 |------------------------------------------|-------------------------------------------|---------------------------------------------------------------------------------------------------------------|---------------|
@@ -871,7 +917,7 @@ the target I2C slave slave device.
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                | Type                                    | Values                                                                    | Default value |
 |-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
@@ -901,7 +947,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                  | Type                                      | Values                                                                    | Default value |
 |---------------------------------------|-------------------------------------------|---------------------------------------------------------------------------|---------------|
@@ -920,7 +966,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                | Type                                    | Values                                                                    | Default value |
 |-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
@@ -955,7 +1001,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                 | Type                                    | Values                                                                                              | Default value |
 |--------------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------------|---------------|
@@ -974,7 +1020,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                | Type                                    | Values                                                                    | Default value |
 |-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
@@ -1002,7 +1048,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                      | Type                                    | Values                                                                       | Default value |
 |-------------------------------------------|-----------------------------------------|------------------------------------------------------------------------------|---------------|
@@ -1021,7 +1067,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                | Type                                    | Values                                                                    | Default value |
 |-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
@@ -1049,7 +1095,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                 | Type                                    | Values                                                                    | Default value |
 |--------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
@@ -1068,7 +1114,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                 | Type                                    | Values                                                                    | Default value |
 |--------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
@@ -1087,7 +1133,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                   | Type                                    | Values                                                                    | Default value |
 |----------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
@@ -1135,7 +1181,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Parameter {-}
 
-<div class="table" widths="[0.25,0.1,0.35,0.25]">
+<div class="table" width="[0.25,0.1,0.35,0.25]">
 
 | Item                                    | Type                                    | Values                              | Default value |
 |-----------------------------------------|-----------------------------------------|-------------------------------------|---------------|
