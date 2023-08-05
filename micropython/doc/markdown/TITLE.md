@@ -1,6 +1,8 @@
 \toc
 
-# Description {-}
+# Raspberry Pi Pico as SCPI instrument
+
+#### Description {-}
 
 This document is an API reference for an SCPI-ish device implemented on Raspberry Pi Pico or
 any RP2040 based microcontroller boards. The device has programmed as a library for Micropython.
@@ -19,8 +21,6 @@ no access from the API.
 
 - Raspberry Pi Pico W
 - Raspberry Pi Pico WH
-
-# Raspberry Pi Pico as SCPI instrument
 
 #### Pico pinout {-}
 
