@@ -1,24 +1,33 @@
-ifeq ($(OS),Windows_NT)
-HOME = C:/Users/$(USERNAME)
-endif
-PIPBASE= $(shell get-pip-base)
-PANSTYLES= $(PIPBASE)/var
-MISC= $(PANSTYLES)/pandoc_misc
-MISC_SYS = $(MISC)/system
-MISC_USER = $(MISC)/user
-include $(MISC_SYS)/Makefile.in
-PROJECT= `pwd`
+all: html
 
-## userland: uncomment and replace
-#MDDIR := markdown
-#DATADIR := data
-#TARGETDIR := Out
-#IMAGEDIR := images
-#CONFIG := config.yaml
-#INPUT := TITLE.md
-#DOCXFRONTPAGE := frontpage.md
-TARGET := RasPiPico-Micro-SCPI-Device-$(DATE)-$(HASH)
-#REVERSE_INPUT := reverse-input.docx
-#REFERENCE := $(MISC)/ref.docx
-##
-include $(MISC_SYS)/Makefile
+html:
+	cd doc && make html && cd -
+
+pdf:
+	cd doc && make pdf && cd -
+
+docx:
+	cd doc && make docx && cd -
+
+clean:
+	cd doc && make clean && cd -
+	cd micropython/doc && make clean
+
+init:
+	cd doc && make init && cd -
+	cd micropython/doc && make init
+
+initdir:
+	cd doc && make initdir && cd -
+	cd micropython/doc && make initdir
+
+apidoc: apidoc-docx
+
+apidoc-html:
+	cd micropython/doc && make html && cd -
+
+apidoc-pdf:
+	cd micropython/doc && make pdf && cd -
+
+apidoc-docx:
+	cd micropython/doc && make docx && cd -
