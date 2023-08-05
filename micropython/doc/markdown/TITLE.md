@@ -1,3 +1,5 @@
+\<INSERT SECTION BREAK HERE\>
+
 \toc
 
 # Raspberry Pi Pico as SCPI instrument
@@ -77,6 +79,8 @@ Table: API unavailable or special functioned GPIO pins
 
 :::
 
+\<INSERT SECTION BREAK HERE\>
+
 # Parameter types
 
 [`<NR1>`]{#nr1}
@@ -129,6 +133,8 @@ Table: API unavailable or special functioned GPIO pins
 [`<Block>`]{#block}
 
 :   Arbitrary Block Response Data. Permits the return of definite length and indefinite length arbitrary response data. This data type has an implied message terminator.
+
+\<INSERT SECTION BREAK HERE\>
 
 # MACHINE Subsystem
 
@@ -189,6 +195,8 @@ Table: API unavailable or special functioned GPIO pins
 `MACHINE:FREQ?` [// Returns frequency in Hz]{custom-style="CommentTok"}
 
 :   Typical Response: _`125000000`_
+
+\<INSERT SECTION BREAK HERE\>
 
 # PIN Subsystem
 
@@ -458,6 +466,8 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 :   Typical Response: _`32768`_
 
+\<INSERT SECTION BREAK HERE\>
+
 # LED Subsystem
 
 ```{=openxml}
@@ -616,6 +626,8 @@ Numeric `0` and string `OFF` turns off.
 `LED:DUTY?` [// Returns LED PWM duty in integer]{custom-style="CommentTok"}
 
 :   Typical Response: _`32768`_
+
+\<INSERT SECTION BREAK HERE\>
 
 # I2C Subsystem
 
@@ -865,6 +877,8 @@ the target I2C slave slave device.
 `I2C1:MEMory:READ? 55,AA,4,1`  [// Returns 4-bytes of data from register 0xAA of slave device]{custom-style="CommentTok"}
 
 :   Typical Response: _`DE,AD,BE,EF`_
+
+\<INSERT SECTION BREAK HERE\>
 
 # SPI Subsystem
 
@@ -1153,6 +1167,8 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 :   Typical Response: _`32768`_
 
+\<INSERT SECTION BREAK HERE\>
+
 # ADC Subsystem
 
 ```{=openxml}
@@ -1198,6 +1214,8 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 `ADC2:READ?` [// Returns voltage at ADC2 in 16bit unsigned integer]{custom-style="CommentTok"}
 
 :   Typical Response: _`32768`_
+
+\<INSERT SECTION BREAK HERE\>
 
 # IEEE-488.2 Common Commands {#ieee4882-common-commands}
 
