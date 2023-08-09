@@ -40,4 +40,4 @@ jobs:
         with:
           path: |
             Out
-            micropython/Out
+            micropython/doc/Out
