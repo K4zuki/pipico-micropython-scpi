@@ -197,7 +197,7 @@ class SpiConfig(namedtuple("SpiConfig", ["freq", "mode", "cspol", "sck", "mosi",
 
 class RaspberryScpiPico(MicroScpiDevice):
     kw_machine = ScpiKeyword("MACHINE", "MACHINE", None)
-    kw_pin = ScpiKeyword("PIN", "PIN", ["6", "7", "14", "15", "20", "21", "22", "25"])
+    kw_pin = ScpiKeyword("PIN", "PIN", ["14", "15", "16", "17", "18", "19", "20", "21", "22", "25"])
     kw_in = ScpiKeyword("INput", "IN", None)
     kw_out = ScpiKeyword("OUTput", "OUT", None)
     kw_od = ScpiKeyword("ODrain", "OD", None)
