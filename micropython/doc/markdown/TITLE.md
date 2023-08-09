@@ -7,7 +7,7 @@
 #### Description {-}
 
 This document is an API reference for an SCPI-ish device implemented on Raspberry Pi Pico or
-any RP2040 based microcontroller boards. The device has programmed as a library for Micropython.
+any RP2040 based microcontroller boards. The device has programmed as Micropython library.
 
 The RP2040 microcontroller has 2x I2C, 2x SPI, 2x UART, 16x PWM and 4x ADC peripherals multiplexed to 30x GPIOs.
 In this implementation GPIO is limited down to 9, and there is no command for UART.
@@ -24,12 +24,19 @@ no access from the API.
 - Raspberry Pi Pico W
 - Raspberry Pi Pico WH
 
+#### Micropython code {-}
+
+Source code repository - https://github.com/K4zuki/pipico-micropython-scpi
+
+Write Micropython firmware, and put `MicroScpiDevice.py` and `RaspberryScpiPico.py` on root of target directory.
+For any question, create an issue on github repo.
+
+\newpage
+
 #### Pico pinout {-}
 
 Following table [@tbl:pico-pinout] shows function assignment for Pico case.
 There is also RP2040 GPIO# column applies to other third party boards.
-
-\newpage
 
 <div class="table" width="[0.2,0.2,0.1,0.1,0.2,0.2]" id="tbl:pico-pinout">
 
@@ -827,9 +834,9 @@ Stop condition is configured by `<stop>`.
 
 #### Syntax {-}
 
-`I2C<bus>:MEMory:WRITE <address>,<memaddress>,<buffer>,<addrsize>`
+`I2C<bus>:MEMory:WRITE <address>,<memaddress>,`<br>`<buffer>,<addrsize>`
 
-:   This command sets
+:   This command sends stream of hexadecimal data into specified memory address of slave device.
 
 #### Parameter {-}
 
@@ -840,7 +847,7 @@ Stop condition is configured by `<stop>`.
 | [\<bus\>]{custom-style="NormalTok"}        | [[NR1]{custom-style="NormalTok"}](#nr1)                | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                  | N/A           |
 | [\<address\>]{custom-style="NormalTok"}    | [[NR4]{custom-style="NormalTok"}](#nr4)                | [02]{custom-style="NormalTok"} to [FC]{custom-style="NormalTok"} (8-bit addressing)<br>[01]{custom-style="NormalTok"} to [7E]{custom-style="NormalTok"} (7-bit addressing) | N/A           |
 | [\<memaddress\>]{custom-style="NormalTok"} | [[NR4]{custom-style="NormalTok"}](#nr4)                | [00]{custom-style="NormalTok"} to [FF]{custom-style="NormalTok"}                                                                                                           | N/A           |
-| [\<buffer\>]{custom-style="NormalTok"}     | [[\<NR4\>\[\<NR4\>\]]{custom-style="NormalTok"}](#nr4) |                                                                                                                                                                            | N/A           |
+| [\<buffer\>]{custom-style="NormalTok"}     | [[\<NR4\>\[\<NR4\>\]]{custom-style="NormalTok"}](#nr4) | Stream of data                                                                                                                                                             | N/A           |
 | [\<addrsize\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1)                | [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                             | N/A           |
 
 </div>
@@ -849,7 +856,7 @@ Stop condition is configured by `<stop>`.
 
 #### Syntax {-}
 
-`I2C<bus>:MEMory:READ? <address>,<memaddress>,<nbytes>,<addrsize>`
+`I2C<bus>:MEMory:READ? <address>,<memaddress>,`<br>`<nbytes>,<addrsize>`
 
 :   This query returns comma separated list of hexadecimal data stored in specific memory address of
 the target I2C slave slave device.
