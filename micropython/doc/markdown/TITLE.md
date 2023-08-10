@@ -22,12 +22,11 @@ no access from the API.
 - Raspberry Pi Pico W
 - Raspberry Pi Pico WH
 
-#### Micropython code {-}
+#### Installation, Question, Discussion, Contribution {-}
 
-Source code repository - https://github.com/K4zuki/pipico-micropython-scpi
+Write Micropython firmware, and put `main.py`, `MicroScpiDevice.py` and `RaspberryScpiPico.py` on root of target directory.
 
-Write Micropython firmware, and put `MicroScpiDevice.py` and `RaspberryScpiPico.py` on root of target directory.
-For any question, create an issue on github repo.
+For any question, create an issue on github repo - https://github.com/K4zuki/pipico-micropython-scpi
 
 \newpage
 
