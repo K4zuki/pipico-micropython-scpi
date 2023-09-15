@@ -1,5 +1,3 @@
-\<INSERT SECTION BREAK HERE\>
-
 \toc
 
 # Raspberry Pi Pico as SCPI instrument
@@ -7,7 +5,7 @@
 #### Description {-}
 
 This document is an API reference for an SCPI-ish device implemented on Raspberry Pi Pico or
-any RP2040 based microcontroller boards. The device has programmed as a library for Micropython.
+any RP2040 based microcontroller boards. The device has programmed as Micropython library.
 
 The RP2040 microcontroller has 2x I2C, 2x SPI, 2x UART, 16x PWM and 4x ADC peripherals multiplexed to 30x GPIOs.
 In this implementation GPIO is limited down to 9, and there is no command for UART.
@@ -23,6 +21,12 @@ no access from the API.
 
 - Raspberry Pi Pico W
 - Raspberry Pi Pico WH
+
+#### Installation, Question, Discussion, Contribution {-}
+
+Write Micropython firmware, and put `main.py`, `MicroScpiDevice.py` and `RaspberryScpiPico.py` on root of target directory.
+
+For any question, create an issue on github repo - https://github.com/K4zuki/pipico-micropython-scpi
 
 \newpage
 
@@ -83,7 +87,9 @@ Table: API unavailable or special functioned GPIO pins
 
 # Parameter types
 
-[`<NR1>`]{#nr1}
+Parameter types in **`bold`** applies to this implementation.
+
+[**`<NR1>`**]{#nr1}
 
 :   Digits with an implied decimal point assumed at the right of the least-significant digit.
 
@@ -97,7 +103,7 @@ Table: API unavailable or special functioned GPIO pins
 
 :   Digits with an explicit decimal point and an exponent. Example: `2.73E+02`
 
-[`<NR4>`]{#nr4}
+[**`<NR4>`**]{#nr4}
 
 :   Hexadecimal, even number of digits without a negative sign `"-"`. Example: `DEAD BEAF C00F3E`
 
@@ -126,15 +132,13 @@ Table: API unavailable or special functioned GPIO pins
 
 :   Character Response Data. Returns discrete parameters. Only the short form of the parameter is returned.
 
-[`<AARD>`]{#aard}
+[**`<AARD>`**]{#aard}
 
 :   Arbitrary ASCII Response Data. Permits the return of undelimited 7-bit ASCII. This data type has an implied message terminator.
 
 [`<Block>`]{#block}
 
 :   Arbitrary Block Response Data. Permits the return of definite length and indefinite length arbitrary response data. This data type has an implied message terminator.
-
-\<INSERT SECTION BREAK HERE\>
 
 # MACHINE Subsystem
 
@@ -195,8 +199,6 @@ Table: API unavailable or special functioned GPIO pins
 `MACHINE:FREQ?` [// Returns frequency in Hz]{custom-style="CommentTok"}
 
 :   Typical Response: _`125000000`_
-
-\<INSERT SECTION BREAK HERE\>
 
 # PIN Subsystem
 
@@ -478,8 +480,6 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 :   Typical Response: _`32768`_
 
-\<INSERT SECTION BREAK HERE\>
-
 # LED Subsystem
 
 ```{=openxml}
@@ -638,8 +638,6 @@ Numeric `0` and string `OFF` turns off.
 `LED:DUTY?` [// Returns LED PWM duty in integer]{custom-style="CommentTok"}
 
 :   Typical Response: _`32768`_
-
-\<INSERT SECTION BREAK HERE\>
 
 # I2C Subsystem
 
@@ -839,9 +837,9 @@ Stop condition is configured by `<stop>`.
 
 #### Syntax {-}
 
-`I2C<bus>:MEMory:WRITE <address>,<memaddress>,<buffer>,<addrsize>`
+`I2C<bus>:MEMory:WRITE <address>,<memaddress>,`<br>`<buffer>,<addrsize>`
 
-:   This command sets
+:   This command sends stream of hexadecimal data into specified memory address of slave device.
 
 #### Parameter {-}
 
@@ -852,7 +850,7 @@ Stop condition is configured by `<stop>`.
 | [\<bus\>]{custom-style="NormalTok"}        | [[NR1]{custom-style="NormalTok"}](#nr1)                | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                  | N/A           |
 | [\<address\>]{custom-style="NormalTok"}    | [[NR4]{custom-style="NormalTok"}](#nr4)                | [02]{custom-style="NormalTok"} to [FC]{custom-style="NormalTok"} (8-bit addressing)<br>[01]{custom-style="NormalTok"} to [7E]{custom-style="NormalTok"} (7-bit addressing) | N/A           |
 | [\<memaddress\>]{custom-style="NormalTok"} | [[NR4]{custom-style="NormalTok"}](#nr4)                | [00]{custom-style="NormalTok"} to [FF]{custom-style="NormalTok"}                                                                                                           | N/A           |
-| [\<buffer\>]{custom-style="NormalTok"}     | [[\<NR4\>\[\<NR4\>\]]{custom-style="NormalTok"}](#nr4) |                                                                                                                                                                            | N/A           |
+| [\<buffer\>]{custom-style="NormalTok"}     | [[\<NR4\>\[\<NR4\>\]]{custom-style="NormalTok"}](#nr4) | Stream of data                                                                                                                                                             | N/A           |
 | [\<addrsize\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1)                | [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                                                                                             | N/A           |
 
 </div>
@@ -861,7 +859,7 @@ Stop condition is configured by `<stop>`.
 
 #### Syntax {-}
 
-`I2C<bus>:MEMory:READ? <address>,<memaddress>,<nbytes>,<addrsize>`
+`I2C<bus>:MEMory:READ? <address>,<memaddress>,`<br>`<nbytes>,<addrsize>`
 
 :   This query returns comma separated list of hexadecimal data stored in specific memory address of
 the target I2C slave slave device.
@@ -889,8 +887,6 @@ the target I2C slave slave device.
 `I2C1:MEMory:READ? 55,AA,4,1`  [// Returns 4-bytes of data from register 0xAA of slave device]{custom-style="CommentTok"}
 
 :   Typical Response: _`DE,AD,BE,EF`_
-
-\<INSERT SECTION BREAK HERE\>
 
 # SPI Subsystem
 
@@ -1179,8 +1175,6 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 :   Typical Response: _`32768`_
 
-\<INSERT SECTION BREAK HERE\>
-
 # ADC Subsystem
 
 ```{=openxml}
@@ -1226,8 +1220,6 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 `ADC2:READ?` [// Returns voltage at ADC2 in 16bit unsigned integer]{custom-style="CommentTok"}
 
 :   Typical Response: _`32768`_
-
-\<INSERT SECTION BREAK HERE\>
 
 # IEEE-488.2 Common Commands {#ieee4882-common-commands}
 
