@@ -24,12 +24,12 @@ no access from the API.
 - Raspberry Pi Pico W
 - Raspberry Pi Pico WH
 
+\newpage
+
 #### Pico pinout {-}
 
 Following table [@tbl:pico-pinout] shows function assignment for Pico case.
 There is also RP2040 GPIO# column applies to other third party boards.
-
-\newpage
 
 <div class="table" width="[0.2,0.2,0.1,0.1,0.2,0.2]" id="tbl:pico-pinout">
 
@@ -342,6 +342,12 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 </div>
 
+#### Example {-}
+
+:::{custom-style="Definition Term"}
+`PIN14:ON` [// Sets Pin14 to logic HI]{custom-style="CommentTok"} \
+:::
+
 ## PIN:OFF {.unnumbered #pin-off}
 
 #### Syntax {-}
@@ -359,6 +365,12 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 | [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"} | N/A           |
 
 </div>
+
+#### Example {-}
+
+:::{custom-style="Definition Term"}
+`PIN14:OFF` [// Sets Pin14 to logic LO]{custom-style="CommentTok"} \
+:::
 
 ## PIN:PWM:FREQuency {.unnumbered #pin-pwm-frequency}
 
@@ -382,7 +394,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 #### Example {-}
 
 :::{custom-style="Definition Term"}
-`PIN14:FREQ 55555` [// Pin14 PWM frequency is set at 55555Hz]{custom-style="CommentTok"}
+`PIN14:PWM:FREQ 55555` [// Pin14 PWM frequency is set at 55555Hz]{custom-style="CommentTok"}
 :::
 
 ## PIN:PWM:FREQuency? {.unnumbered #pin-pwm-frequency-query}
@@ -435,7 +447,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 #### Example {-}
 
 :::{custom-style="Definition Term"}
-`PIN14:DUTY 25252` [// Pin14 PWM duty is set at 25252 out of 65535]{custom-style="CommentTok"}
+`PIN14:PWM:DUTY 25252` [// Pin14 PWM duty is set at 25252 out of 65535]{custom-style="CommentTok"}
 :::
 
 ## PIN:PWM:DUTY? {.unnumbered #pin-pwm-duty-query}
@@ -462,7 +474,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Example {-}
 
-`PIN14:DUTY?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
+`PIN14:PWM:DUTY?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
 
 :   Typical Response: _`32768`_
 
