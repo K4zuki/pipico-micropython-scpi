@@ -72,6 +72,10 @@ class ScpiKeyword(namedtuple("ScpiKeyword", ["long", "short", "opt"])):
 
 
 class ScpiMatch(namedtuple("ScpiMatch", ["match", "opt"])):
+    """
+    - match: `bool`
+    - opt: `str`
+    """
     pass
 
 
