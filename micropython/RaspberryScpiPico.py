@@ -361,7 +361,9 @@ class RaspberryScpiPico(MicroScpiDevice):
         """<Vendor name>,<Model number>,<Serial number>,<Firmware version>"""
         serial = "".join(f"{d:02x}" for d in machine.unique_id())
 
-        print(f"RaspberryPiPico,RP001,{serial},0.0.1")
+        query = (opt[-1] == "?")
+        if query:
+            print(f"RaspberryPiPico,RP001,{serial},0.0.1")
 
     @staticmethod
     def cb_rst(param="", opt=None):
