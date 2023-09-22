@@ -161,3 +161,4 @@ cython_debug/
 #.idea/
 
 host/port_config.py
+*.uf2
