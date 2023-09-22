@@ -1,8 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Flash EMU2751A.py" type="MicroPythonConfigurationType" factoryName="MicroPython" nameIsGenerated="true" path="$PROJECT_DIR$/EMU2751A.py" runReplOnSuccess="no">
-    <module name="micropython" />
-    <method v="2">
-      <option name="MicroPython.StopREPL.Before.Run" enabled="true" />
-    </method>
-  </configuration>
-</component>
