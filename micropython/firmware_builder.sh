@@ -1,4 +1,4 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 
 MANIFEST=/root/manifest.py
 make -C ports/rp2 -j6 BOARD=RPI_PICO FROZEN_MANIFEST=$MANIFEST clean
