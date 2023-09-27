@@ -38,6 +38,7 @@ import time
 
 - SYSTem:ERRor?
 
+- PIN[6|7|14|15|20|21|22|25]?
 - PIN[6|7|14|15|20|21|22|25]:MODE[?] INput|OUTput|ODrain|PWM
 - PIN[6|7|14|15|20|21|22|25]:VALue[?] 0|1|OFF|ON
 - PIN[6|7|14|15|20|21|22|25]:ON
@@ -45,6 +46,7 @@ import time
 - PIN[6|7|14|15|20|21|22|25]:PWM:FREQuency[?] num
 - PIN[6|7|14|15|20|21|22|25]:PWM:DUTY[?] num
 
+- LED?
 - LED:ON
 - LED:OFF
 - LED:VALue[?] 0|1|OFF|ON
@@ -53,6 +55,7 @@ import time
 - LED:PWM:FREQuency[?] num
 - LED:PWM:DUTY[?] num
 
+- I2C[01]?
 - I2C[01]:SCAN?
 - I2C[01]:FREQuency[?] num
 - I2C[01]:ADDRess:BIT[?] 0|1|DEFault
@@ -61,6 +64,7 @@ import time
 - I2C[01]:MEMory:WRITE address,memaddress,buffer,addrsize
 - I2C[01]:MEMory:READ address,memaddress,nbytes,addrsize
 
+- SPI[01]?
 - SPI[01]:CSEL:POLarity[?] 0|1|DEFault
 - SPI[01]:CSEL:VALue[?] 0|1|OFF|ON
 - SPI[01]:MODE[?] 0|1|2|3|DEFault
@@ -197,11 +201,11 @@ class SpiConfig(namedtuple("SpiConfig", ["freq", "mode", "cspol", "sck", "mosi",
 
 class RaspberryScpiPico(MicroScpiDevice):
     kw_machine = ScpiKeyword("MACHINE", "MACHINE", None)
-    kw_pin = ScpiKeyword("PIN", "PIN", ["14", "15", "16", "17", "18", "19", "20", "21", "22", "25"])
+    kw_pin = ScpiKeyword("PIN", "PIN", ["14", "15", "16", "17", "18", "19", "20", "21", "22", "25", "?"])
     kw_in = ScpiKeyword("INput", "IN", None)
     kw_out = ScpiKeyword("OUTput", "OUT", None)
     kw_od = ScpiKeyword("ODrain", "OD", None)
-    kw_led = ScpiKeyword("LED", "LED", None)
+    kw_led = ScpiKeyword("LED", "LED", ["?"])
     kw_status = ScpiKeyword("STATe", "STAT", ["?"])
     kw_pwm = ScpiKeyword("PWM", "PWM", None)
     kw_en = ScpiKeyword("ENable", "EN", None)
@@ -215,13 +219,13 @@ class RaspberryScpiPico(MicroScpiDevice):
     kw_width = ScpiKeyword("WIDTH", "WIDTH", None)
     kw_start = ScpiKeyword("START", "START", None)
     kw_stop = ScpiKeyword("STOP", "STOP", None)
-    kw_i2c = ScpiKeyword("I2C", "I2C", ["0", "1"])
+    kw_i2c = ScpiKeyword("I2C", "I2C", ["0", "1", "?"])
     kw_scan = ScpiKeyword("SCAN", "SCAN", ["?"])
     kw_addr = ScpiKeyword("ADDRess", "ADDR", None)
     kw_bit = ScpiKeyword("BIT", "BIT", ["?"])
     kw_memory = ScpiKeyword("MEMory", "MEM", None)
     kw_freq = ScpiKeyword("FREQuency", "FREQ", ["?"])
-    kw_spi = ScpiKeyword("SPI", "SPI", ["0", "1"])
+    kw_spi = ScpiKeyword("SPI", "SPI", ["0", "1", "?"])
     kw_csel = ScpiKeyword("CSEL", "CS", None)
     kw_mode = ScpiKeyword("MODE", "MODE", ["?"])
     kw_pol = ScpiKeyword("POLarity", "POL", ["?"])
@@ -314,6 +318,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         system_error = ScpiCommand((self.kw_system, self.kw_error), True, self.cb_system_error)
 
+        pin_q = ScpiCommand((self.kw_pin,), True, self.cb_pin_status)
         pin_mode = ScpiCommand((self.kw_pin, self.kw_mode), False, self.cb_pin_mode)
         pin_val = ScpiCommand((self.kw_pin, self.kw_value), False, self.cb_pin_val)
         pin_on = ScpiCommand((self.kw_pin, self.kw_on), False, self.cb_pin_on)
@@ -321,12 +326,14 @@ class RaspberryScpiPico(MicroScpiDevice):
         pin_pwm_freq = ScpiCommand((self.kw_pin, self.kw_pwm, self.kw_freq), False, self.cb_pin_pwm_freq)
         pin_pwm_duty = ScpiCommand((self.kw_pin, self.kw_pwm, self.kw_duty), False, self.cb_pin_pwm_duty)
 
+        led_q = ScpiCommand((self.kw_led,), True, self.cb_led_status)
         led_val = ScpiCommand((self.kw_led, self.kw_value), True, self.cb_led_val)
         led_on = ScpiCommand((self.kw_led, self.kw_on), False, self.cb_led_on)
         led_off = ScpiCommand((self.kw_led, self.kw_off), False, self.cb_led_off)
         led_pwm_freq = ScpiCommand((self.kw_led, self.kw_pwm, self.kw_freq), False, self.cb_led_pwm_freq)
         led_pwm_duty = ScpiCommand((self.kw_led, self.kw_pwm, self.kw_duty), False, self.cb_led_pwm_duty)
 
+        i2c_q = ScpiCommand((self.kw_i2c,), True, self.cb_i2c_status)
         i2c_scan_q = ScpiCommand((self.kw_i2c, self.kw_scan), True, self.cb_i2c_scan)
         i2c_freq = ScpiCommand((self.kw_i2c, self.kw_freq), False, self.cb_i2c_freq)
         i2c_abit = ScpiCommand((self.kw_i2c, self.kw_addr, self.kw_bit), False, self.cb_i2c_address_bit)
@@ -335,6 +342,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         i2c_write_memory = ScpiCommand((self.kw_i2c, self.kw_memory, self.kw_write), False, self.cb_i2c_write_memory)
         i2c_read_memory = ScpiCommand((self.kw_i2c, self.kw_memory, self.kw_read), True, self.cb_i2c_read_memory)
 
+        spi_q = ScpiCommand((self.kw_spi,), True, self.cb_spi_status)
         spi_cs_pol = ScpiCommand((self.kw_spi, self.kw_csel, self.kw_pol), False, self.cb_spi_cs_pol)
         spi_cs_val = ScpiCommand((self.kw_spi, self.kw_csel, self.kw_value), False, self.cb_spi_cs_val)
         spi_mode = ScpiCommand((self.kw_spi, self.kw_mode), False, self.cb_spi_clock_phase)
@@ -348,11 +356,11 @@ class RaspberryScpiPico(MicroScpiDevice):
         self.commands = [cls, ese, opc, rst, sre, esr_q, idn_q, stb_q, tst_q,
                          machine_freq,
                          system_error,
-                         pin_mode, pin_val, pin_on, pin_off, pin_pwm_freq, pin_pwm_duty,
-                         led_val, led_on, led_off, led_pwm_freq, led_pwm_duty,
-                         i2c_scan_q, i2c_freq, i2c_abit, i2c_write, i2c_read_q,
+                         pin_q, pin_mode, pin_val, pin_on, pin_off, pin_pwm_freq, pin_pwm_duty,
+                         led_q, led_val, led_on, led_off, led_pwm_freq, led_pwm_duty,
+                         i2c_q, i2c_scan_q, i2c_freq, i2c_abit, i2c_write, i2c_read_q,
                          i2c_write_memory, i2c_read_memory,
-                         spi_cs_pol, spi_mode, spi_freq, spi_write, spi_read, spi_cs_val, spi_transfer,
+                         spi_q, spi_cs_pol, spi_mode, spi_freq, spi_write, spi_read, spi_cs_val, spi_transfer,
                          adc_read,
                          ]
 
@@ -413,6 +421,35 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_system_error(self, param="", opt=None):
         pass
+
+    def cb_pin_status(self, param="", opt=None):
+        """
+        - ``PIN?``
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        query = (opt[-1] == "?")
+
+        if query:
+            for pin in self.pin_conf.keys():
+                conf = self.pin_conf[pin]
+                pwm_conf = self.pwm_conf[pin]
+                mode = conf.mode
+                value = conf.value
+                freq = pwm_conf.freq
+                duty = pwm_conf.duty_u16
+                message = ";".join([f"PIN{pin}:MODE {IO_MODE_STRINGS[mode]}",
+                                    f"PIN{pin}:VALue {IO_VALUE_STRINGS[value]}",
+                                    f"PIN{pin}:PWM:FREQuency {freq}",
+                                    f"PIN{pin}:PWM:DUTY {duty}"
+                                    ])
+                print(message, end=";")
+            print()
+        else:
+            print("syntax error: no parameter")
 
     def cb_pin_val(self, param="", opt=None):
         """
@@ -606,6 +643,28 @@ class RaspberryScpiPico(MicroScpiDevice):
         else:
             print("syntax error: no parameter")
 
+    def cb_led_status(self, param="", opt=None):
+        """
+        - ``LED?``
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        pin_number = 25
+        query = (opt[-1] == "?")
+        conf = self.pin_conf[pin_number]
+        pwm_conf = self.pwm_conf[pin_number]
+        value = conf.value
+        freq = pwm_conf.freq
+        duty = pwm_conf.duty_u16
+
+        if query:
+            print(f"LED:VALue {IO_VALUE_STRINGS[value]};LED:PWM:FREQuency {freq};LED:PWM:DUTY {duty}")
+        else:
+            print("syntax error: no parameter")
+
     def cb_led_on(self, param="", opt=None):
         """
         - LED:ON
@@ -714,6 +773,27 @@ class RaspberryScpiPico(MicroScpiDevice):
             print("syntax error: no parameter")
 
         self.cb_pin_pwm_duty(param, opt)
+
+    def cb_i2c_status(self, param="", opt=None):
+        """
+        - ``I2C[01]?``
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        query = (opt[-1] == "?")
+
+        if query:
+            for bus in self.i2c_conf.keys():
+                conf = self.i2c_conf[bus]
+                shift = conf.bit
+                freq = conf.freq
+                print(f"I2C{bus}:ADDRess:BIT {shift};I2C{bus}:FREQuency {freq};", end="")
+            print()
+        else:
+            print("syntax error: no parameter")
 
     def cb_i2c_scan(self, param, opt):
         """
@@ -1012,6 +1092,28 @@ class RaspberryScpiPico(MicroScpiDevice):
             print(f"{value}")  # decimal
         else:
             print("syntax error: query only")
+
+    def cb_spi_status(self, param="", opt=None):
+        """
+        - ``SPI[01]?``
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        query = (opt[-1] == "?")
+
+        if query:
+            for bus in self.spi_conf.keys():
+                conf = self.spi_conf[bus]
+                cspol = conf.cspol
+                freq = conf.freq
+                mode = conf.mode
+                print(f"SPI{bus}:CSEL:POLarity {cspol};SPI{bus}:FREQuency {freq};SPI{bus}:MODE {mode};", end="")
+            print()
+        else:
+            print("syntax error: no parameter")
 
     def cb_spi_cs_pol(self, param, opt):
         """

@@ -71,6 +71,8 @@ scpi_commands = [
 
     "SYSTem:ERRor?",
 
+    "PIN?",
+
     "PIN14:MODE?", "PIN14:MODE INput", "PIN14:MODE OUTput", "PIN14:MODE ODrain", "PIN14:MODE PWM",
     "PIN15:MODE?", "PIN15:MODE INput", "PIN15:MODE OUTput", "PIN15:MODE ODrain", "PIN15:MODE PWM",
     "PIN16:MODE?", "PIN16:MODE INput", "PIN16:MODE OUTput", "PIN16:MODE ODrain", "PIN16:MODE PWM",
@@ -104,11 +106,13 @@ scpi_commands = [
     "PIN22:PWM:FREQuency?", "PIN22:PWM:FREQuency 12345", "PIN22:PWM:DUTY 12345", "PIN22:PWM:DUTY?",
     "PIN25:PWM:FREQuency?", "PIN25:PWM:FREQuency 12345", "PIN25:PWM:DUTY 12345", "PIN25:PWM:DUTY?",
 
+    "LED?",
     "LED:VALue OFF", "LED:VALue ON", "LED:OFF", "LED:ON",
     "LED:PWM:FREQuency 12345", "LED:PWM:FREQuency?", "LED:PWM:DUTY?", "LED:PWM:DUTY 12345",
 
     "ADC0:READ?", "ADC1:READ?", "ADC2:READ?", "ADC3:READ?",
 
+    "I2C?",
     "I2C0:SCAN?", "I2C0:FREQuency?", "I2C0:FREQuency 114514",
     "I2C1:SCAN?", "I2C1:FREQuency?", "I2C1:FREQuency 114514",
 
@@ -134,6 +138,7 @@ scpi_commands = [
     "I2C1:MEMory:WRITE 10,7A,bb,1",
     "I2C1:MEMory:READ? 10,00,256,1",
 
+    "SPI?",
     "SPI0:CSEL:POLarity?", "SPI0:CSEL:POLarity 0", "SPI0:CSEL:POLarity 1", "SPI0:CSEL:POLarity DEFault",
     "SPI1:CSEL:POLarity?", "SPI1:CSEL:POLarity 0", "SPI1:CSEL:POLarity 1", "SPI1:CSEL:POLarity DEFault",
     "SPI0:CSEL:VALue 0", "SPI0:CSEL:VALue?", "SPI0:CSEL:VALue 1", "SPI0:CSEL:VALue?", "SPI0:CSEL:VALue OFF",
