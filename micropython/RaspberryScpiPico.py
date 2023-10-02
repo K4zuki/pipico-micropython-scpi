@@ -831,7 +831,6 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         query = (opt[-1] == "?")
         bus_number = int(opt[0])
-        bus = self.i2c[bus_number]
         bus_freq = param
         conf = self.i2c_conf[bus_number]
 
@@ -867,7 +866,6 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         query = (opt[-1] == "?")
         bus_number = int(opt[0])
-        bus = self.i2c[bus_number]
         bit = param
         conf = self.i2c_conf[bus_number]
 
@@ -1126,7 +1124,6 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         query = (opt[-1] == "?")
         bus_number = int(opt[0])
-        bus = self.spi[bus_number]
         conf = self.spi_conf[bus_number]
         cspol = param
 
@@ -1160,7 +1157,6 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         query = (opt[-1] == "?")
         bus_number = int(opt[0])
-        bus = self.spi[bus_number]
         conf = self.spi_conf[bus_number]
         cs_pin = conf.csel
         cs_pol = conf.cspol
@@ -1235,7 +1231,6 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         query = (opt[-1] == "?")
         bus_number = int(opt[0])
-        bus = self.spi[bus_number]
         bus_freq = param
         conf = self.spi_conf[bus_number]
         vals = list(conf)
@@ -1279,10 +1274,6 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
         bus_number = int(opt[0])
         bus = self.spi[bus_number]
-        bus_freq = param
-        conf = self.spi_conf[bus_number]
-        cs = conf.csel
-        cspol = conf.cspol
 
         rstring = re.compile(r"^([0-9a-fA-F]+)$")
 
@@ -1323,7 +1314,6 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
         bus_number = int(opt[0])
         bus = self.spi[bus_number]
-        conf = self.spi_conf[bus_number]
         rstring = re.compile(r"^([0-9a-fA-F]+)$")
 
         if query:
@@ -1360,8 +1350,6 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
         bus_number = int(opt[0])
         bus = self.spi[bus_number]
-        bus_freq = param
-        conf = self.spi_conf[bus_number]
         rstring = re.compile(r"^([1-9]|[1-9][0-9]+),([0-9a-fA-F].)$")
 
         if query:
@@ -1386,7 +1374,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                     print("syntax error: invalid value:", param)
             else:
                 print("syntax error: invalid parameters")
-        elif bus_freq is not None:
+        elif param is not None:
             print("cb_spi_read", bus_number, param)
         else:
             print("syntax error: no parameter")
