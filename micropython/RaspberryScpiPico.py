@@ -121,16 +121,17 @@ SPI_CKPH_LO = 0
 DEFAULT_SPI_CKPH = SPI_CKPH_LO
 
 """
--102	syntax error; invalid syntax
--108	parameter not allowed; more parameters than expected
--109	missing parameter; fewer parameters than expected
--113	undefined header; invalid command received
--121	invalid character in number; parameter has invalid number character
--148	character data not allowed; discrete parameter was received while string or numeric was expected
--158	string data not allowed; unexpected string parameter received
--222	data out of range; data value was outside of valid range
--223	too much data; more data than expected
--224	illegal parameter value; invalid parameter choice
+-102    syntax error; invalid syntax
+-108    parameter not allowed; more parameters than expected
+-109    missing parameter; fewer parameters than expected
+-113    undefined header; invalid command received
+-121    invalid character in number; parameter has invalid number character
+-148    character data not allowed; discrete parameter was received while string or numeric was expected
+-158    string data not allowed; unexpected string parameter received
+-222    data out of range; data value was outside of valid range
+-223    too much data; more data than expected
+-224    illegal parameter value; invalid parameter choice
+-333    I2C bus access fail
 """
 
 E_NONE = 0
@@ -144,6 +145,7 @@ E_STRING_UNALLOWED = -158
 E_OUT_OF_RANGE = -222
 E_DATA_OVERFLOW = -223
 E_INVALID_PARAMETER = -224
+E_I2C_FAIL = -333
 
 MAX_ERROR_COUNT = 256
 ERROR_LIST = [E_NONE] * MAX_ERROR_COUNT
@@ -1010,7 +1012,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                         data = ",".join(f"{d:02x}" for d in read)
                         print(data)
                     except OSError:
-                        print("bus read failed")
+                        self.error_push(E_I2C_FAIL)
                 else:
                     self.error_push(E_INVALID_PARAMETER)
             else:
@@ -1105,7 +1107,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                         data = ",".join(f"{d:02x}" for d in read)
                         print(data)
                     except OSError:
-                        print("bus read failed")
+                        self.error_push(E_I2C_FAIL)
                 else:
                     self.error_push(E_INVALID_PARAMETER)
             else:
