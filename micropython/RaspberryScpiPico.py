@@ -457,7 +457,25 @@ class RaspberryScpiPico(MicroScpiDevice):
             self.error_stack(E_MISSING_PARAM)
 
     def cb_system_error(self, param="", opt=None):
-        pass
+        """
+        - ``SYSTem:ERRor?``
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        query = (opt[-1] == "?")
+        if query:
+            if self.error_counter > 0:
+                print(ERROR_LIST[self.error_shift])
+                ERROR_LIST[self.error_shift] = E_NONE
+                self.error_shift += 1
+                self.error_counter = max(self.error_counter, 0)
+            else:
+                print(E_NONE)
+        else:
+            self.error_stack(E_SYNTAX)
 
     def cb_pin_status(self, param="", opt=None):
         """
