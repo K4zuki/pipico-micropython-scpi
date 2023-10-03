@@ -55,7 +55,7 @@ import time
 - LED:PWM:FREQuency[?] num
 - LED:PWM:DUTY[?] num
 
-- I2C[01]?
+- I2C?
 - I2C[01]:SCAN?
 - I2C[01]:FREQuency[?] num
 - I2C[01]:ADDRess:BIT[?] 0|1|DEFault
@@ -64,7 +64,7 @@ import time
 - I2C[01]:MEMory:WRITE address,memaddress,buffer,addrsize
 - I2C[01]:MEMory:READ address,memaddress,nbytes,addrsize
 
-- SPI[01]?
+- SPI?
 - SPI[01]:CSEL:POLarity[?] 0|1|DEFault
 - SPI[01]:CSEL:VALue[?] 0|1|OFF|ON
 - SPI[01]:MODE[?] 0|1|2|3|DEFault
@@ -269,7 +269,7 @@ class RaspberryScpiPico(MicroScpiDevice):
     kw_def = ScpiKeyword("DEFault", "DEF", None)
     kw_transfer = ScpiKeyword("TRANSfer", "TRANS", None)
     kw_system = ScpiKeyword("SYSTem", "SYST", None)
-    kw_error = ScpiKeyword("ERRor", "ERR", None)
+    kw_error = ScpiKeyword("ERRor", "ERR", ["?"])
 
     "PIN[14|15|16|17|18|19|20|21|22|25]"
     pins = {
@@ -331,14 +331,14 @@ class RaspberryScpiPico(MicroScpiDevice):
         1: SpiConfig(1_000_000, SPI_MODE0, SPI_CSPOL_LO, sck1, mosi1, miso1, cs1)
     }
 
-    error_shift = 0
-    error_stack_pointer = 0
+    error_rd_pointer = 0
+    error_wr_pointer = 0
     error_counter = 0
 
     def error_push(self, error_no):
-        ERROR_LIST[self.error_stack_pointer] = error_no
+        ERROR_LIST[self.error_wr_pointer] = error_no
         self.error_counter += 1
-        error_stack_pointer = (self.error_stack_pointer + 1) & 0xFF
+        self.error_wr_pointer = (self.error_wr_pointer + 1) & 0xFF
 
     def __init__(self):
         super().__init__()
@@ -470,10 +470,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
         if query:
             if self.error_counter > 0:
-                print(ERROR_LIST[self.error_shift])
-                ERROR_LIST[self.error_shift] = E_NONE
-                self.error_shift += 1
-                self.error_counter = max(self.error_counter, 0)
+                print(ERROR_LIST[self.error_rd_pointer])
+                ERROR_LIST[self.error_rd_pointer] = E_NONE
+                self.error_rd_pointer = (self.error_rd_pointer + 1) & 0xFF
+                self.error_counter = max(self.error_counter - 1, 0)
             else:
                 print(E_NONE)
         else:
@@ -820,7 +820,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_i2c_status(self, param="", opt=None):
         """
-        - ``I2C[01]?``
+        - ``I2C?``
 
         :param param:
         :param opt:
@@ -849,18 +849,20 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
-        bus_number = int(opt[0])
-        bus = self.i2c[bus_number]
-        conf = self.i2c_conf[bus_number]
-        shift = conf.bit
-
-        if query:
-            # print("cb_i2c_scan", "Query", param)
-            scanned = bus.scan()
-            if not scanned:
-                print(E_NONE)
+        if isinstance(opt[0], str):
+            bus_number = int(opt[0])
+            bus = self.i2c[bus_number]
+            conf = self.i2c_conf[bus_number]
+            shift = conf.bit
+            if query:
+                # print("cb_i2c_scan", "Query", param)
+                scanned = bus.scan()
+                if not scanned:
+                    print(E_NONE)
+                else:
+                    print(",".join([f"{(int(s) << shift):02x}" for s in scanned]))
             else:
-                print(",".join([f"{(int(s) << shift):02x}" for s in scanned]))
+                self.error_push(E_SYNTAX)
         else:
             self.error_push(E_SYNTAX)
 
@@ -1137,7 +1139,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_spi_status(self, param="", opt=None):
         """
-        - ``SPI[01]?``
+        - ``SPI?``
 
         :param param:
         :param opt:
