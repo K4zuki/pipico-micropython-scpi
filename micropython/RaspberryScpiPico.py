@@ -333,7 +333,7 @@ class RaspberryScpiPico(MicroScpiDevice):
     error_stack_pointer = 0
     error_counter = 0
 
-    def error_stack(self, error_no):
+    def error_push(self, error_no):
         ERROR_LIST[self.error_stack_pointer] = error_no
         self.error_counter += 1
         error_stack_pointer = (self.error_stack_pointer + 1) & 0xFF
@@ -409,7 +409,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         if query:
             print(f"RaspberryPiPico,RP001,{serial},0.0.1")
         else:
-            self.error_stack(E_SYNTAX)
+            self.error_push(E_SYNTAX)
 
     @staticmethod
     def cb_rst(param="", opt=None):
@@ -450,11 +450,11 @@ class RaspberryScpiPico(MicroScpiDevice):
                 if ABS_MIN_CLOCK < machine_freq < ABS_MAX_CLOCK:
                     machine.freq(machine_freq)
                 else:
-                    self.error_stack(E_OUT_OF_RANGE)
+                    self.error_push(E_OUT_OF_RANGE)
             except TypeError:
-                self.error_stack(E_INVALID_PARAMETER)
+                self.error_push(E_INVALID_PARAMETER)
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_system_error(self, param="", opt=None):
         """
@@ -475,7 +475,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             else:
                 print(E_NONE)
         else:
-            self.error_stack(E_SYNTAX)
+            self.error_push(E_SYNTAX)
 
     def cb_pin_status(self, param="", opt=None):
         """
@@ -504,7 +504,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 print(message, end=";")
             print()
         else:
-            self.error_stack(E_SYNTAX)
+            self.error_push(E_SYNTAX)
 
     def cb_pin_val(self, param="", opt=None):
         """
@@ -537,9 +537,9 @@ class RaspberryScpiPico(MicroScpiDevice):
                 vals[conf.index(conf.value)] = IO_OFF
                 self.pin_conf[pin_number] = PinConfig(*vals)
             else:
-                self.error_stack(E_INVALID_PARAMETER)
+                self.error_push(E_INVALID_PARAMETER)
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_pin_mode(self, param="", opt=None):
         """
@@ -572,7 +572,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 mode = machine.Pin.ALT
                 alt = machine.Pin.ALT_PWM
             else:
-                self.error_stack(E_INVALID_PARAMETER)
+                self.error_push(E_INVALID_PARAMETER)
 
             pin.init(mode, alt=alt, pull=conf.pull)
             self.pins[pin_number] = pin
@@ -581,7 +581,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             self.pin_conf[pin_number] = PinConfig(*vals)
             # print(pin)
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_pin_on(self, param="", opt=None):
         """
@@ -598,7 +598,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_pin_on", pin_number, "Query", param)
-            self.error_stack(E_SYNTAX)
+            self.error_push(E_SYNTAX)
         else:
             # print("cb_pin_on", pin_number, param)
             self.cb_pin_val(param="ON", opt=opt)
@@ -618,7 +618,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_pin_off", pin_number, "Query", param)
-            self.error_stack(E_SYNTAX)
+            self.error_push(E_SYNTAX)
         else:
             # print("cb_pin_off", pin_number, param)
             self.cb_pin_val(param="OFF", opt=opt)
@@ -656,9 +656,9 @@ class RaspberryScpiPico(MicroScpiDevice):
                 vals[conf.index(conf.freq)] = pwm_freq
                 self.pwm_conf[pin_number] = PwmConfig(*vals)
             else:
-                self.error_stack(E_OUT_OF_RANGE)
+                self.error_push(E_OUT_OF_RANGE)
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_pin_pwm_duty(self, param="", opt=None):
         """
@@ -693,9 +693,9 @@ class RaspberryScpiPico(MicroScpiDevice):
                 vals[conf.index(conf.duty_u16)] = pwm_duty
                 self.pwm_conf[pin_number] = PwmConfig(*vals)
             else:
-                self.error_stack(E_OUT_OF_RANGE)
+                self.error_push(E_OUT_OF_RANGE)
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_led_status(self, param="", opt=None):
         """
@@ -717,7 +717,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         if query:
             print(f"LED:VALue {IO_VALUE_STRINGS[value]};LED:PWM:FREQuency {freq};LED:PWM:DUTY {duty}")
         else:
-            self.error_stack(E_SYNTAX)
+            self.error_push(E_SYNTAX)
 
     def cb_led_on(self, param="", opt=None):
         """
@@ -733,7 +733,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_led_on", "Query", param)
-            self.error_stack(E_SYNTAX)
+            self.error_push(E_SYNTAX)
         else:
             # print("cb_led_on", param)
             self.cb_pin_val(param="ON", opt=opt)
@@ -752,7 +752,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_led_off", "Query", param)
-            self.error_stack(E_SYNTAX)
+            self.error_push(E_SYNTAX)
         else:
             # print("cb_led_off", param)
             self.cb_pin_val(param="OFF", opt=opt)
@@ -771,12 +771,12 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_led_state", "Query", param)
-            self.error_stack(E_SYNTAX)
+            self.error_push(E_SYNTAX)
         elif param is not None:
             # print("cb_led_state", param)
             self.cb_pin_val(param, opt)
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_led_pwm_freq(self, param="", opt=None):
         """
@@ -795,7 +795,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             # print("cb_led_pwm_freq", param)
             self.cb_pin_pwm_freq(param, opt)
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_led_pwm_duty(self, param, opt):
         """
@@ -814,7 +814,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             # print("cb_pin_pwm_duty", param)
             self.cb_pin_pwm_duty(param, opt)
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_i2c_status(self, param="", opt=None):
         """
@@ -835,7 +835,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 print(f"I2C{bus}:ADDRess:BIT {shift};I2C{bus}:FREQuency {freq};", end="")
             print()
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_i2c_scan(self, param, opt):
         """
@@ -860,7 +860,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             else:
                 print(",".join([f"{(int(s) << shift):02x}" for s in scanned]))
         else:
-            self.error_stack(E_SYNTAX)
+            self.error_push(E_SYNTAX)
 
     def cb_i2c_freq(self, param, opt):
         """
@@ -893,9 +893,9 @@ class RaspberryScpiPico(MicroScpiDevice):
                 vals[conf.index(conf.freq)] = bus_freq
                 self.i2c_conf[bus_number] = I2cConfig(*vals)
             else:
-                self.error_stack(E_OUT_OF_RANGE)
+                self.error_push(E_OUT_OF_RANGE)
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_i2c_address_bit(self, param, opt):
         """
@@ -927,9 +927,9 @@ class RaspberryScpiPico(MicroScpiDevice):
                 vals[conf.index(conf.bit)] = DEFAULT_I2C_BIT
                 self.i2c_conf[bus_number] = I2cConfig(*vals)
             else:
-                self.error_stack(E_INVALID_PARAMETER)
+                self.error_push(E_INVALID_PARAMETER)
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_i2c_write(self, param, opt):
         """
@@ -953,7 +953,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_i2c_write", "Query", param)
-            self.error_stack(E_SYNTAX)
+            self.error_push(E_SYNTAX)
         elif param is not None:
             # print("cb_i2c_write", param)
             searched = rstring.search(param)
@@ -970,9 +970,9 @@ class RaspberryScpiPico(MicroScpiDevice):
                 except OSError:
                     print("bus write failed")
             else:
-                self.error_stack(E_INVALID_PARAMETER)
+                self.error_push(E_INVALID_PARAMETER)
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_i2c_read(self, param, opt):
         """
@@ -1012,11 +1012,11 @@ class RaspberryScpiPico(MicroScpiDevice):
                     except OSError:
                         print("bus read failed")
                 else:
-                    self.error_stack(E_INVALID_PARAMETER)
+                    self.error_push(E_INVALID_PARAMETER)
             else:
-                self.error_stack(E_MISSING_PARAM)
+                self.error_push(E_MISSING_PARAM)
         else:
-            self.error_stack(E_SYNTAX)
+            self.error_push(E_SYNTAX)
 
     def cb_i2c_write_memory(self, param, opt):
         """
@@ -1041,7 +1041,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_i2c_write_memory", "Query", param)
-            self.error_stack(E_SYNTAX)
+            self.error_push(E_SYNTAX)
         elif param is not None:
             # print("cb_i2c_write_memory", param)
 
@@ -1063,9 +1063,9 @@ class RaspberryScpiPico(MicroScpiDevice):
                 except OSError:
                     print("bus write failed")
             else:
-                self.error_stack(E_INVALID_PARAMETER)
+                self.error_push(E_INVALID_PARAMETER)
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_i2c_read_memory(self, param, opt):
         """
@@ -1107,11 +1107,11 @@ class RaspberryScpiPico(MicroScpiDevice):
                     except OSError:
                         print("bus read failed")
                 else:
-                    self.error_stack(E_INVALID_PARAMETER)
+                    self.error_push(E_INVALID_PARAMETER)
             else:
-                self.error_stack(E_MISSING_PARAM)
+                self.error_push(E_MISSING_PARAM)
         else:
-            self.error_stack(E_SYNTAX)
+            self.error_push(E_SYNTAX)
 
     def cb_adc_read(self, param, opt):
         """
@@ -1131,7 +1131,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             value = adc.read_u16()
             print(f"{value}")  # decimal
         else:
-            self.error_stack(E_SYNTAX)
+            self.error_push(E_SYNTAX)
 
     def cb_spi_status(self, param="", opt=None):
         """
@@ -1153,7 +1153,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 print(f"SPI{bus}:CSEL:POLarity {cspol};SPI{bus}:FREQuency {freq};SPI{bus}:MODE {mode};", end="")
             print()
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_spi_cs_pol(self, param, opt):
         """
@@ -1184,9 +1184,9 @@ class RaspberryScpiPico(MicroScpiDevice):
                 vals[conf.index(conf.cspol)] = DEFAULT_SPI_CSPOL
                 self.spi_conf[bus_number] = SpiConfig(*vals)
             else:
-                self.error_stack(E_INVALID_PARAMETER)
+                self.error_push(E_INVALID_PARAMETER)
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_spi_cs_val(self, param, opt):
         """
@@ -1213,9 +1213,9 @@ class RaspberryScpiPico(MicroScpiDevice):
             elif param == str(SPI_CSPOL_LO) or self.kw_off.match(param).match:
                 cs_pin.value(cs_pol)
             else:
-                self.error_stack(E_INVALID_PARAMETER)
+                self.error_push(E_INVALID_PARAMETER)
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_spi_clock_phase(self, param, opt):
         """
@@ -1255,12 +1255,12 @@ class RaspberryScpiPico(MicroScpiDevice):
                 bus = machine.SPI(bus_number, baudrate=conf.freq, sck=conf.sck, mosi=conf.mosi, miso=conf.miso,
                                   polarity=ckpol, phase=ckph)
             else:
-                self.error_stack(E_INVALID_PARAMETER)
+                self.error_push(E_INVALID_PARAMETER)
 
             self.spi_conf[bus_number] = conf
             self.spi[bus_number] = bus
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_spi_freq(self, param, opt):
         """
@@ -1298,11 +1298,11 @@ class RaspberryScpiPico(MicroScpiDevice):
                     vals[conf.index(conf.freq)] = bus_freq
                     self.spi_conf[bus_number] = SpiConfig(*vals)
                 else:
-                    self.error_stack(E_OUT_OF_RANGE)
+                    self.error_push(E_OUT_OF_RANGE)
             except ValueError:
-                self.error_stack(E_INVALID_PARAMETER)
+                self.error_push(E_INVALID_PARAMETER)
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_spi_tx(self, param, opt):
         """
@@ -1321,7 +1321,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_spi_tx", bus_number, "Query", param)
-            self.error_stack(E_SYNTAX)
+            self.error_push(E_SYNTAX)
         elif param is not None:
             # print("cb_spi_tx", bus_number, param)
             searched = rstring.search(param)
@@ -1341,9 +1341,9 @@ class RaspberryScpiPico(MicroScpiDevice):
                 except OSError:
                     print("bus write failed")
             else:
-                self.error_stack(E_INVALID_PARAMETER)
+                self.error_push(E_INVALID_PARAMETER)
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_spi_write(self, param, opt):
         """
@@ -1360,7 +1360,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_spi_write", bus_number, "Query", param)
-            self.error_stack(E_SYNTAX)
+            self.error_push(E_SYNTAX)
         elif param is not None:
             # print("cb_spi_write", bus_number, param)
             searched = rstring.search(param)
@@ -1376,9 +1376,9 @@ class RaspberryScpiPico(MicroScpiDevice):
                 except OSError:
                     print("bus write failed")
             else:
-                self.error_stack(E_INVALID_PARAMETER)
+                self.error_push(E_INVALID_PARAMETER)
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
 
     def cb_spi_read(self, param, opt):
         """
@@ -1413,10 +1413,10 @@ class RaspberryScpiPico(MicroScpiDevice):
                 except OSError:
                     print("bus read failed")
                 except ValueError:
-                    self.error_stack(E_INVALID_PARAMETER)
+                    self.error_push(E_INVALID_PARAMETER)
             else:
-                self.error_stack(E_INVALID_PARAMETER)
+                self.error_push(E_INVALID_PARAMETER)
         elif param is not None:
-            self.error_stack(E_SYNTAX)
+            self.error_push(E_SYNTAX)
         else:
-            self.error_stack(E_MISSING_PARAM)
+            self.error_push(E_MISSING_PARAM)
