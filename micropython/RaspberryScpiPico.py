@@ -120,6 +120,34 @@ SPI_CKPH_HI = 1
 SPI_CKPH_LO = 0
 DEFAULT_SPI_CKPH = SPI_CKPH_LO
 
+"""
+-102	syntax error; invalid syntax
+-108	parameter not allowed; more parameters than expected
+-109	missing parameter; fewer parameters than expected
+-113	undefined header; invalid command received
+-121	invalid character in number; parameter has invalid number character
+-148	character data not allowed; discrete parameter was received while string or numeric was expected
+-158	string data not allowed; unexpected string parameter received
+-222	data out of range; data value was outside of valid range
+-223	too much data; more data than expected
+-224	illegal parameter value; invalid parameter choice
+"""
+
+E_NONE = 0
+E_SYNTAX = -102
+E_PARAM_UNALLOWED = -108
+E_MISSING_PARAM = -109
+E_UNDEFINED_HEADER = -113
+E_WRONG_NUMBER_CHARACTER = -121
+E_CHARACTER_UNALLOWED = -148
+E_STRING_UNALLOWED = -158
+E_OUT_OF_RANGE = -222
+E_DATA_OVERFLOW = -223
+E_INVALID_PARAMETER = -224
+
+MAX_ERROR_COUNT = 256
+ERROR_LIST = [E_NONE] * MAX_ERROR_COUNT
+
 uart0 = machine.UART(0, tx=machine.Pin(0), rx=machine.Pin(1))
 
 sck0 = machine.Pin(2)
@@ -300,6 +328,15 @@ class RaspberryScpiPico(MicroScpiDevice):
         0: SpiConfig(1_000_000, SPI_MODE0, SPI_CSPOL_LO, sck0, mosi0, miso0, cs0),
         1: SpiConfig(1_000_000, SPI_MODE0, SPI_CSPOL_LO, sck1, mosi1, miso1, cs1)
     }
+
+    error_shift = 0
+    error_stack_pointer = 0
+    error_counter = 0
+
+    def error_stack(self, error_no):
+        ERROR_LIST[self.error_stack_pointer] = error_no
+        self.error_counter += 1
+        error_stack_pointer = (self.error_stack_pointer + 1) & 0xFF
 
     def __init__(self):
         super().__init__()
