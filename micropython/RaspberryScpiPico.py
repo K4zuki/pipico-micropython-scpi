@@ -957,7 +957,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 try:
                     bus.writeto(address, bytes(data_array), stop)
                 except OSError:
-                    print("bus write failed")
+                    self.error_push(E_I2C_FAIL)
             else:
                 self.error_push(E_INVALID_PARAMETER)
         else:
