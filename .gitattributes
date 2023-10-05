@@ -1,0 +1,5 @@
+*.md text
+*.sh text
+Makefile text
+Dockerfile text
+*.py text
