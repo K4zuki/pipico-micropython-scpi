@@ -771,10 +771,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         opt[0] = "25"
         query = (opt[-1] == "?")
 
-        if query:
-            # print("cb_led_state", "Query", param)
-            self.error_push(E_SYNTAX)
-        elif param is not None:
+        if param is not None:
             # print("cb_led_state", param)
             self.cb_pin_val(param, opt)
         else:
