@@ -986,15 +986,16 @@ class RaspberryScpiPico(MicroScpiDevice):
                         read = bus.readfrom(int(address), int(length), stop)
                         data = ",".join(f"{d:02x}" for d in read)
                         print(data)
+                        return
                     except OSError:
                         self.error_push(E_I2C_FAIL)
-                        print(0)
                 else:
                     self.error_push(E_INVALID_PARAMETER)
             else:
                 self.error_push(E_MISSING_PARAM)
         else:
             self.error_push(E_SYNTAX)
+        print(0)
 
     def cb_i2c_write_memory(self, param, opt):
         """
@@ -1082,15 +1083,16 @@ class RaspberryScpiPico(MicroScpiDevice):
                         read = bus.readfrom_mem(address, memaddress, length)
                         data = ",".join(f"{d:02x}" for d in read)
                         print(data)
+                        return
                     except OSError:
                         self.error_push(E_I2C_FAIL)
-                        print(0)
                 else:
                     self.error_push(E_INVALID_PARAMETER)
             else:
                 self.error_push(E_MISSING_PARAM)
         else:
             self.error_push(E_SYNTAX)
+        print(0)
 
     def cb_adc_read(self, param, opt):
         """
@@ -1158,10 +1160,12 @@ class RaspberryScpiPico(MicroScpiDevice):
                 vals = list(conf)
                 vals[conf.index(conf.cspol)] = int(cspol)
                 self.spi_conf[bus_number] = SpiConfig(*vals)
+                self.cb_spi_cs_val("OFF", [bus_number])
             elif self.kw_def.match(param).match:
                 vals = list(conf)
                 vals[conf.index(conf.cspol)] = DEFAULT_SPI_CSPOL
                 self.spi_conf[bus_number] = SpiConfig(*vals)
+                self.cb_spi_cs_val("OFF", [bus_number])
             else:
                 self.error_push(E_INVALID_PARAMETER)
         else:
@@ -1184,13 +1188,13 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_spi_cs_val", "Query", param)
-            print(IO_VALUE_STRINGS[cs_pin.value() ^ cs_pol])
+            print(IO_VALUE_STRINGS[int(cs_pin.value() ^ (not cs_pol))])
         elif param is not None:
             # print("cb_spi_cs_val", param)
             if param == str(SPI_CSPOL_HI) or self.kw_on.match(param).match:
-                cs_pin.value(~(cs_pol ^ 1))
+                cs_pin.value(int(not (cs_pol ^ SPI_CSPOL_HI)))
             elif param == str(SPI_CSPOL_LO) or self.kw_off.match(param).match:
-                cs_pin.value(cs_pol)
+                cs_pin.value(int(not (cs_pol ^ SPI_CSPOL_LO)))
             else:
                 self.error_push(E_INVALID_PARAMETER)
         else:
