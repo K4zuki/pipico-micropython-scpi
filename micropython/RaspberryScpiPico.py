@@ -786,11 +786,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
         pwm_freq = param
 
-        if pwm_freq is not None:
-            # print("cb_led_pwm_freq", param)
-            self.cb_pin_pwm_freq(param, opt)
-        else:
-            self.error_push(E_MISSING_PARAM)
+        self.cb_pin_pwm_freq(param, opt)
 
     def cb_led_pwm_duty(self, param, opt):
         """
@@ -805,11 +801,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
         pwm_duty = param
 
-        if pwm_duty is not None:
-            # print("cb_pin_pwm_duty", param)
-            self.cb_pin_pwm_duty(param, opt)
-        else:
-            self.error_push(E_MISSING_PARAM)
+        self.cb_pin_pwm_duty(param, opt)
 
     def cb_i2c_status(self, param="", opt=None):
         """
