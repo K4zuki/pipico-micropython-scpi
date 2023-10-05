@@ -761,7 +761,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_led_val(self, param, opt):
         """
-        - LED:VALue 0|1|OFF|ON
+        - LED:VALue[?] 0|1|OFF|ON
 
         :param param:
         :param opt:
@@ -771,11 +771,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         opt[0] = "25"
         query = (opt[-1] == "?")
 
-        if param is not None:
-            # print("cb_led_state", param)
-            self.cb_pin_val(param, opt)
-        else:
-            self.error_push(E_MISSING_PARAM)
+        self.cb_pin_val(param, opt)
 
     def cb_led_pwm_freq(self, param="", opt=None):
         """
