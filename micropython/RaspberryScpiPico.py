@@ -1000,6 +1000,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                         print(data)
                     except OSError:
                         self.error_push(E_I2C_FAIL)
+                      print(0)
                 else:
                     self.error_push(E_INVALID_PARAMETER)
             else:
@@ -1050,7 +1051,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 try:
                     bus.writeto_mem(address, memaddress, data_array)
                 except OSError:
-                    print("bus write failed")
+                    self.error_push(E_I2C_FAIL)
             else:
                 self.error_push(E_INVALID_PARAMETER)
         else:
@@ -1095,6 +1096,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                         print(data)
                     except OSError:
                         self.error_push(E_I2C_FAIL)
+                        print(0)
                 else:
                     self.error_push(E_INVALID_PARAMETER)
             else:
