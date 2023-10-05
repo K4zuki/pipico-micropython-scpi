@@ -1000,7 +1000,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                         print(data)
                     except OSError:
                         self.error_push(E_I2C_FAIL)
-                      print(0)
+                        print(0)
                 else:
                     self.error_push(E_INVALID_PARAMETER)
             else:
