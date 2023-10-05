@@ -114,6 +114,12 @@ class ScpiCommand(namedtuple("ScpiCommand", ["keywords", "query", "callback"])):
 
 kw = ScpiKeyword("KEYWord", "KEYW", None)
 
+E_NONE = 0
+E_SYNTAX = -102
+
+MAX_ERROR_COUNT = 256
+ERROR_LIST = [E_NONE] * MAX_ERROR_COUNT
+
 
 class MicroScpiDevice:
     kw_cls = ScpiKeyword("*CLS", "*CLS", None)
@@ -126,6 +132,15 @@ class MicroScpiDevice:
     kw_stb = ScpiKeyword("*STB", "*STB", ["?"])
     kw_tst = ScpiKeyword("*TST", "*TST", ["?"])
     commands = [ScpiCommand((kw, kw), False, cb_do_nothing), ]  # type: List[ScpiCommand]
+
+    error_rd_pointer = 0
+    error_wr_pointer = 0
+    error_counter = 0
+
+    def error_push(self, error_no):
+        ERROR_LIST[self.error_wr_pointer] = error_no
+        self.error_counter += 1
+        self.error_wr_pointer = (self.error_wr_pointer + 1) & 0xFF
 
     @staticmethod
     def mini_lexer(line: str):
@@ -161,7 +176,8 @@ class MicroScpiDevice:
         length_matched = [c for c in commands if len(c.keywords) == len(candidate_cmd)]  # type: List[ScpiCommand]
 
         if len(length_matched) == 0:
-            print("{}: command not found".format(':'.join(candidate_cmd)))
+            self.error_push(E_SYNTAX)
+            # print("{}: command not found".format(':'.join(candidate_cmd)))
         else:
             for command in length_matched:
                 result = command.match(candidate_cmd)
@@ -170,4 +186,5 @@ class MicroScpiDevice:
                     break
             else:
                 # When no break occurred - error
-                print("{}: command not found".format(':'.join(candidate_cmd)))
+                self.error_push(E_SYNTAX)
+                # print("{}: command not found".format(':'.join(candidate_cmd)))

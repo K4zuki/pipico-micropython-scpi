@@ -82,7 +82,7 @@ import machine
 import re
 from math import ceil
 from collections import namedtuple
-from MicroScpiDevice import ScpiKeyword, ScpiCommand, MicroScpiDevice, cb_do_nothing
+from MicroScpiDevice import ScpiKeyword, ScpiCommand, MicroScpiDevice, cb_do_nothing, ERROR_LIST
 
 ABS_MAX_CLOCK = 275_000_000
 DEFAULT_CPU_CLOCK = 125_000_000
@@ -146,9 +146,6 @@ E_OUT_OF_RANGE = -222
 E_DATA_OVERFLOW = -223
 E_INVALID_PARAMETER = -224
 E_I2C_FAIL = -333
-
-MAX_ERROR_COUNT = 256
-ERROR_LIST = [E_NONE] * MAX_ERROR_COUNT
 
 uart0 = machine.UART(0, tx=machine.Pin(0), rx=machine.Pin(1))
 
@@ -330,15 +327,6 @@ class RaspberryScpiPico(MicroScpiDevice):
         0: SpiConfig(1_000_000, SPI_MODE0, SPI_CSPOL_LO, sck0, mosi0, miso0, cs0),
         1: SpiConfig(1_000_000, SPI_MODE0, SPI_CSPOL_LO, sck1, mosi1, miso1, cs1)
     }
-
-    error_rd_pointer = 0
-    error_wr_pointer = 0
-    error_counter = 0
-
-    def error_push(self, error_no):
-        ERROR_LIST[self.error_wr_pointer] = error_no
-        self.error_counter += 1
-        self.error_wr_pointer = (self.error_wr_pointer + 1) & 0xFF
 
     def __init__(self):
         super().__init__()
