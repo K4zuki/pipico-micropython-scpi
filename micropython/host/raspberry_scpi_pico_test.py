@@ -71,6 +71,7 @@ scpi_commands = [
 
     "SYSTem:ERRor?",
 
+    "PI",
     "PIN?",
 
     "PIN14:MODE?", "PIN14:MODE INput", "PIN14:MODE OUTput", "PIN14:MODE ODrain", "PIN14:MODE PWM",
@@ -204,6 +205,15 @@ if __name__ == '__main__':
                 time.sleep(0.01)
                 ret = inst.read().strip()
                 print(ret)
+
+        while True:
+            inst.write("SYSTem:ERRor?")
+            time.sleep(0.3)
+            if inst.bytes_in_buffer > 0:
+                ret = inst.read().strip()
+                print(ret)
+                if ret == "0":
+                    break
 
         inst.close()
 
