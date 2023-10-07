@@ -808,7 +808,9 @@ class RaspberryScpiPico(MicroScpiDevice):
                 conf = self.i2c_conf[bus]
                 shift = conf.bit
                 freq = conf.freq
-                print(f"I2C{bus}:ADDRess:BIT {shift};I2C{bus}:FREQuency {freq}")
+                print(f"I2C{bus}:ADDRess:BIT {shift};I2C{bus}:FREQuency {freq};", end="")
+            else:
+                print()
         else:
             self.error_push(E_MISSING_PARAM)
 
