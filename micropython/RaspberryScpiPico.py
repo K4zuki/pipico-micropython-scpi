@@ -82,7 +82,7 @@ import machine
 import re
 from math import ceil
 from collections import namedtuple
-from MicroScpiDevice import ScpiKeyword, ScpiCommand, MicroScpiDevice, cb_do_nothing, ERROR_LIST
+from MicroScpiDevice import ScpiKeyword, ScpiCommand, ScpiErrorNumber, MicroScpiDevice, cb_do_nothing, ERROR_LIST
 
 ABS_MAX_CLOCK = 275_000_000
 DEFAULT_CPU_CLOCK = 125_000_000
@@ -134,19 +134,19 @@ DEFAULT_SPI_CKPH = SPI_CKPH_LO
 -333    I2C bus access fail
 """
 
-E_NONE = 0
-E_SYNTAX = -102
-E_PARAM_UNALLOWED = -108
-E_MISSING_PARAM = -109
-E_UNDEFINED_HEADER = -113
-E_WRONG_NUMBER_CHARACTER = -121
-E_CHARACTER_UNALLOWED = -148
-E_STRING_UNALLOWED = -158
-E_OUT_OF_RANGE = -222
-E_DATA_OVERFLOW = -223
-E_INVALID_PARAMETER = -224
-E_I2C_FAIL = -333
-E_SPI_FAIL = -334
+E_NONE = ScpiErrorNumber(0, "No error")
+E_SYNTAX = ScpiErrorNumber(-102, "Syntax error")
+E_PARAM_UNALLOWED = ScpiErrorNumber(-108, "Parameter not allowed")
+E_MISSING_PARAM = ScpiErrorNumber(-109, "Missing parameter")
+E_UNDEFINED_HEADER = ScpiErrorNumber(-113, "Undefined header")
+E_WRONG_NUMBER_CHARACTER = ScpiErrorNumber(-121, "Invalid character in number")
+E_CHARACTER_UNALLOWED = ScpiErrorNumber(-148, "Character data not allowed")
+E_STRING_UNALLOWED = ScpiErrorNumber(-158, "String data not allowed")
+E_OUT_OF_RANGE = ScpiErrorNumber(-222, "Data out of range")
+E_DATA_OVERFLOW = ScpiErrorNumber(-223, "Too much data")
+E_INVALID_PARAMETER = ScpiErrorNumber(-224, "Illegal parameter value")
+E_I2C_FAIL = ScpiErrorNumber(-333, "I2C bus error")
+E_SPI_FAIL = ScpiErrorNumber(-334, "SPI bus error")
 
 uart0 = machine.UART(0, tx=machine.Pin(0), rx=machine.Pin(1))
 
@@ -459,7 +459,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
         if query:
             if self.error_counter > 0:
-                print(ERROR_LIST[self.error_rd_pointer])
+                err = ERROR_LIST[self.error_rd_pointer]
+                print(f"{err.id}, \"err.message\"")
                 ERROR_LIST[self.error_rd_pointer] = E_NONE
                 self.error_rd_pointer = (self.error_rd_pointer + 1) & 0xFF
                 self.error_counter = max(self.error_counter - 1, 0)
