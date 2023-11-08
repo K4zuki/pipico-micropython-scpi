@@ -209,7 +209,7 @@ class PwmConfig(namedtuple("PwmConfig", ["freq", "duty_u16"])):
 class I2cConfig(namedtuple("I2cConfig", ["freq", "bit", "scl", "sda"])):
     """
     :int freq: frequency
-    :int bit: addres bit
+    :int bit: address bit
     :Pin scl: scl pin
     :Pin sda: sda pin
     """
