@@ -79,6 +79,14 @@ class ScpiMatch(namedtuple("ScpiMatch", ["match", "opt"])):
     pass
 
 
+class ScpiErrorNumber(namedtuple("ScpiErrorNumber", ["id", "message"])):
+    """
+    - id: `int`
+    - message: `str`
+    """
+    pass
+
+
 def cb_do_nothing(*args, **kwargs):
     """Abstract callback function for ScpiCommand class
     """
@@ -114,8 +122,8 @@ class ScpiCommand(namedtuple("ScpiCommand", ["keywords", "query", "callback"])):
 
 kw = ScpiKeyword("KEYWord", "KEYW", None)
 
-E_NONE = 0
-E_SYNTAX = -102
+E_NONE = ScpiErrorNumber(0, "No error")
+E_SYNTAX = ScpiErrorNumber(-102, "Syntax error")
 
 MAX_ERROR_COUNT = 256
 ERROR_LIST = [E_NONE] * MAX_ERROR_COUNT
