@@ -69,9 +69,9 @@ import time
 - SPI[01]:CSEL:VALue[?] 0|1|OFF|ON
 - SPI[01]:MODE[?] 0|1|2|3|DEFault
 - SPI[01]:FREQuency[?] num
-- SPI[01]:TRANSfer data
-- SPI[01]:WRITE data
-- SPI[01]:READ? length,mask
+- SPI[01]:TRANSfer data,pre_cs,post_cs
+- SPI[01]:WRITE data,pre_cs,post_cs
+- SPI[01]:READ? length,mask,pre_cs,post_cs
 
 - ADC[0123]:READ?
 
@@ -134,6 +134,7 @@ DEFAULT_SPI_CKPH = SPI_CKPH_LO
 -333    I2C bus access fail
 """
 
+BUS_FAIL_CODE = 0
 E_NONE = ScpiErrorNumber(0, "No error")
 E_SYNTAX = ScpiErrorNumber(-102, "Syntax error")
 E_PARAM_UNALLOWED = ScpiErrorNumber(-108, "Parameter not allowed")
@@ -460,12 +461,13 @@ class RaspberryScpiPico(MicroScpiDevice):
         if query:
             if self.error_counter > 0:
                 err = ERROR_LIST[self.error_rd_pointer]
-                print(f"{err.id}, \"err.message\"")
+                print(f"{err.id}, '{err.message}'")
                 ERROR_LIST[self.error_rd_pointer] = E_NONE
                 self.error_rd_pointer = (self.error_rd_pointer + 1) & 0xFF
                 self.error_counter = max(self.error_counter - 1, 0)
             else:
-                print(E_NONE)
+                err = E_NONE
+                print(f"{err.id}, '{err.message}'")
         else:
             self.error_push(E_SYNTAX)
 
@@ -834,7 +836,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 # print("cb_i2c_scan", "Query", param)
                 scanned = bus.scan()
                 if not scanned:
-                    print(E_NONE)
+                    print(BUS_FAIL_CODE)
                 else:
                     print(",".join([f"{(int(s) << shift):02x}" for s in scanned]))
             else:
@@ -990,14 +992,14 @@ class RaspberryScpiPico(MicroScpiDevice):
                         return
                     except OSError:
                         self.error_push(E_I2C_FAIL)
-                        print(E_NONE)
+                        print(BUS_FAIL_CODE)
                 else:
                     self.error_push(E_INVALID_PARAMETER)
             else:
                 self.error_push(E_MISSING_PARAM)
         else:
             self.error_push(E_SYNTAX)
-            print(E_NONE)
+            print(BUS_FAIL_CODE)
 
     def cb_i2c_write_memory(self, param, opt):
         """
@@ -1086,14 +1088,14 @@ class RaspberryScpiPico(MicroScpiDevice):
                         return
                     except OSError:
                         self.error_push(E_I2C_FAIL)
-                        print(E_NONE)
+                        print(BUS_FAIL_CODE)
                 else:
                     self.error_push(E_INVALID_PARAMETER)
             else:
                 self.error_push(E_MISSING_PARAM)
         else:
             self.error_push(E_SYNTAX)
-        print(E_NONE)
+        print(BUS_FAIL_CODE)
 
     def cb_adc_read(self, param, opt):
         """
@@ -1290,7 +1292,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_spi_tx(self, param, opt):
         """
-        - SPI[01]:TRANSfer data
+        - ``SPI[01]:TRANSfer data,pre_cs,post_cs``
 
         :param param:
         :param opt:
@@ -1301,7 +1303,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         bus_number = int(opt[0])
         bus = self.spi[bus_number]
 
-        rstring = re.compile(r"^(([0-9a-fA-F][0-9a-fA-F])+)$")
+        rstring = re.compile(r"^(([0-9a-fA-F].)+),([oO][nN]|[oO][fF].),([oO][nN]|[oO][fF].)$")
 
         if query:
             # print("cb_spi_tx", bus_number, "Query", param)
@@ -1310,7 +1312,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             # print("cb_spi_tx", bus_number, param)
             searched = rstring.search(param)
             if searched is not None:
-                data = searched.groups()[0]
+                data, _, pre_cs, post_cs = searched.groups()
                 # print(f"0x{data}")
                 string_length = len(data)
                 data_array = tuple(int(data[i:i + 2], 16) for i in range(0, string_length, 2))
@@ -1318,12 +1320,14 @@ class RaspberryScpiPico(MicroScpiDevice):
                 read_data_array = bytearray([0] * length)
                 # print([hex(c) for c in data_array])
                 try:
+                    self.cb_spi_cs_val(pre_cs, [bus_number, ""])
                     bus.write_readinto(bytes(data_array), read_data_array)
+                    self.cb_spi_cs_val(post_cs, [bus_number, ""])
                     data = ",".join(f"{d:02x}" for d in read_data_array)
                     print(data)
                 except OSError:
                     self.error_push(E_SPI_FAIL)
-                    print(E_NONE)
+                    print(BUS_FAIL_CODE)
             else:
                 self.error_push(E_INVALID_PARAMETER)
         else:
@@ -1331,7 +1335,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_spi_write(self, param, opt):
         """
-        - SPI[01]:WRITE data
+        - ``SPI[01]:WRITE data,pre_cs,post_cs``
 
         :param param:
         :param opt:
@@ -1340,7 +1344,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
         bus_number = int(opt[0])
         bus = self.spi[bus_number]
-        rstring = re.compile(r"^(([0-9a-fA-F][0-9a-fA-F])+)$")
+        rstring = re.compile(r"^(([0-9a-fA-F].)+),([oO][nN]|[oO][fF].),([oO][nN]|[oO][fF].)$")
 
         if query:
             # print("cb_spi_write", bus_number, "Query", param)
@@ -1349,13 +1353,15 @@ class RaspberryScpiPico(MicroScpiDevice):
             # print("cb_spi_write", bus_number, param)
             searched = rstring.search(param)
             if searched is not None:
-                data = searched.groups()[0]
+                data, _, pre_cs, post_cs = searched.groups()
                 # print(f"0x{data}")
                 string_length = len(data)
                 data_array = (int(data[i:i + 2], 16) for i in range(0, string_length, 2))
                 # print([hex(c) for c in data_array])
                 try:
+                    self.cb_spi_cs_val(pre_cs, [bus_number, ""])
                     bus.write(bytes(data_array))
+                    self.cb_spi_cs_val(post_cs, [bus_number, ""])
                 except OSError:
                     self.error_push(E_SPI_FAIL)
             else:
@@ -1365,7 +1371,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_spi_read(self, param, opt):
         """
-        - SPI[01]:READ? length,mask
+        - ``SPI[01]:READ? length,mask,pre_cs,post_cs``
 
         :param param:
         :param opt:
@@ -1375,19 +1381,21 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
         bus_number = int(opt[0])
         bus = self.spi[bus_number]
-        rstring = re.compile(r"^([1-9]|[1-9][0-9]+),(([0-9a-fA-F][0-9a-fA-F])+)$")
+        rstring = re.compile(r"^([1-9]|[1-9][0-9]+),([0-9a-fA-F].),([oO][nN]|[oO][fF].),([oO][nN]|[oO][fF].)$")
 
         if query:
             # print("cb_spi_read", bus_number, "Query", param)
             searched = rstring.search(param)
 
             if searched is not None:
-                length, mask, _ = searched.groups()
+                length, mask, pre_cs, post_cs = searched.groups()
                 # print(length, mask)
                 try:
                     data_array = bytearray([0] * int(length))
                     mask = int("0x" + mask)
+                    self.cb_spi_cs_val(pre_cs, [bus_number, ""])
                     bus.readinto(data_array, mask)
+                    self.cb_spi_cs_val(post_cs, [bus_number, ""])
                     data = ",".join(f"{d:02x}" for d in data_array)
                     print(data)
                     return

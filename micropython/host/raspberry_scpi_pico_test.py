@@ -152,14 +152,14 @@ scpi_commands = [
     "SPI1:MODE DEFault", "SPI1:MODE?", "SPI1:MODE", "SPI1:MODE 5", "SPI1:MODE A",
     "SPI0:FREQuency?", "SPI0:FREQuency 123456",
     "SPI1:FREQuency?", "SPI1:FREQuency 123456",
-    "SPI0:WRITE 12345", "SPI0:WRITE 123456",
-    "SPI1:WRITE 12345", "SPI1:WRITE 123456",
-    "SPI0:READ? 1,aa", "SPI0:READ? 10,bb", "SPI0:READ? 100,gg",
-    "SPI1:READ? 1,aa", "SPI1:READ? 10,bb", "SPI1:READ? 100,gg",
-    "SPI0:READ? 1,00", "SPI0:READ? 10,11", "SPI0:READ? 100,99",
-    "SPI1:READ? 1,00", "SPI0:READ? 10,11", "SPI0:READ? 100,99",
-    "SPI0:TRANSfer 12345", "SPI0:TRANSfer 123456",
-    "SPI1:TRANSfer 12345", "SPI1:TRANSfer 123456",
+    "SPI0:WRITE 12345,ON,OFF", "SPI0:WRITE 123456,ON,OFF",
+    "SPI1:WRITE 12345,ON,OFF", "SPI1:WRITE 123456,ON,OFF",
+    "SPI0:READ? 1,aa,ON,OFf", "SPI0:READ? 10,bb,oN,OFF", "SPI0:READ? 100,gg,ON,OfF",
+    "SPI1:READ? 1,aa,ON,OFf", "SPI1:READ? 10,bb,oN,OFF", "SPI1:READ? 100,gg,ON,OfF",
+    "SPI0:READ? 1,00,ON,OFf", "SPI0:READ? 10,11,oN,OFF", "SPI0:READ? 100,99,ON,OfF",
+    "SPI1:READ? 1,00,ON,OFf", "SPI0:READ? 10,11,oN,OFF", "SPI0:READ? 100,99,ON,OfF",
+    "SPI0:TRANSfer 12345,ON,OFF", "SPI0:TRANSfer 123456,ON,OFF",
+    "SPI1:TRANSfer 12345,ON,OFF", "SPI1:TRANSfer 123456,ON,OFF",
 
     "I2C0:WRITE 78,0001020f2a7981ff7828,0",
     "I2C0:WRITE 78,403031323334,1",
@@ -212,7 +212,7 @@ if __name__ == '__main__':
             if inst.bytes_in_buffer > 0:
                 ret = inst.read().strip()
                 print(ret)
-                if ret == "0":
+                if ret == "0, 'No error'":
                     break
 
         inst.close()
