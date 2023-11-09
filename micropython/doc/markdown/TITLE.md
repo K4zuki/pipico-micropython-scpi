@@ -28,12 +28,27 @@ Write Micropython firmware, and put `main.py`, `MicroScpiDevice.py` and `Raspber
 
 For any question, create an issue on github repo - https://github.com/K4zuki/pipico-micropython-scpi
 
-\newpage
-
 #### Pico pinout {-}
 
-Following table [@tbl:pico-pinout] shows function assignment for Pico case.
+Following tables [@tbl:pico-pinout] and [@tbl:special-functions] show function assignment for Pico.
 There is also RP2040 GPIO# column applies to other third party boards.
+
+::: {.table #tbl:special-functions width=[0.3,0.3,0.3]}
+
+Table: API unavailable or special functioned GPIO pins
+
+| RP2040 GPIO# | API subsystem | Note                                   |
+|:------------:|:-------------:|----------------------------------------|
+|      0       |      NA       | UART0 TX (not implemented)             |
+|      1       |      NA       | UART0 RX (not implemented)             |
+|      23      |      NA       | (Pico) Onboard DC-DC converter control |
+|      24      |      NA       | (Pico) VBUS status readout             |
+|      25      | LED, PIN, PWM | (Pico) Onboard LED                     |
+|      29      |      ADC      | (Pico) VSYS/3 voltage readout          |
+
+:::
+
+\newpage
 
 <div class="table" width="[0.2,0.2,0.1,0.1,0.2,0.2]" id="tbl:pico-pinout">
 
@@ -63,27 +78,6 @@ Table: Raspberry Pi Pico pinout and function assignment
 |  [[PIN 15]{custom-style="GPIOPinStyle"}](#pin-subsystem) |       15        |     20      |     22      |       16        | [[PIN 16]{custom-style="GPIOPinStyle"}](#pin-subsystem)  |
 
 </div>
-
-\newpage
-
-#### Exceptions for Pico GPIO usage {-}
-
-::: {.table #tbl:special-functions width=[0.3,0.3,0.3]}
-
-Table: API unavailable or special functioned GPIO pins
-
-| RP2040 GPIO# | API subsystem | Note                                   |
-|:------------:|:-------------:|----------------------------------------|
-|      0       |      NA       | UART0 TX (not implemented)             |
-|      1       |      NA       | UART0 RX (not implemented)             |
-|      23      |      NA       | (Pico) Onboard DC-DC converter control |
-|      24      |      NA       | (Pico) VBUS status readout             |
-|      25      | LED, PIN, PWM | (Pico) Onboard LED                     |
-|      29      |      ADC      | (Pico) VSYS/3 voltage readout          |
-
-:::
-
-\<INSERT SECTION BREAK HERE\>
 
 # Parameter types
 
@@ -1111,7 +1105,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Syntax {-}
 
-`SPI<bus>:TRANSfer <data>`
+`SPI<bus>:TRANSfer <data>,<pre_cs>,<post_cs>`
 
 :   This command transfers
 
@@ -1119,10 +1113,12 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 <div class="table" width="[0.15,0.15,0.5,0.25]">
 
-| Item                                 | Type                                    | Values                                                                    | Default value |
-|--------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
-| [\<data\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) |                                                                           | N/A           |
+| Item                                    | Type                                      | Values                                                                    | Default value |
+|-----------------------------------------|-------------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}     | [[NR1]{custom-style="NormalTok"}](#nr1)   | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| [\<data\>]{custom-style="NormalTok"}    | [[NR1]{custom-style="NormalTok"}](#nr1)   |                                                                           | N/A           |
+| [\<pre_cs\>]{custom-style="NormalTok"}  | [[Bool]{custom-style="NormalTok"}](#bool) |                                                                           | N/A           |
+| [\<post_cs\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool) |                                                                           | N/A           |
 
 </div>
 
@@ -1130,7 +1126,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Syntax {-}
 
-`SPI<bus>:WRITE <data>`
+`SPI<bus>:WRITE <data>,<pre_cs>,<post_cs>`
 
 :   This command
 
@@ -1138,10 +1134,12 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 <div class="table" width="[0.15,0.15,0.5,0.25]">
 
-| Item                                 | Type                                    | Values                                                                    | Default value |
-|--------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
-| [\<data\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) |                                                                           | N/A           |
+| Item                                    | Type                                      | Values                                                                    | Default value |
+|-----------------------------------------|-------------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}     | [[NR1]{custom-style="NormalTok"}](#nr1)   | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| [\<data\>]{custom-style="NormalTok"}    | [[NR1]{custom-style="NormalTok"}](#nr1)   |                                                                           | N/A           |
+| [\<pre_cs\>]{custom-style="NormalTok"}  | [[Bool]{custom-style="NormalTok"}](#bool) |                                                                           | N/A           |
+| [\<post_cs\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool) |                                                                           | N/A           |
 
 </div>
 
@@ -1149,7 +1147,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Syntax {-}
 
-`SPI<bus>:READ? <length>,<mask>`
+`SPI<bus>:READ? <length>,<mask>,<pre_cs>,<post_cs>`
 
 :   This query returns
 
@@ -1157,11 +1155,13 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 <div class="table" width="[0.15,0.15,0.5,0.25]">
 
-| Item                                   | Type                                    | Values                                                                    | Default value |
-|----------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"}    | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
-| [\<length\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) |                                                                           | N/A           |
-| [\<mask\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1) |                                                                           | N/A           |
+| Item                                    | Type                                      | Values                                                                    | Default value |
+|-----------------------------------------|-------------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}     | [[NR1]{custom-style="NormalTok"}](#nr1)   | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| [\<length\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1)   |                                                                           | N/A           |
+| [\<mask\>]{custom-style="NormalTok"}    | [[NR1]{custom-style="NormalTok"}](#nr1)   |                                                                           | N/A           |
+| [\<pre_cs\>]{custom-style="NormalTok"}  | [[Bool]{custom-style="NormalTok"}](#bool) |                                                                           | N/A           |
+| [\<post_cs\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool) |                                                                           | N/A           |
 
 </div>
 
