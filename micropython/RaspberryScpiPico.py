@@ -73,7 +73,7 @@ import time
 - SPI[01]:WRITE data,pre_cs,post_cs
 - SPI[01]:READ? length,mask,pre_cs,post_cs
 
-- ADC[0123]:READ?
+- ADC[01234]:READ?
 
 """
 import sys
@@ -190,6 +190,7 @@ adc0 = machine.ADC(machine.Pin(26))
 adc1 = machine.ADC(machine.Pin(27))
 adc2 = machine.ADC(machine.Pin(28))
 adc3 = machine.ADC(machine.Pin(29))  # VSYS/3
+adc4 = machine.ADC(machine.ADC.CORE_TEMP)  # temperature sensor
 
 
 class PinConfig(namedtuple("PinConfig", ["mode", "value", "pull"])):
@@ -259,7 +260,7 @@ class RaspberryScpiPico(MicroScpiDevice):
     kw_mode = ScpiKeyword("MODE", "MODE", ["?"])
     kw_pol = ScpiKeyword("POLarity", "POL", ["?"])
     kw_xfer = ScpiKeyword("TRANSfer", "TRANS", None)
-    kw_adc = ScpiKeyword("ADC", "ADC", ["0", "1", "2", "3"])
+    kw_adc = ScpiKeyword("ADC", "ADC", ["0", "1", "2", "3", "4"])
     kw_high = ScpiKeyword("HIGH", "HIGH", None)
     kw_low = ScpiKeyword("LOW", "LOW", None)
     kw_write = ScpiKeyword("WRITE", "WRITE", None)
@@ -291,7 +292,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         0: adc0,
         1: adc1,
         2: adc2,
-        3: adc3
+        3: adc3,
+        4: adc4
     }
     spi = {
         0: spi0,
@@ -1099,7 +1101,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_adc_read(self, param, opt):
         """
-        - ADC[012]:READ?
+        - ADC[01234]:READ?
 
         :param param:
         :param opt:
