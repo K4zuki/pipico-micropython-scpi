@@ -56,8 +56,10 @@ I2C[01]:MEMory:READ? address,memaddress,nbytes,addrsize
 SPI[01]:CSEL:POLarity[?] 0/1
 SPI[01]:MODE[?] 0/1/2/3
 SPI[01]:FREQuency[?] num
-SPI[01]:TRANSfer length,data
-ADC[0123]:READ?
+SPI[01]:READ? length,mask,pre_cs,post_cs
+SPI[01]:WRITE data,pre_cs,post_cs
+SPI[01]:TRANSfer length,data,pre_cs,post_cs
+ADC[01234]:READ?
 """
 import sys
 import time
@@ -79,7 +81,7 @@ scpi_commands = [
     "PIN16:MODE?", "PIN16:MODE INput", "PIN16:MODE OUTput", "PIN16:MODE ODrain", "PIN16:MODE PWM",
     "PIN17:MODE?", "PIN17:MODE INput", "PIN17:MODE OUTput", "PIN17:MODE ODrain", "PIN17:MODE PWM",
     "PIN18:MODE?", "PIN18:MODE INput", "PIN18:MODE OUTput", "PIN18:MODE ODrain", "PIN18:MODE PWM",
-    "PIN17:MODE?", "PIN17:MODE INput", "PIN17:MODE OUTput", "PIN17:MODE ODrain", "PIN17:MODE PWM",
+    "PIN19:MODE?", "PIN19:MODE INput", "PIN19:MODE OUTput", "PIN19:MODE ODrain", "PIN19:MODE PWM",
     "PIN20:MODE?", "PIN20:MODE INput", "PIN20:MODE OUTput", "PIN20:MODE ODrain", "PIN20:MODE PWM",
     "PIN21:MODE?", "PIN21:MODE INput", "PIN21:MODE OUTput", "PIN21:MODE ODrain", "PIN21:MODE PWM",
     "PIN22:MODE?", "PIN22:MODE INput", "PIN22:MODE OUTput", "PIN22:MODE ODrain", "PIN22:MODE PWM",
@@ -90,7 +92,7 @@ scpi_commands = [
     "PIN16:VALue?", "PIN16:VALue 0", "PIN16:VALue 1", "PIN16:VALue OFF", "PIN16:VALue ON", "PIN16:OFF", "PIN16:ON",
     "PIN17:VALue?", "PIN17:VALue 0", "PIN17:VALue 1", "PIN17:VALue OFF", "PIN17:VALue ON", "PIN17:OFF", "PIN17:ON",
     "PIN18:VALue?", "PIN18:VALue 0", "PIN18:VALue 1", "PIN18:VALue OFF", "PIN18:VALue ON", "PIN18:OFF", "PIN18:ON",
-    "PIN17:VALue?", "PIN17:VALue 0", "PIN17:VALue 1", "PIN17:VALue OFF", "PIN17:VALue ON", "PIN17:OFF", "PIN17:ON",
+    "PIN19:VALue?", "PIN19:VALue 0", "PIN19:VALue 1", "PIN19:VALue OFF", "PIN19:VALue ON", "PIN19:OFF", "PIN19:ON",
     "PIN20:VALue?", "PIN20:VALue 0", "PIN20:VALue 1", "PIN20:VALue OFF", "PIN20:VALue ON", "PIN20:OFF", "PIN20:ON",
     "PIN21:VALue?", "PIN21:VALue 0", "PIN21:VALue 1", "PIN21:VALue OFF", "PIN21:VALue ON", "PIN21:OFF", "PIN21:ON",
     "PIN22:VALue?", "PIN22:VALue 0", "PIN22:VALue 1", "PIN22:VALue OFF", "PIN22:VALue ON", "PIN22:OFF", "PIN22:ON",
@@ -111,7 +113,7 @@ scpi_commands = [
     "LED:VALue OFF", "LED:VALue ON", "LED:OFF", "LED:ON",
     "LED:PWM:FREQuency 12345", "LED:PWM:FREQuency?", "LED:PWM:DUTY?", "LED:PWM:DUTY 12345",
 
-    "ADC0:READ?", "ADC1:READ?", "ADC2:READ?", "ADC3:READ?",
+    "ADC0:READ?", "ADC1:READ?", "ADC2:READ?", "ADC3:READ?", "ADC4:READ?",
 
     "I2C?",
     "I2C0:SCAN?", "I2C0:FREQuency?", "I2C0:FREQuency 114514",
