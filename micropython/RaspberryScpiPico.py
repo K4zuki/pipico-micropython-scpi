@@ -1305,7 +1305,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         bus_number = int(opt[0])
         bus = self.spi[bus_number]
 
-        rstring = re.compile(r"^(([0-9a-fA-F].)+),([oO][nN]|[oO][fF].),([oO][nN]|[oO][fF].)$")
+        rstring = re.compile(r"^(([0-9a-fA-F].)+),([oO][nN]|[oO][fF].|[01]),([oO][nN]|[oO][fF].|[01])$")
 
         if query:
             # print("cb_spi_tx", bus_number, "Query", param)
@@ -1346,7 +1346,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
         bus_number = int(opt[0])
         bus = self.spi[bus_number]
-        rstring = re.compile(r"^(([0-9a-fA-F].)+),([oO][nN]|[oO][fF].),([oO][nN]|[oO][fF].)$")
+        rstring = re.compile(r"^(([0-9a-fA-F].)+),([oO][nN]|[oO][fF].|[01]),([oO][nN]|[oO][fF].|[01])$")
 
         if query:
             # print("cb_spi_write", bus_number, "Query", param)
@@ -1383,7 +1383,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
         bus_number = int(opt[0])
         bus = self.spi[bus_number]
-        rstring = re.compile(r"^([1-9]|[1-9][0-9]+),([0-9a-fA-F].),([oO][nN]|[oO][fF].),([oO][nN]|[oO][fF].)$")
+        rstring = re.compile(
+            r"^([1-9]|[1-9][0-9]+),([0-9a-fA-F].),([oO][nN]|[oO][fF].|[01]),([oO][nN]|[oO][fF].|[01])$")
 
         if query:
             # print("cb_spi_read", bus_number, "Query", param)
