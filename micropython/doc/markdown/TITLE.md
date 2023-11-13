@@ -5,7 +5,7 @@
 #### Description {-}
 
 This document is an API reference for an SCPI-ish device implemented on Raspberry Pi Pico or
-any RP2040 based microcontroller boards. The device has programmed as Micropython library.
+any RP2040 based microcontroller boards.
 
 The RP2040 microcontroller has 2x I2C, 2x SPI, 2x UART, 16x PWM and 4x ADC peripherals multiplexed to 30x GPIOs.
 In this implementation GPIO is limited down to 9, and there is no command for UART.
@@ -21,10 +21,16 @@ no access from the API.
 
 - Raspberry Pi Pico W
 - Raspberry Pi Pico WH
+- Other third party RP2040 boards
 
 #### Installation, Question, Discussion, Contribution {-}
 
-Write Micropython firmware, and put `main.py`, `MicroScpiDevice.py` and `RaspberryScpiPico.py` on root of target directory.
+Simple way of installation: write Micropython firmware, and put `main.py`, `MicroScpiDevice.py` and `RaspberryScpiPico.py` on
+root of target directory.
+
+Complicated way: install Docker on your PC and run `make docker`{.sh} and `make firmware`{.sh}
+to build docker image and uf2 firmware respectively (firmware build requires docker image).
+Recommend to use WSL to use `make` on Windows.
 
 For any question, create an issue on github repo - https://github.com/K4zuki/pipico-micropython-scpi
 
@@ -193,6 +199,42 @@ Parameter types in **`bold`** applies to this implementation.
 `MACHINE:FREQ?` [// Returns frequency in Hz]{custom-style="CommentTok"}
 
 :   Typical Response: _`125000000`_
+
+# SYSTEM Subsystem
+
+```{=openxml}
+<w:sdt>
+    <w:sdtContent xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+        <w:p>
+            <w:r>
+                <w:fldChar w:fldCharType="begin" w:dirty="true" />
+                <w:instrText xml:space="preserve">TOC \o "2-2" \h \b ”system-subsystem” \u</w:instrText>
+                <w:fldChar w:fldCharType="separate" />
+                <w:fldChar w:fldCharType="end" />
+            </w:r>
+        </w:p>
+    </w:sdtContent>
+</w:sdt>
+
+```
+
+## SYSTem:Error? {.unnumbered #system-error-query}
+
+#### Syntax {-}
+
+`SYSTem:ERRor?`
+
+:   This query picks error number and message from error stack.
+
+#### Returned Query Format {-}
+
+[[\<CRD\>]{custom-style="NormalTok"}](#crd)
+
+#### Example {-}
+
+`SYSTem:ERRor?` [// Returns first error in error list]{custom-style="CommentTok"}
+
+:   Typical Response: _`0, 'No error'`_
 
 # PIN Subsystem
 
@@ -1107,7 +1149,8 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 `SPI<bus>:TRANSfer <data>,<pre_cs>,<post_cs>`
 
-:   This command transfers
+:   This command sends a stream of hexadecimal data and returns what it reads from selected slave device
+at the same time. Also, it configures chip select pin for pre and post of data transfer respectively.
 
 #### Parameter {-}
 
@@ -1128,7 +1171,8 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 `SPI<bus>:WRITE <data>,<pre_cs>,<post_cs>`
 
-:   This command
+:   This command sends stream of hexadecimal data into selected slave device. Also, it configures chip select pin
+for pre and post of data transfer respectively.
 
 #### Parameter {-}
 
@@ -1149,7 +1193,8 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 `SPI<bus>:READ? <length>,<mask>,<pre_cs>,<post_cs>`
 
-:   This query returns
+:   This query returns comma separated list of hexadecimal data from selected slave device.
+Also, it configures chip select pin for pre and post of data transfer respectively.
 
 #### Parameter {-}
 
@@ -1205,9 +1250,9 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 <div class="table" width="[0.15,0.15,0.5,0.25]">
 
-| Item                                    | Type                                    | Values                              | Default value |
-|-----------------------------------------|-----------------------------------------|-------------------------------------|---------------|
-| [\<channel\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [0/1/2/3]{custom-style="NormalTok"} | N/A           |
+| Item                                    | Type                                    | Values                                | Default value |
+|-----------------------------------------|-----------------------------------------|---------------------------------------|---------------|
+| [\<channel\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [0/1/2/3/4]{custom-style="NormalTok"} | N/A           |
 
 </div>
 
