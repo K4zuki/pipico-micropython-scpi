@@ -224,7 +224,23 @@ Parameter types in **`bold`** applies to this implementation.
 
 `SYSTem:ERRor?`
 
-:   This query picks error number and message from error stack.
+:   This query returns error code and message from top of error queue (see following table for code and message).
+
+    | Code | Message                     |
+    |:----:|:----------------------------|
+    |  0   | No error                    |
+    | -102 | Syntax error                |
+    | -108 | Parameter not allowed       |
+    | -109 | Missing parameter           |
+    | -113 | Undefined header            |
+    | -121 | Invalid character in number |
+    | -148 | Character data not allowed  |
+    | -158 | String data not allowed     |
+    | -222 | Data out of range           |
+    | -223 | Too much data               |
+    | -224 | Illegal parameter value     |
+    | -333 | I2C bus error               |
+    | -334 | SPI bus error               |
 
 #### Returned Query Format {-}
 
