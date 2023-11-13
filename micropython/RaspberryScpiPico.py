@@ -132,6 +132,7 @@ DEFAULT_SPI_CKPH = SPI_CKPH_LO
 -223    too much data; more data than expected
 -224    illegal parameter value; invalid parameter choice
 -333    I2C bus access fail
+-334    SPI bus access fail
 """
 
 BUS_FAIL_CODE = 0
