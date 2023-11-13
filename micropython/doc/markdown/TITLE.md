@@ -32,7 +32,7 @@ Complicated way: install Docker on your PC and run `make docker`{.sh} and `make 
 to build docker image and uf2 firmware respectively (firmware build requires docker image).
 Recommend to use WSL to use `make` on Windows.
 
-For any question, create an issue on github repo - https://github.com/K4zuki/pipico-micropython-scpi
+For any question, create an issue on github repo - <https://github.com/K4zuki/pipico-micropython-scpi>
 
 #### Pico pinout {-}
 
