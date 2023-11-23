@@ -25,12 +25,12 @@ no access from the API.
 
 #### Installation, Question, Discussion, Contribution {-}
 
-Simple way of installation: write Micropython firmware, and put `main.py`, `MicroScpiDevice.py` and `RaspberryScpiPico.py` on
-root of target directory.
+_**Simple way of installation:**_ write Micropython firmware, and put `main.py`, `MicroScpiDevice.py` and
+`RaspberryScpiPico.py` on root of target directory.
 
-Complicated way: install Docker on your PC and run `make docker`{.sh} and `make firmware`{.sh}
+_**Complicated way:**_ install Docker on your PC and run `make docker`{.sh} and `make firmware`{.sh}
 to build docker image and uf2 firmware respectively (firmware build requires docker image).
-Recommend to use WSL to use `make` on Windows.
+Recommend to use WSL to use `make` on Windows i.e. `wsl.exe make docker`{.sh} and `wsl.exe make firmware`{.sh}
 
 For any question, create an issue on github repo - <https://github.com/K4zuki/pipico-micropython-scpi>
 
@@ -116,11 +116,11 @@ Parameter types in **`bold`** applies to this implementation.
 :   Expanded decimal format that includes `<NRf>` and `MIN`, `MAX`. Examples: `273 27.3 2.73E+02 MAX`
 :   `MIN` and `MAX` are the minimum and maximum limit values that are implicit in the range specification for the parameter.
 
-[`<Bool>`]{#bool}
+[**`<Bool>`**]{#bool}
 
 :   Boolean Data. Can be numeric `(0, 1)` or named `(OFF, ON)`.
 
-[`<SPD>`]{#spd}
+[**`<SPD>`**]{#spd}
 
 :   String Program Data. Programs string parameters enclosed in single or double quotes.
 
@@ -128,11 +128,15 @@ Parameter types in **`bold`** applies to this implementation.
 
 :   Character Program Data. Programs discrete parameters. Accepts both the short form and long form.
 
+[**`<SRD>`**]{#srd}
+
+:   String Response Data. Returns string parameters enclosed in single or double quotes.
+
 [`<CRD>`]{#crd}
 
 :   Character Response Data. Returns discrete parameters. Only the short form of the parameter is returned.
 
-[**`<AARD>`**]{#aard}
+[`<AARD>`]{#aard}
 
 :   Arbitrary ASCII Response Data. Permits the return of undelimited 7-bit ASCII. This data type has an implied message terminator.
 
@@ -244,7 +248,7 @@ Parameter types in **`bold`** applies to this implementation.
 
 #### Returned Query Format {-}
 
-[[\<CRD\>]{custom-style="NormalTok"}](#crd)
+[[\<NR1\>]{custom-style="NormalTok"}](#nr1), [[\<SRD\>]{custom-style="NormalTok"}](#srd)
 
 #### Example {-}
 
@@ -1050,7 +1054,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Returned Query Format {-}
 
-[[\<CRD\>]{custom-style="NormalTok"}](#crd)
+[[\<Bool\>]{custom-style="NormalTok"}](#bool)
 
 #### Example {-}
 
@@ -1172,14 +1176,24 @@ at the same time. Also, it configures chip select pin for pre and post of data t
 
 <div class="table" width="[0.15,0.15,0.5,0.25]">
 
-| Item                                    | Type                                      | Values                                                                    | Default value |
-|-----------------------------------------|-------------------------------------------|---------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"}     | [[NR1]{custom-style="NormalTok"}](#nr1)   | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
-| [\<data\>]{custom-style="NormalTok"}    | [[NR1]{custom-style="NormalTok"}](#nr1)   |                                                                           | N/A           |
-| [\<pre_cs\>]{custom-style="NormalTok"}  | [[Bool]{custom-style="NormalTok"}](#bool) |                                                                           | N/A           |
-| [\<post_cs\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool) |                                                                           | N/A           |
+| Item                                    | Type                                                   | Values                                                                    | Default value |
+|-----------------------------------------|--------------------------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}     | [[NR1]{custom-style="NormalTok"}](#nr1)                | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| [\<data\>]{custom-style="NormalTok"}    | [[\<NR4\>\[\<NR4\>\]]{custom-style="NormalTok"}](#nr4) | Stream of data                                                            | N/A           |
+| [\<pre_cs\>]{custom-style="NormalTok"}  | [[Bool]{custom-style="NormalTok"}](#bool)              | Logical value of CS pin.                                                  | N/A           |
+| [\<post_cs\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool)              | Logical value of CS pin.                                                  | N/A           |
 
 </div>
+
+#### Returned Query Format {-}
+
+[[\<NR4\>\[,\<NR4\>\]]{custom-style="NormalTok"}](#nr4)
+
+#### Example {-}
+
+`SPI0:TRANSfer ABBA,ON,OFF`  [// Writes 2-bytes of data into SPI0 bus. Simultaneously the slave device returns the same size of data. Asserts CS before transfer; de-asserted after transfer]{custom-style="CommentTok"}
+
+:   Typical Response: _`BE,EF`_
 
 ## SPI:WRITE {-}
 
@@ -1194,12 +1208,12 @@ for pre and post of data transfer respectively.
 
 <div class="table" width="[0.15,0.15,0.5,0.25]">
 
-| Item                                    | Type                                      | Values                                                                    | Default value |
-|-----------------------------------------|-------------------------------------------|---------------------------------------------------------------------------|---------------|
-| [\<bus\>]{custom-style="NormalTok"}     | [[NR1]{custom-style="NormalTok"}](#nr1)   | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
-| [\<data\>]{custom-style="NormalTok"}    | [[NR1]{custom-style="NormalTok"}](#nr1)   |                                                                           | N/A           |
-| [\<pre_cs\>]{custom-style="NormalTok"}  | [[Bool]{custom-style="NormalTok"}](#bool) |                                                                           | N/A           |
-| [\<post_cs\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool) |                                                                           | N/A           |
+| Item                                    | Type                                                   | Values                                                                    | Default value |
+|-----------------------------------------|--------------------------------------------------------|---------------------------------------------------------------------------|---------------|
+| [\<bus\>]{custom-style="NormalTok"}     | [[NR1]{custom-style="NormalTok"}](#nr1)                | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
+| [\<data\>]{custom-style="NormalTok"}    | [[\<NR4\>\[\<NR4\>\]]{custom-style="NormalTok"}](#nr4) | Stream of data                                                            | N/A           |
+| [\<pre_cs\>]{custom-style="NormalTok"}  | [[Bool]{custom-style="NormalTok"}](#bool)              | Logical value of CS pin.                                                  | N/A           |
+| [\<post_cs\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool)              | Logical value of CS pin.                                                  | N/A           |
 
 </div>
 
@@ -1221,20 +1235,20 @@ Also, it configures chip select pin for pre and post of data transfer respective
 | [\<bus\>]{custom-style="NormalTok"}     | [[NR1]{custom-style="NormalTok"}](#nr1)   | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"} | N/A           |
 | [\<length\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1)   |                                                                           | N/A           |
 | [\<mask\>]{custom-style="NormalTok"}    | [[NR1]{custom-style="NormalTok"}](#nr1)   |                                                                           | N/A           |
-| [\<pre_cs\>]{custom-style="NormalTok"}  | [[Bool]{custom-style="NormalTok"}](#bool) |                                                                           | N/A           |
-| [\<post_cs\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool) |                                                                           | N/A           |
+| [\<pre_cs\>]{custom-style="NormalTok"}  | [[Bool]{custom-style="NormalTok"}](#bool) | Logical value of CS pin.                                                  | N/A           |
+| [\<post_cs\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool) | Logical value of CS pin.                                                  | N/A           |
 
 </div>
 
 #### Returned Query Format {-}
 
-[[\<NR1\>]{custom-style="NormalTok"}](#nr1)
+[[\<NR4\>\[,\<NR4\>\]]{custom-style="NormalTok"}](#nr4)
 
 #### Example {-}
 
-`SPI0:READ? 1,AA` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
+`SPI0:READ? 1,AA` [// Returns a byte of data]{custom-style="CommentTok"}
 
-:   Typical Response: _`32768`_
+:   Typical Response: _`DE`_
 
 # ADC Subsystem
 
@@ -1309,11 +1323,11 @@ Also, it configures chip select pin for pre and post of data transfer respective
 :   This command reads the instrument's identification string which contains four
 comma-separated fields. The first field is the manufacturer's name, the second is
 the model number of the instrument, the third is the serial number, and the fourth
-is the firmware revision which contains three firmwares separated by dashes.
+is the firmware revision in `x.y.z` style.
 
 #### Returned Query Format {-}
 
-[[\<AARD\>]{custom-style="NormalTok"}](#aard)
+[[\<SRD\>]{custom-style="NormalTok"}](#srd)
 
 #### Example {-}
 
