@@ -274,6 +274,25 @@ Parameter types in **`bold`** applies to this implementation.
 
 ```
 
+## PIN? {.unnumbered #pin-query}
+
+#### Syntax {-}
+
+`PIN?`
+
+:   This query returns status of all available pins (mode, value, PWM frequency, PWM duty).
+
+#### Returned Query Format {-}
+
+[[\<SRD\>]{custom-style="NormalTok"}](#srd)
+
+#### Example {-}
+
+`PIN?` [// Returns entire Pin status]{custom-style="CommentTok"}
+
+:   Typical Response:
+_`PIN14:MODE IN;PIN14:VALue OFF;PIN14:PWM:FREQuency 1000;PIN14:PWM:DUTY 32768;PIN15:MODE IN;PIN15:VALue OFF;PIN15:PWM:FREQuency 1000;PIN15:PWM:DUTY 32768;PIN16:MODE IN;PIN16:VALue OFF;PIN16:PWM:FREQuency 1000;PIN16:PWM:DUTY 32768;PIN17:MODE IN;PIN17:VALue OFF;PIN17:PWM:FREQuency 1000;PIN17:PWM:DUTY 32768;PIN18:MODE IN;PIN18:VALue OFF;PIN18:PWM:FREQuency 1000;PIN18:PWM:DUTY 32768;PIN19:MODE IN;PIN19:VALue OFF;PIN19:PWM:FREQuency 1000;PIN19:PWM:DUTY 32768;PIN20:MODE IN;PIN20:VALue OFF;PIN20:PWM:FREQuency 1000;PIN20:PWM:DUTY 32768;PIN21:MODE IN;PIN21:VALue OFF;PIN21:PWM:FREQuency 1000;PIN21:PWM:DUTY 32768;PIN22:MODE IN;PIN22:VALue OFF;PIN22:PWM:FREQuency 1000;PIN22:PWM:DUTY 32768;PIN25:MODE IN;PIN25:VALue OFF;PIN25:PWM:FREQuency 1000;PIN25:PWM:DUTY 32768;`_
+
 ## PIN:MODE {.unnumbered #pin-mode}
 
 #### Syntax {-}
@@ -554,6 +573,23 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 ```
 
+## LED? {.unnumbered #led-query}
+
+#### Syntax {-}
+
+`PIN?`
+
+:   This query returns all status of onboard LED (value, PWM frequency, PWM duty).
+
+#### Returned Query Format {-}
+
+#### Example {-}
+
+`LED?` [// Returns entire Pin status]{custom-style="CommentTok"}
+
+:   Typical Response:
+_`LED:VALue ON;LED:PWM:FREQuency 12345;LED:PWM:DUTY 12345`_
+
 ## LED:ON {.unnumbered #led-on}
 
 #### Syntax {-}
@@ -712,6 +748,23 @@ Numeric `0` and string `OFF` turns off.
 </w:sdt>
 
 ```
+
+## I2C? {.unnumbered #i2c-query}
+
+#### Syntax {-}
+
+`I2C?`
+
+:   This query returns all status of I2C buses (addressing, clock frequency).
+
+#### Returned Query Format {-}
+
+#### Example {-}
+
+`I2C?` [// Returns I2C bus status]{custom-style="CommentTok"}
+
+:   Typical Response:
+_`I2C0:ADDRess:BIT 1;I2C0:FREQuency 100000;I2C1:ADDRess:BIT 1;I2C1:FREQuency 100000;`_
 
 ## I2C:SCAN? {.unnumbered #i2c-scan-query}
 
@@ -961,6 +1014,25 @@ the target I2C slave slave device.
 </w:sdt>
 
 ```
+
+## SPI? {.unnumbered #spi-query}
+
+#### Syntax {-}
+
+`SPI?`
+
+:   This query returns all status of SPI buses (chip select polarity, clock frequency, bus mode).
+
+#### Returned Query Format {-}
+
+[[\<SRD\>]{custom-style="NormalTok"}](#srd)
+
+#### Example {-}
+
+`SPI?` [// Returns SPI bus status]{custom-style="CommentTok"}
+
+:   Typical Response:
+_`SPI0:CSEL:POLarity 0;SPI0:FREQuency 1000000;SPI0:MODE 0;SPI1:CSEL:POLarity 0;SPI1:FREQuency 1000000;SPI1:MODE 0;`_
 
 ## SPI:CSEL:POLarity {.unnumbered #spi-csel-polarity}
 
