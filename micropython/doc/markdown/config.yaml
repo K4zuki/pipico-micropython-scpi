@@ -77,7 +77,7 @@ docx_coreprop:
   table-cell-vertical-alignment: center # top / center / bottom / both
   read-only-recommended: true
   extra_section: true
-  disable-table-autofit: false # requires explicit column widths setting for *every* table when setting 'true'
+  disable-table-autofit: true # requires explicit column widths setting for *every* table when setting 'true'
   table:
     "Normal Table": "Centered"
   paragraph:
