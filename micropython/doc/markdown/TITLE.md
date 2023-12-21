@@ -46,7 +46,7 @@ For any question, create an issue on github repo.
 
 #### Pico pinout {-}
 
-Following tables [@tbl:pico-pinout] and [@tbl:special-functions] show function assignment for Pico.
+Following tables [@tbl:special-functions] and [@tbl:pico-pinout] show function assignment for Pico.
 There is also RP2040 GPIO# column applies to other third party boards.
 
 ::: {.table #tbl:special-functions width=[0.18,0.22,0.6]}
@@ -55,12 +55,13 @@ Table: API unavailable or special functioned GPIO pins
 
 | RP2040<br>GPIO# | API subsystem | Note                                   |
 |:---------------:|:-------------:|----------------------------------------|
-|        0        |      NA       | UART0 TX (not implemented)             |
-|        1        |      NA       | UART0 RX (not implemented)             |
+|        0        |      NA       | No error indicator                     |
+|        1        |      NA       | Error indicator                        |
 |       23        |      NA       | (Pico) Onboard DC-DC converter control |
 |       24        |      NA       | (Pico) VBUS status readout             |
 |       25        | LED, PIN, PWM | (Pico) Onboard LED                     |
 |       29        |      ADC      | (Pico) VSYS/3 voltage readout          |
+|       NA        |      ADC      | (Pico) Core temperature readout        |
 
 :::
 
@@ -72,8 +73,8 @@ Table: Raspberry Pi Pico pinout and function assignment
 
 |                                         Pico<br>Function | RP2040<br>GPIO# | Pico<br>Pin | Pico<br>Pin | RP2040<br>GPIO# | Pico<br>Function                                         |
 |---------------------------------------------------------:|:---------------:|:-----------:|:-----------:|:---------------:|:---------------------------------------------------------|
-|                                                 UART0 TX |        0        |      1      |     40      |                 | [VBUS]{custom-style="PowerPinStyle"}                     |
-|                                                 UART0 RX |        1        |      2      |     39      |                 | [VSYS]{custom-style="PowerPinStyle"}                     |
+|                                       No error indicator |        0        |      1      |     40      |                 | [VBUS]{custom-style="PowerPinStyle"}                     |
+|                                          Error indicator |        1        |      2      |     39      |                 | [VSYS]{custom-style="PowerPinStyle"}                     |
 |                     [GND]{custom-style="GroundPinStyle"} |                 |      3      |     38      |                 | [GND]{custom-style="GroundPinStyle"}                     |
 | [[SPI0 SCK]{custom-style="SPIPinStyle"}](#spi-subsystem) |        2        |      4      |     37      |                 | 3V3 EN                                                   |
 |  [[SPI0 TX]{custom-style="SPIPinStyle"}](#spi-subsystem) |        3        |      5      |     36      |                 | 3V3 OUT                                                  |
