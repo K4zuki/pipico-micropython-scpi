@@ -150,7 +150,8 @@ E_INVALID_PARAMETER = ScpiErrorNumber(-224, "Illegal parameter value")
 E_I2C_FAIL = ScpiErrorNumber(-333, "I2C bus error")
 E_SPI_FAIL = ScpiErrorNumber(-334, "SPI bus error")
 
-uart0 = machine.UART(0, tx=machine.Pin(0), rx=machine.Pin(1))
+pin0 = machine.Pin(0)  # no-error indicator
+pin1 = machine.Pin(1)  # error indicator
 
 sck0 = machine.Pin(2)
 mosi0 = machine.Pin(3)
@@ -396,6 +397,21 @@ class RaspberryScpiPico(MicroScpiDevice):
                          adc_read,
                          ]
 
+        self.error_indicate(False)
+
+    @staticmethod
+    def error_indicate(error=False):
+        pin0.off()
+        pin1.off()
+        if error:
+            pin1.on()
+        else:
+            pin0.on()
+
+    def error_push(self, error_no):
+        super().error_push(error_no)
+        self.error_indicate(True)
+
     def cb_idn(self, param="", opt=None):
         """<Vendor name>,<Model number>,<Serial number>,<Firmware version>"""
         serial = "".join(f"{d:02x}" for d in machine.unique_id())
@@ -471,6 +487,9 @@ class RaspberryScpiPico(MicroScpiDevice):
             else:
                 err = E_NONE
                 print(f"{err.id}, '{err.message}'")
+
+            self.error_indicate(True if self.error_counter > 0 else False)
+
         else:
             self.error_push(E_SYNTAX)
 
