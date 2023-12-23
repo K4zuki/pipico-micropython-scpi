@@ -30,17 +30,17 @@ Shallow clone is recommended as it includes binary files.
 
 ##### Simple way of installation - typical Micropython method {-}
 
-Write official Micropython uf2 firmware, and put [main.py]{custom-style="VerbatimChar"}, [MicroScpiDevice.py]{custom-style="VerbatimChar"}
-and [RaspberryScpiPico.py]{custom-style="VerbatimChar"} on root of target directory.
+Write official Micropython uf2 firmware, and put [main.py]{custom-style="CommentVarTok"}, [MicroScpiDevice.py]{custom-style="CommentVarTok"}
+and [RaspberryScpiPico.py]{custom-style="CommentVarTok"} on root of target directory.
 
 ##### Complicated way - build custom UF2 firmware {-}
 
-Install Docker on your PC and run [make docker]{custom-style="VerbatimChar"} and [make firmware]{custom-style="VerbatimChar"}
+Install Docker on your PC and run [make docker]{custom-style="CommentVarTok"} and [make firmware]{custom-style="CommentVarTok"}
 to build docker image and uf2 firmware respectively (firmware build requires docker image).
-This builds [pipco-micropython-scpi.uf2]{custom-style="VerbatimChar"} firmeare in build directory.
+This builds [pipco-micropython-scpi.uf2]{custom-style="CommentVarTok"} firmeare in build directory.
 
-Recommend to use WSL to use [make]{custom-style="VerbatimChar"} on Windows i.e.
-[wsl.exe make docker]{custom-style="VerbatimChar"} and [wsl.exe make firmware]{custom-style="VerbatimChar"}.
+WSL is recommended to use [make]{custom-style="CommentVarTok"} on Windows i.e.
+[wsl.exe make docker]{custom-style="CommentVarTok"} and [wsl.exe make firmware]{custom-style="CommentVarTok"}.
 
 For any question, create an issue on github repo.
 
@@ -49,9 +49,9 @@ For any question, create an issue on github repo.
 Following tables [@tbl:special-functions] and [@tbl:pico-pinout] show function assignment for Pico.
 There is also RP2040 GPIO# column applies to other third party boards.
 
-::: {.table #tbl:special-functions width=[0.18,0.22,0.6]}
+::: {.table width=[0.18,0.22,0.6]}
 
-Table: API unavailable or special functioned GPIO pins
+Table: API unavailable or special functioned GPIO pins {#tbl:special-functions}
 
 | RP2040<br>GPIO# | API subsystem | Note                                   |
 |:---------------:|:-------------:|----------------------------------------|
@@ -67,9 +67,9 @@ Table: API unavailable or special functioned GPIO pins
 
 \newpage
 
-<div class="table" width="[0.25,0.15,0.1,0.1,0.15,0.25]" id="tbl:pico-pinout">
+<div class="table" width="[0.25,0.15,0.1,0.1,0.15,0.25]">
 
-Table: Raspberry Pi Pico pinout and function assignment
+Table: Raspberry Pi Pico pinout and function assignment {#tbl:pico-pinout}
 
 |                                         Pico<br>Function | RP2040<br>GPIO# | Pico<br>Pin | Pico<br>Pin | RP2040<br>GPIO# | Pico<br>Function                                         |
 |---------------------------------------------------------:|:---------------:|:-----------:|:-----------:|:---------------:|:---------------------------------------------------------|
@@ -100,7 +100,7 @@ Table: Raspberry Pi Pico pinout and function assignment
 
 Parameter types in **`bold`** applies to this implementation.
 
-[**`<NR1>`**]{#nr1}
+[[\<NR1\>]{custom-style="RegionMarkerTok"}]{#nr1}
 
 :   Digits with an implied decimal point assumed at the right of the least-significant digit.
 
@@ -114,7 +114,7 @@ Parameter types in **`bold`** applies to this implementation.
 
 :   Digits with an explicit decimal point and an exponent. Example: `2.73E+02`
 
-[**`<NR4>`**]{#nr4}
+[[\<NR4\>]{custom-style="RegionMarkerTok"}]{#nr4}
 
 :   Hexadecimal, even number of digits without a negative sign `"-"`. Example: `DEAD BEAF C00F3E`
 
@@ -127,23 +127,23 @@ Parameter types in **`bold`** applies to this implementation.
 :   Expanded decimal format that includes `<NRf>` and `MIN`, `MAX`. Examples: `273 27.3 2.73E+02 MAX`
 :   `MIN` and `MAX` are the minimum and maximum limit values that are implicit in the range specification for the parameter.
 
-[**`<Bool>`**]{#bool}
+[[\<Bool\>]{custom-style="RegionMarkerTok"}]{#bool}
 
 :   Boolean Data. Can be numeric `(0, 1)` or named `(OFF, ON)`.
 
-[**`<SPD>`**]{#spd}
+[[\<SPD\>]{custom-style="RegionMarkerTok"}]{#spd}
 
 :   String Program Data. Programs string parameters enclosed in single or double quotes.
 
-[**`<CPD>`**]{#cpd}
+[[\<CPD\>]{custom-style="RegionMarkerTok"}]{#cpd}
 
 :   Character Program Data. Programs discrete parameters. Accepts both the short form and long form.
 
-[**`<SRD>`**]{#srd}
+[[\<SRD\>]{custom-style="RegionMarkerTok"}]{#srd}
 
 :   String Response Data. Returns string parameters enclosed in single or double quotes.
 
-[**`<CRD>`**]{#crd}
+[[\<CRD\>]{custom-style="RegionMarkerTok"}]{#crd}
 
 :   Character Response Data. Returns discrete parameters. Only the short form of the parameter is returned.
 
@@ -177,17 +177,17 @@ Parameter types in **`bold`** applies to this implementation.
 
 #### Syntax {-}
 
-`MACHINE:FREQuency <frequency>`
+[MACHINE:FREQuency \<frequency\>]{custom-style="ExtensionTok"}
 
-:   This command sets Pico's CPU clock frequency in Hz. `<frequency>` must be between 100MHz and 275MHz inclusive.
+:   This command sets Pico's CPU clock frequency in Hz. `\<frequency\>` must be between 100MHz and 275MHz inclusive.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
-| Item                                      | Type                                    | Range of values                                                                    | Default |
-|-------------------------------------------|-----------------------------------------|------------------------------------------------------------------------------------|:-------:|
-| [\<frequency\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [100_000_000]{custom-style="NormalTok"} to [275_000_000]{custom-style="NormalTok"} |   N/A   |
+| Item                                      | Type                                    | Range of values                                                                       | Default |
+|-------------------------------------------|-----------------------------------------|---------------------------------------------------------------------------------------|:-------:|
+| [\<frequency\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [100_000_000]{custom-style="NormalTok"} to<br>[275_000_000]{custom-style="NormalTok"} |   N/A   |
 
 </div>
 
@@ -201,7 +201,7 @@ Parameter types in **`bold`** applies to this implementation.
 
 #### Syntax {-}
 
-`MACHINE:FREQuency?`
+[MACHINE:FREQuency?]{custom-style="ExtensionTok"}
 
 :   This query returns Pico's CPU clock frequency in Hz.
 
@@ -237,11 +237,11 @@ Parameter types in **`bold`** applies to this implementation.
 
 #### Syntax {-}
 
-`SYSTem:ERRor?`
+[SYSTem:ERRor?]{custom-style="ExtensionTok"}
 
 :   This query returns error code and message from top of error queue (see following table for code and message).
 
-    <div class="table" width="[0.2,0.5]">
+    <div class="table" width="[0.15,0.45]">
     | Code | Message                     |
     |:----:|:----------------------------|
     |  0   | No error                    |
@@ -292,7 +292,7 @@ Parameter types in **`bold`** applies to this implementation.
 
 #### Syntax {-}
 
-`PIN?`
+[PIN?]{custom-style="ExtensionTok"}
 
 :   This query returns status of all available pins (mode, value, PWM frequency, PWM duty).
 
@@ -311,18 +311,18 @@ _`PIN14:MODE IN;PIN14:VALue OFF;PIN14:PWM:FREQuency 1000;PIN14:PWM:DUTY 32768;PI
 
 #### Syntax {-}
 
-`PIN<pin>:MODE <mode>`
+[PIN\<pin\>:MODE \<mode\>]{custom-style="ExtensionTok"}
 
 :   This command sets mode of specified IO pin.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
-| Item                                 | Type                                    | Values                                                    | Default |
-|--------------------------------------|-----------------------------------------|-----------------------------------------------------------|:-------:|
-| [\<pin\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"} |   N/A   |
-| [\<mode\>]{custom-style="NormalTok"} | [[CPD]{custom-style="NormalTok"}](#cpd) | [INput/OUTput/ODrain/PWM]{custom-style="NormalTok"}       |   N/A   |
+| Item                                 | Type                                    | Values                                                        | Default |
+|--------------------------------------|-----------------------------------------|---------------------------------------------------------------|:-------:|
+| [\<pin\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/<br>21/22/25]{custom-style="NormalTok"} |   N/A   |
+| [\<mode\>]{custom-style="NormalTok"} | [[CPD]{custom-style="NormalTok"}](#cpd) | [INput/OUTput/ODrain/PWM]{custom-style="NormalTok"}           |   N/A   |
 
 </div>
 
@@ -336,17 +336,17 @@ _`PIN14:MODE IN;PIN14:VALue OFF;PIN14:PWM:FREQuency 1000;PIN14:PWM:DUTY 32768;PI
 
 #### Syntax {-}
 
-`PIN<pin>:MODE?`
+[PIN\<pin\>:MODE?]{custom-style="ExtensionTok"}
 
 :   This query returns status of specified IO pin's mode.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
-| Item                                | Type                                    | Values                                                    | Default |
-|-------------------------------------|-----------------------------------------|-----------------------------------------------------------|:-------:|
-| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"} |   N/A   |
+| Item                                | Type                                    | Values                                                        | Default |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------|:-------:|
+| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/<br>21/22/25]{custom-style="NormalTok"} |   N/A   |
 
 </div>
 
@@ -364,19 +364,19 @@ _`PIN14:MODE IN;PIN14:VALue OFF;PIN14:PWM:FREQuency 1000;PIN14:PWM:DUTY 32768;PI
 
 #### Syntax {-}
 
-`PIN<pin>:VALue <value>`
+[PIN\<pin\>:VALue \<value\>]{custom-style="ExtensionTok"}
 
 :   This command sets logical value of specified IO pin.
 Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets logic LO.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
-| Item                                  | Type                                      | Values                                                    | Default |
-|---------------------------------------|-------------------------------------------|-----------------------------------------------------------|:-------:|
-| [\<pin\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1)   | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"} |   N/A   |
-| [\<value\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool) |                                                           |   N/A   |
+| Item                                  | Type                                      | Values                                                        | Default |
+|---------------------------------------|-------------------------------------------|---------------------------------------------------------------|:-------:|
+| [\<pin\>]{custom-style="NormalTok"}   | [[NR1]{custom-style="NormalTok"}](#nr1)   | [14/15/16/17/18/19/20/<br>21/22/25]{custom-style="NormalTok"} |   N/A   |
+| [\<value\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool) |                                                               |   N/A   |
 
 </div>
 
@@ -391,17 +391,17 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Syntax {-}
 
-`PIN<pin>:VALue?`
+[PIN\<pin\>:VALue?]{custom-style="ExtensionTok"}
 
 :   This query returns logical value of specified IO pin. `ON` is a logic HI, `OFF` is a logic LO.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
-| Item                                | Type                                    | Values                                                    | Default |
-|-------------------------------------|-----------------------------------------|-----------------------------------------------------------|:-------:|
-| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"} |   N/A   |
+| Item                                | Type                                    | Values                                                        | Default |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------|:-------:|
+| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/<br>21/22/25]{custom-style="NormalTok"} |   N/A   |
 
 </div>
 
@@ -419,17 +419,17 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Syntax {-}
 
-`PIN<pin>:ON`
+[PIN\<pin\>:ON]{custom-style="ExtensionTok"}
 
 :   This command sets logical value of specified IO pin to logic HI.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
-| Item                                | Type                                    | Values                                                    | Default |
-|-------------------------------------|-----------------------------------------|-----------------------------------------------------------|:-------:|
-| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"} |   N/A   |
+| Item                                | Type                                    | Values                                                        | Default |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------|:-------:|
+| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/<br>21/22/25]{custom-style="NormalTok"} |   N/A   |
 
 </div>
 
@@ -443,17 +443,17 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Syntax {-}
 
-`PIN<pin>:OFF`
+[PIN\<pin\>:OFF]{custom-style="ExtensionTok"}
 
 :   This command sets logical value of specified IO pin to logic LO.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
-| Item                                | Type                                    | Values                                                    | Default |
-|-------------------------------------|-----------------------------------------|-----------------------------------------------------------|:-------:|
-| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"} |   N/A   |
+| Item                                | Type                                    | Values                                                        | Default |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------|:-------:|
+| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/<br>21/22/25]{custom-style="NormalTok"} |   N/A   |
 
 </div>
 
@@ -467,17 +467,17 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Syntax {-}
 
-`PIN<pin>:PWM:FREQuency <frequency>`
+[PIN\<pin\>:PWM:FREQuency \<frequency\>]{custom-style="ExtensionTok"}
 
 :   This command sets PWM frequency of specified IO pin in Hz.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                      | Type                                    | Values                                                                  | Default |
 |-------------------------------------------|-----------------------------------------|-------------------------------------------------------------------------|:-------:|
-| [\<pin\>]{custom-style="NormalTok"}       | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"}               |   N/A   |
+| [\<pin\>]{custom-style="NormalTok"}       | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/<br>21/22/25]{custom-style="NormalTok"}           |   N/A   |
 | [\<frequency\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [1000]{custom-style="NormalTok"} to [100_000]{custom-style="NormalTok"} |   N/A   |
 
 </div>
@@ -492,17 +492,17 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Syntax {-}
 
-`PIN<pin>:PWM:FREQuency?`
+[PIN\<pin\>:PWM:FREQuency?]{custom-style="ExtensionTok"}
 
 :   This query returns PWM frequency of specified IO pin in Hz.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
-| Item                                | Type                                    | Values                                                    | Default |
-|-------------------------------------|-----------------------------------------|-----------------------------------------------------------|:-------:|
-| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"} |   N/A   |
+| Item                                | Type                                    | Values                                                        | Default |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------|:-------:|
+| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/<br>21/22/25]{custom-style="NormalTok"} |   N/A   |
 
 </div>
 
@@ -520,17 +520,17 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Syntax {-}
 
-`PIN<pin>:PWM:DUTY <duty>`
+[PIN\<pin\>:PWM:DUTY \<duty\>]{custom-style="ExtensionTok"}
 
 :   This command sets PWM duty of specified IO pin in range of 1 to 65535.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                 | Type                                    | Values                                                             | Default |
 |--------------------------------------|-----------------------------------------|--------------------------------------------------------------------|:-------:|
-| [\<pin\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"}          |   N/A   |
+| [\<pin\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/<br>21/22/25]{custom-style="NormalTok"}      |   N/A   |
 | [\<duty\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [1]{custom-style="NormalTok"} to [65535]{custom-style="NormalTok"} |   N/A   |
 
 </div>
@@ -545,17 +545,17 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Syntax {-}
 
-`PIN<pin>:PWM:DUTY?`
+[PIN\<pin\>:PWM:DUTY?]{custom-style="ExtensionTok"}
 
 :   This query returns PWM duty of specified IO pin in range of 1 to 65535
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
-| Item                                | Type                                    | Values                                                    | Default |
-|-------------------------------------|-----------------------------------------|-----------------------------------------------------------|:-------:|
-| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/21/22/25]{custom-style="NormalTok"} |   N/A   |
+| Item                                | Type                                    | Values                                                        | Default |
+|-------------------------------------|-----------------------------------------|---------------------------------------------------------------|:-------:|
+| [\<pin\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | [14/15/16/17/18/19/20/<br>21/22/25]{custom-style="NormalTok"} |   N/A   |
 
 </div>
 
@@ -591,7 +591,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Syntax {-}
 
-`PIN?`
+[PIN?]{custom-style="ExtensionTok"}
 
 :   This query returns all status of onboard LED (value, PWM frequency, PWM duty).
 
@@ -608,7 +608,7 @@ _`LED:VALue ON;LED:PWM:FREQuency 12345;LED:PWM:DUTY 12345`_
 
 #### Syntax {-}
 
-`LED:ON`
+[LED:ON]{custom-style="ExtensionTok"}
 
 :   This command turns onboard LED on.
 
@@ -616,7 +616,7 @@ _`LED:VALue ON;LED:PWM:FREQuency 12345;LED:PWM:DUTY 12345`_
 
 #### Syntax {-}
 
-`LED:OFF`
+[LED:OFF]{custom-style="ExtensionTok"}
 
 :   This command turns onboard LED off.
 
@@ -624,14 +624,14 @@ _`LED:VALue ON;LED:PWM:FREQuency 12345;LED:PWM:DUTY 12345`_
 
 #### Syntax {-}
 
-`LED:VALue <value>`
+[LED:VALue \<value\>]{custom-style="ExtensionTok"}
 
 :   This command sets logical value of onboard LED. Numeric `1` and string `ON` turns on.
 Numeric `0` and string `OFF` turns off.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                  | Type                                      | Values | Default |
 |---------------------------------------|-------------------------------------------|--------|:-------:|
@@ -643,7 +643,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Syntax {-}
 
-`LED:VALue?`
+[LED:VALue?]{custom-style="ExtensionTok"}
 
 :   This query returns logical value of onboard LED.
 
@@ -661,7 +661,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Syntax {-}
 
-`LED:PWM:ENable`
+[LED:PWM:ENable]{custom-style="ExtensionTok"}
 
 :   This command enables PWM output for onboard LED.
 
@@ -669,7 +669,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Syntax {-}
 
-`LED:PWM:DISable`
+[LED:PWM:DISable]{custom-style="ExtensionTok"}
 
 :   This command disables PWM output for onboard LED.
 
@@ -677,13 +677,13 @@ Numeric `0` and string `OFF` turns off.
 
 #### Syntax {-}
 
-`LED:PWM:FREQuency <frequency>`
+[LED:PWM:FREQuency \<frequency\>]{custom-style="ExtensionTok"}
 
 :   This command sets PWM frequency of onboard LED in Hz.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                      | Type                                    | Values                                                                  | Default |
 |-------------------------------------------|-----------------------------------------|-------------------------------------------------------------------------|:-------:|
@@ -695,7 +695,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Syntax {-}
 
-`LED:PWM:FREQuency?`
+[LED:PWM:FREQuency?]{custom-style="ExtensionTok"}
 
 :   This query returns PWM frequency of onboard LED in Hz.
 
@@ -713,13 +713,13 @@ Numeric `0` and string `OFF` turns off.
 
 #### Syntax {-}
 
-`LED:PWM:DUTY <duty>`
+[LED:PWM:DUTY \<duty\>]{custom-style="ExtensionTok"}
 
 :   This command sets PWM duty of onboard LED in range of 1 to 65535.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                 | Type                                    | Values                                                             | Default |
 |--------------------------------------|-----------------------------------------|--------------------------------------------------------------------|:-------:|
@@ -731,7 +731,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Syntax {-}
 
-`LED:PWM:DUTY?`
+[LED:PWM:DUTY?]{custom-style="ExtensionTok"}
 
 :   This query returns PWM duty of onboard LED in range of 1 to 65535.
 
@@ -767,7 +767,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Syntax {-}
 
-`I2C?`
+[I2C?]{custom-style="ExtensionTok"}
 
 :   This query returns all status of I2C buses (addressing, clock frequency).
 
@@ -784,13 +784,13 @@ _`I2C0:ADDRess:BIT 1;I2C0:FREQuency 100000;I2C1:ADDRess:BIT 1;I2C1:FREQuency 100
 
 #### Syntax {-}
 
-`I2C<bus>:SCAN?`
+[I2C\<bus\>:SCAN?]{custom-style="ExtensionTok"}
 
 :   This query returns list of I2C slave device on the specified bus.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                | Type                                    | Values                                                                    | Default |
 |-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|:-------:|
@@ -812,13 +812,13 @@ _`I2C0:ADDRess:BIT 1;I2C0:FREQuency 100000;I2C1:ADDRess:BIT 1;I2C1:FREQuency 100
 
 #### Syntax {-}
 
-`I2C<bus>:FREQuency <frequency>`
+[I2C\<bus\>:FREQuency \<frequency\>]{custom-style="ExtensionTok"}
 
 :   This command sets clock frequency of specified bus.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                      | Type                                    | Values                                                                    | Default |
 |-------------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|:-------:|
@@ -831,13 +831,13 @@ _`I2C0:ADDRess:BIT 1;I2C0:FREQuency 100000;I2C1:ADDRess:BIT 1;I2C1:FREQuency 100
 
 #### Syntax {-}
 
-`I2C<bus>:FREQuency?`
+[I2C\<bus\>:FREQuency?]{custom-style="ExtensionTok"}
 
 :   This query returns clock frequency of specified bus.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                | Type                                    | Values                                                                    | Default |
 |-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|:-------:|
@@ -859,13 +859,13 @@ _`I2C0:ADDRess:BIT 1;I2C0:FREQuency 100000;I2C1:ADDRess:BIT 1;I2C1:FREQuency 100
 
 #### Syntax {-}
 
-`I2C<bus>:ADDRess:BIT <bit>`
+[I2C\<bus\>:ADDRess:BIT \<bit\>]{custom-style="ExtensionTok"}
 
 :   This command sets addressing of specified bus.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                | Type                                    | Values                                                                                                          | Default |
 |-------------------------------------|-----------------------------------------|-----------------------------------------------------------------------------------------------------------------|:-------:|
@@ -878,13 +878,13 @@ _`I2C0:ADDRess:BIT 1;I2C0:FREQuency 100000;I2C1:ADDRess:BIT 1;I2C1:FREQuency 100
 
 #### Syntax {-}
 
-`I2C<bus>:ADDRess:BIT?`
+[I2C\<bus\>:ADDRess:BIT?]{custom-style="ExtensionTok"}
 
 :   This query returns addressing of specified bus.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                | Type                                    | Values                                                                    | Default |
 |-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|:-------:|
@@ -906,14 +906,14 @@ _`I2C0:ADDRess:BIT 1;I2C0:FREQuency 100000;I2C1:ADDRess:BIT 1;I2C1:FREQuency 100
 
 #### Syntax {-}
 
-`I2C<bus>:WRITE <address>,<buffer>,<stop>`
+[I2C\<bus\>:WRITE \<address\>,\<buffer\>,\<stop\>]{custom-style="ExtensionTok"}
 
 :   This command writes list of hexadecimal to specified slave device on the bus.
-Stop condition is configured by `<stop>`.
+Stop condition is configured by `\<stop\>`.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                    | Type                                                   | Values                                                                                                                                                                     | Default |
 |-----------------------------------------|--------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------:|
@@ -928,14 +928,14 @@ Stop condition is configured by `<stop>`.
 
 #### Syntax {-}
 
-`I2C<bus>:READ? <address>,<length>,<stop>`
+[I2C\<bus\>:READ? \<address\>,\<length\>,\<stop\>]{custom-style="ExtensionTok"}
 
-:   This query reads `<length>` bytes of data from specified slave device on the bus.
-Stop condition is configured by `<stop>`.
+:   This query reads `\<length\>` bytes of data from specified slave device on the bus.
+Stop condition is configured by `\<stop\>`.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                    | Type                                    | Values                                                                                                                                                                     | Default |
 |-----------------------------------------|-----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------:|
@@ -960,13 +960,13 @@ Stop condition is configured by `<stop>`.
 
 #### Syntax {-}
 
-`I2C<bus>:MEMory:WRITE <address>,<memaddress>,`<br>`<buffer>,<addrsize>`
+[I2C\<bus\>:MEMory:WRITE \<address\>,\<memaddress\>,<br>\<buffer\>,\<addrsize\>]{custom-style="ExtensionTok"}
 
 :   This command sends stream of hexadecimal data into specified memory address of slave device.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                       | Type                                                   | Values                                                                                                                                                                     | Default |
 |--------------------------------------------|--------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------:|
@@ -982,14 +982,14 @@ Stop condition is configured by `<stop>`.
 
 #### Syntax {-}
 
-`I2C<bus>:MEMory:READ? <address>,<memaddress>,`<br>`<nbytes>,<addrsize>`
+[I2C\<bus\>:MEMory:READ? \<address\>,\<memaddress\>,<br>\<nbytes\>,\<addrsize\>]{custom-style="ExtensionTok"}
 
 :   This query returns comma separated list of hexadecimal data stored in specific memory address of
 the target I2C slave slave device.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                       | Type                                    | Values                                                                                                                                                                     | Default |
 |--------------------------------------------|-----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------:|
@@ -1033,7 +1033,7 @@ the target I2C slave slave device.
 
 #### Syntax {-}
 
-`SPI?`
+[SPI?]{custom-style="ExtensionTok"}
 
 :   This query returns all status of SPI buses (chip select polarity, clock frequency, bus mode).
 
@@ -1052,18 +1052,18 @@ _`SPI0:CSEL:POLarity 0;SPI0:FREQuency 1000000;SPI0:MODE 0;SPI1:CSEL:POLarity 0;S
 
 #### Syntax {-}
 
-`SPI<bus>:CSEL:POLarity <polarity>`
+[SPI\<bus\>:CSEL:POLarity \<polarity\>]{custom-style="ExtensionTok"}
 
 :   This command sets chip select polarity for specified SPI bus
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
-| Item                                     | Type                                      | Values                                                                                                         | Default |
-|------------------------------------------|-------------------------------------------|----------------------------------------------------------------------------------------------------------------|:-------:|
-| [\<bus\>]{custom-style="NormalTok"}      | [[NR1]{custom-style="NormalTok"}](#nr1)   | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                      |   N/A   |
-| [\<polarity\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool) | Chip select polarity. [1]{custom-style="NormalTok"} is HI-active<br>[0]{custom-style="NormalTok"} is LO-active |   N/A   |
+| Item                                     | Type                                      | Values                                                                                                            | Default |
+|------------------------------------------|-------------------------------------------|-------------------------------------------------------------------------------------------------------------------|:-------:|
+| [\<bus\>]{custom-style="NormalTok"}      | [[NR1]{custom-style="NormalTok"}](#nr1)   | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                                         |   N/A   |
+| [\<polarity\>]{custom-style="NormalTok"} | [[Bool]{custom-style="NormalTok"}](#bool) | Chip select polarity.<br>[1]{custom-style="NormalTok"} is HI-active<br>[0]{custom-style="NormalTok"} is LO-active |   N/A   |
 
 </div>
 
@@ -1075,13 +1075,13 @@ _`SPI0:CSEL:POLarity 0;SPI0:FREQuency 1000000;SPI0:MODE 0;SPI1:CSEL:POLarity 0;S
 
 #### Syntax {-}
 
-`SPI<bus>:CSEL:POLarity?`
+[SPI\<bus\>:CSEL:POLarity?]{custom-style="ExtensionTok"}
 
 :   This query returns chip select pin polarity for specified SPI bus
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                | Type                                    | Values                                                                    | Default |
 |-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|:-------:|
@@ -1103,7 +1103,7 @@ _`SPI0:CSEL:POLarity 0;SPI0:FREQuency 1000000;SPI0:MODE 0;SPI1:CSEL:POLarity 0;S
 
 #### Syntax {-}
 
-`SPI<bus>:CSEL:VALue <value>`
+[SPI\<bus\>:CSEL:VALue \<value\>]{custom-style="ExtensionTok"}
 
 :   This command sets logical value of chip select pin for specified bus.
 Numeric `1` and string `ON` selects bus. Numeric `0` and string `OFF` deselects bus.
@@ -1111,7 +1111,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                  | Type                                      | Values                                                                    | Default |
 |---------------------------------------|-------------------------------------------|---------------------------------------------------------------------------|:-------:|
@@ -1124,13 +1124,13 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Syntax {-}
 
-`SPI<bus>:CSEL:VALue?`
+[SPI\<bus\>:CSEL:VALue?]{custom-style="ExtensionTok"}
 
 :   This query returns logical value of CS pin. `ON` is selecting bus, `OFF` is deselecting.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                | Type                                    | Values                                                                    | Default |
 |-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|:-------:|
@@ -1152,11 +1152,11 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Syntax {-}
 
-`SPI<bus>:MODE <mode>`
+[SPI\<bus\>:MODE \<mode\>]{custom-style="ExtensionTok"}
 
 :   This command sets bus clock and phase mode for specified SPI bus
 
-    <div table="[0.25,0.25,0.25]">
+    <div class="table" width="[0.15,0.15,0.15]">
 
     | Mode  | CPOL |  CPHA   |
     |:-----:|:----:|:-------:|
@@ -1169,12 +1169,12 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
-| Item                                 | Type                                    | Values                                                                                                  | Default |
-|--------------------------------------|-----------------------------------------|---------------------------------------------------------------------------------------------------------|:-------:|
-| [\<bus\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                               |   N/A   |
-| [\<mode\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus clock and phase mode [0/1/2/3]{custom-style="NormalTok"} or <br>[DEFault]{custom-style="NormalTok"} |   N/A   |
+| Item                                 | Type                                    | Values                                                                                                 | Default |
+|--------------------------------------|-----------------------------------------|--------------------------------------------------------------------------------------------------------|:-------:|
+| [\<bus\>]{custom-style="NormalTok"}  | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus number [0]{custom-style="NormalTok"} or [1]{custom-style="NormalTok"}                              |   N/A   |
+| [\<mode\>]{custom-style="NormalTok"} | [[NR1]{custom-style="NormalTok"}](#nr1) | Bus clock and phase mode<br>[0/1/2/3]{custom-style="NormalTok"} or [DEFault]{custom-style="NormalTok"} |   N/A   |
 
 </div>
 
@@ -1182,13 +1182,13 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Syntax {-}
 
-`SPI<bus>:MODE?`
+[SPI\<bus\>:MODE?]{custom-style="ExtensionTok"}
 
 :   This query returns bus clock and phase mode for specified SPI bus
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                | Type                                    | Values                                                                    | Default |
 |-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|:-------:|
@@ -1210,13 +1210,13 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Syntax {-}
 
-`SPI<bus>:FREQuency <frequency>`
+[SPI\<bus\>:FREQuency \<frequency\>]{custom-style="ExtensionTok"}
 
 :   This command sets bus clock frequency for specified bus.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                      | Type                                    | Values                                                                       | Default |
 |-------------------------------------------|-----------------------------------------|------------------------------------------------------------------------------|:-------:|
@@ -1229,13 +1229,13 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Syntax {-}
 
-`SPI<bus>:FREQuency?`
+[SPI\<bus\>:FREQuency?]{custom-style="ExtensionTok"}
 
 :   This query returns bus clock frequency for specified bus.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                | Type                                    | Values                                                                    | Default |
 |-------------------------------------|-----------------------------------------|---------------------------------------------------------------------------|:-------:|
@@ -1257,14 +1257,14 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Syntax {-}
 
-`SPI<bus>:TRANSfer <data>,<pre_cs>,<post_cs>`
+[SPI\<bus\>:TRANSfer \<data\>,\<pre_cs\>,\<post_cs\>]{custom-style="ExtensionTok"}
 
 :   This command sends a stream of hexadecimal data and returns what it reads from selected slave device
 at the same time. Also, it configures chip select pin for pre and post of data transfer respectively.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                    | Type                                                   | Values                                                                    | Default |
 |-----------------------------------------|--------------------------------------------------------|---------------------------------------------------------------------------|:-------:|
@@ -1289,14 +1289,14 @@ at the same time. Also, it configures chip select pin for pre and post of data t
 
 #### Syntax {-}
 
-`SPI<bus>:WRITE <data>,<pre_cs>,<post_cs>`
+[SPI\<bus\>:WRITE \<data\>,\<pre_cs\>,\<post_cs\>]{custom-style="ExtensionTok"}
 
 :   This command sends stream of hexadecimal data into selected slave device. Also, it configures chip select pin
 for pre and post of data transfer respectively.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                    | Type                                                   | Values                                                                    | Default |
 |-----------------------------------------|--------------------------------------------------------|---------------------------------------------------------------------------|:-------:|
@@ -1311,14 +1311,14 @@ for pre and post of data transfer respectively.
 
 #### Syntax {-}
 
-`SPI<bus>:READ? <length>,<mask>,<pre_cs>,<post_cs>`
+[SPI\<bus\>:READ? \<length\>,\<mask\>,\<pre_cs\>,\<post_cs\>]{custom-style="ExtensionTok"}
 
 :   This query returns comma separated list of hexadecimal data from selected slave device.
 Also, it configures chip select pin for pre and post of data transfer respectively.
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                    | Type                                      | Values                                                                    | Default |
 |-----------------------------------------|-------------------------------------------|---------------------------------------------------------------------------|:-------:|
@@ -1362,13 +1362,13 @@ Also, it configures chip select pin for pre and post of data transfer respective
 
 #### Syntax {-}
 
-`ADC<channel>:READ?`
+[ADC\<channel\>:READ?]{custom-style="ExtensionTok"}
 
 :   This query returns ADC conversion value in range of 0 to 65535
 
 #### Parameter {-}
 
-<div class="table" width="[0.22,0.18,0.45,0.15]">
+<div class="table" width="[0.22,0.23,0.40,0.15]">
 
 | Item                                    | Type                                    | Values                                | Default |
 |-----------------------------------------|-----------------------------------------|---------------------------------------|:-------:|
@@ -1408,7 +1408,7 @@ Also, it configures chip select pin for pre and post of data transfer respective
 
 #### Syntax {-}
 
-`*IDN?`
+[*IDN?]{custom-style="ExtensionTok"}
 
 :   This command reads the instrument's identification string which contains four
 comma-separated fields. The first field is the manufacturer's name, the second is
@@ -1429,7 +1429,7 @@ is the firmware revision in `x.y.z` style.
 
 #### Syntax {-}
 
-`*RST`
+[*RST]{custom-style="ExtensionTok"}
 
 :   This command resets the target device, including System clock,
 GPIO mode and state, I2C and SPI bus clock, SPI chip select pin polarity and state.
