@@ -150,8 +150,8 @@ E_INVALID_PARAMETER = ScpiErrorNumber(-224, "Illegal parameter value")
 E_I2C_FAIL = ScpiErrorNumber(-333, "I2C bus error")
 E_SPI_FAIL = ScpiErrorNumber(-334, "SPI bus error")
 
-pin0 = machine.Pin(0)  # no-error indicator
-pin1 = machine.Pin(1)  # error indicator
+pin0 = machine.Pin(0, mode=machine.Pin.OUT, value=IO_ON)  # no-error indicator
+pin1 = machine.Pin(1, mode=machine.Pin.OUT, value=IO_OFF)  # error indicator
 
 sck0 = machine.Pin(2)
 mosi0 = machine.Pin(3)
