@@ -30,17 +30,19 @@ Shallow clone is recommended as it includes binary files.
 
 ##### Simple way of installation - typical Micropython method {-}
 
-Write official Micropython uf2 firmware, and put [main.py]{custom-style="CommentVarTok"}, [MicroScpiDevice.py]{custom-style="CommentVarTok"}
-and [RaspberryScpiPico.py]{custom-style="CommentVarTok"} on root of target directory.
+Write official Micropython uf2 firmware, and put [main.py]{custom-style="PreprocessorTok"},
+[MicroScpiDevice.py]{custom-style="PreprocessorTok"} and [RaspberryScpiPico.py]{custom-style="PreprocessorTok"}
+on root of target directory.
 
 ##### Complicated way - build custom UF2 firmware {-}
 
-Install Docker on your PC and run [make docker]{custom-style="CommentVarTok"} and [make firmware]{custom-style="CommentVarTok"}
-to build docker image and uf2 firmware respectively (firmware build requires docker image).
-This builds [pipco-micropython-scpi.uf2]{custom-style="CommentVarTok"} firmeare in build directory.
+Install Docker on your PC and run [make docker]{custom-style="PreprocessorTok"} and
+[make firmware]{custom-style="PreprocessorTok"} to build docker image and uf2 firmware respectively
+(firmware build requires docker image).
+This builds [pipco-micropython-scpi.uf2]{custom-style="PreprocessorTok"} firmeare in build directory.
 
-WSL is recommended to use [make]{custom-style="CommentVarTok"} on Windows i.e.
-[wsl.exe make docker]{custom-style="CommentVarTok"} and [wsl.exe make firmware]{custom-style="CommentVarTok"}.
+WSL is recommended to use [make]{custom-style="PreprocessorTok"} on Windows i.e.
+[wsl.exe make docker]{custom-style="PreprocessorTok"} and [wsl.exe make firmware]{custom-style="PreprocessorTok"}.
 
 For any question, create an issue on github repo.
 
@@ -98,38 +100,45 @@ Table: Raspberry Pi Pico pinout and function assignment {#tbl:pico-pinout}
 
 # Parameter types
 
-Parameter types in **`bold`** applies to this implementation.
+Parameter types with [mark]{custom-style="RegionMarkerTok"} applies to this implementation.
 
 [[\<NR1\>]{custom-style="RegionMarkerTok"}]{#nr1}
 
-:   Digits with an implied decimal point assumed at the right of the least-significant digit.
-
-    Example: `273`
+:   Digits with an implied decimal point assumed at the right of the least-significant digit.\
+Example: [273]{custom-style="StringTok"}
 
 [`<NR2>`]{#nr2}
 
-:   Digits with an explicit decimal point. Example: `27.3`
+:   Digits with an explicit decimal point.\
+Example: [27.3]{custom-style="StringTok"}
 
 [`<NR3>`]{#nr3}
 
-:   Digits with an explicit decimal point and an exponent. Example: `2.73E+02`
+:   Digits with an explicit decimal point and an exponent.\
+Example: [2.73E+02]{custom-style="StringTok"}
 
 [[\<NR4\>]{custom-style="RegionMarkerTok"}]{#nr4}
 
-:   Hexadecimal, even number of digits without a negative sign `"-"`. Example: `DEAD BEAF C00F3E`
+:   Hexadecimal, even number of digits without a negative sign ["-"]{custom-style="PreprocessorTok"}.\
+Example: [DEAD BEAF C00F3E]{custom-style="StringTok"}
 
 [`<NRf>`]{#nrf}
 
-:   Extended format that includes `<NR1>`, `<NR2>`, and `<NR3>`. Examples: `273 27.3 2.73E+02`
+:   Extended format that includes [\<NR1\>]{custom-style="PreprocessorTok"},
+[\<NR2\>]{custom-style="PreprocessorTok"}, and [\<NR3\>]{custom-style="PreprocessorTok"}.\
+Examples: [273 27.3 2.73E+02]{custom-style="StringTok"}
 
 [`<NRf+>`]{#nrf-plus}
 
-:   Expanded decimal format that includes `<NRf>` and `MIN`, `MAX`. Examples: `273 27.3 2.73E+02 MAX`
-:   `MIN` and `MAX` are the minimum and maximum limit values that are implicit in the range specification for the parameter.
+:   Expanded decimal format that includes [\<NRf\>]{custom-style="PreprocessorTok"} and
+[MIN]{custom-style="PreprocessorTok"}, [MAX]{custom-style="PreprocessorTok"}.\
+Examples: [273 27.3 2.73E+02 MAX]{custom-style="StringTok"}
+:   [MIN]{custom-style="PreprocessorTok"} and [MAX]{custom-style="PreprocessorTok"}
+are the minimum and maximum limit values that are implicit in the range specification for the parameter.
 
 [[\<Bool\>]{custom-style="RegionMarkerTok"}]{#bool}
 
-:   Boolean Data. Can be numeric `(0, 1)` or named `(OFF, ON)`.
+:   Boolean Data. Can be numeric [(0, 1)]{custom-style="PreprocessorTok"} or named [(OFF, ON)]{custom-style="PreprocessorTok"}.
 
 [[\<SPD\>]{custom-style="RegionMarkerTok"}]{#spd}
 
@@ -149,37 +158,24 @@ Parameter types in **`bold`** applies to this implementation.
 
 [`<AARD>`]{#aard}
 
-:   Arbitrary ASCII Response Data. Permits the return of undelimited 7-bit ASCII. This data type has an implied message terminator.
+:   Arbitrary ASCII Response Data. Permits the return of undelimited 7-bit ASCII.
+This data type has an implied message terminator.
 
 [`<Block>`]{#block}
 
-:   Arbitrary Block Response Data. Permits the return of definite length and indefinite length arbitrary response data. This data type has an implied message terminator.
+:   Arbitrary Block Response Data. Permits the return of definite length and indefinite length arbitrary response data.
+This data type has an implied message terminator.
 
-# MACHINE Subsystem
-
-```{=openxml}
-<w:sdt>
-    <w:sdtContent xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-        <w:p>
-            <w:r>
-                <w:fldChar w:fldCharType="begin" w:dirty="true" />
-                <w:instrText xml:space="preserve">TOC \o "2-2" \h \b ”machine-subsystem” \u</w:instrText>
-                <w:fldChar w:fldCharType="separate" />
-                <w:fldChar w:fldCharType="end" />
-            </w:r>
-        </w:p>
-    </w:sdtContent>
-</w:sdt>
-
-```
+# MACHINE Subsystem {.subsection-toc}
 
 ## MACHINE:FREQuency {.unnumbered #machine-frequency}
 
 #### Syntax {-}
 
-[MACHINE:FREQuency \<frequency\>]{custom-style="ExtensionTok"}
+[MACHINE:FREQuency \<frequency\>]{custom-style="ControlFlowTok"}
 
-:   This command sets Pico's CPU clock frequency in Hz. `\<frequency\>` must be between 100MHz and 275MHz inclusive.
+:   This command sets Pico's CPU clock frequency in Hz.
+[\<frequency\>]{custom-style="PreprocessorTok"} must be between 100MHz and 275MHz inclusive.
 
 #### Parameter {-}
 
@@ -201,7 +197,7 @@ Parameter types in **`bold`** applies to this implementation.
 
 #### Syntax {-}
 
-[MACHINE:FREQuency?]{custom-style="ExtensionTok"}
+[MACHINE:FREQuency?]{custom-style="ControlFlowTok"}
 
 :   This query returns Pico's CPU clock frequency in Hz.
 
@@ -213,31 +209,15 @@ Parameter types in **`bold`** applies to this implementation.
 
 `MACHINE:FREQ?` [// Returns frequency in Hz]{custom-style="CommentTok"}
 
-:   Typical Response: _`125000000`_
+:   Typical Response: [125000000]{custom-style="StringTok"}
 
-# SYSTEM Subsystem
-
-```{=openxml}
-<w:sdt>
-    <w:sdtContent xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-        <w:p>
-            <w:r>
-                <w:fldChar w:fldCharType="begin" w:dirty="true" />
-                <w:instrText xml:space="preserve">TOC \o "2-2" \h \b ”system-subsystem” \u</w:instrText>
-                <w:fldChar w:fldCharType="separate" />
-                <w:fldChar w:fldCharType="end" />
-            </w:r>
-        </w:p>
-    </w:sdtContent>
-</w:sdt>
-
-```
+# SYSTEM Subsystem {.subsection-toc}
 
 ## SYSTem:Error? {.unnumbered #system-error-query}
 
 #### Syntax {-}
 
-[SYSTem:ERRor?]{custom-style="ExtensionTok"}
+[SYSTem:ERRor?]{custom-style="ControlFlowTok"}
 
 :   This query returns error code and message from top of error queue (see following table for code and message).
 
@@ -268,31 +248,15 @@ Parameter types in **`bold`** applies to this implementation.
 
 `SYSTem:ERRor?` [// Returns first error in error list]{custom-style="CommentTok"}
 
-:   Typical Response: _`0, 'No error'`_
+:   Typical Response: [0, 'No error']{custom-style="StringTok"}
 
-# PIN Subsystem
-
-```{=openxml}
-<w:sdt>
-    <w:sdtContent xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-        <w:p>
-            <w:r>
-                <w:fldChar w:fldCharType="begin" w:dirty="true" />
-                <w:instrText xml:space="preserve">TOC \o "2-2" \h \b ”pin-subsystem” \u</w:instrText>
-                <w:fldChar w:fldCharType="separate" />
-                <w:fldChar w:fldCharType="end" />
-            </w:r>
-        </w:p>
-    </w:sdtContent>
-</w:sdt>
-
-```
+# PIN Subsystem {.subsection-toc}
 
 ## PIN? {.unnumbered #pin-query}
 
 #### Syntax {-}
 
-[PIN?]{custom-style="ExtensionTok"}
+[PIN?]{custom-style="ControlFlowTok"}
 
 :   This query returns status of all available pins (mode, value, PWM frequency, PWM duty).
 
@@ -304,14 +268,23 @@ Parameter types in **`bold`** applies to this implementation.
 
 `PIN?` [// Returns entire Pin status]{custom-style="CommentTok"}
 
-:   Typical Response:
-_`PIN14:MODE IN;PIN14:VALue OFF;PIN14:PWM:FREQuency 1000;PIN14:PWM:DUTY 32768;PIN15:MODE IN;PIN15:VALue OFF;PIN15:PWM:FREQuency 1000;PIN15:PWM:DUTY 32768;PIN16:MODE IN;PIN16:VALue OFF;PIN16:PWM:FREQuency 1000;PIN16:PWM:DUTY 32768;PIN17:MODE IN;PIN17:VALue OFF;PIN17:PWM:FREQuency 1000;PIN17:PWM:DUTY 32768;PIN18:MODE IN;PIN18:VALue OFF;PIN18:PWM:FREQuency 1000;PIN18:PWM:DUTY 32768;PIN19:MODE IN;PIN19:VALue OFF;PIN19:PWM:FREQuency 1000;PIN19:PWM:DUTY 32768;PIN20:MODE IN;PIN20:VALue OFF;PIN20:PWM:FREQuency 1000;PIN20:PWM:DUTY 32768;PIN21:MODE IN;PIN21:VALue OFF;PIN21:PWM:FREQuency 1000;PIN21:PWM:DUTY 32768;PIN22:MODE IN;PIN22:VALue OFF;PIN22:PWM:FREQuency 1000;PIN22:PWM:DUTY 32768;PIN25:MODE IN;PIN25:VALue OFF;PIN25:PWM:FREQuency 1000;PIN25:PWM:DUTY 32768;`_
+:   Typical Response: <br>[
+PIN14:MODE IN;PIN14:VALue OFF;PIN14:PWM:FREQuency 1000;PIN14:PWM:DUTY 32768;
+PIN15:MODE IN;PIN15:VALue OFF;PIN15:PWM:FREQuency 1000;PIN15:PWM:DUTY 32768;
+PIN16:MODE IN;PIN16:VALue OFF;PIN16:PWM:FREQuency 1000;PIN16:PWM:DUTY 32768;
+PIN17:MODE IN;PIN17:VALue OFF;PIN17:PWM:FREQuency 1000;PIN17:PWM:DUTY 32768;
+PIN18:MODE IN;PIN18:VALue OFF;PIN18:PWM:FREQuency 1000;PIN18:PWM:DUTY 32768;
+PIN19:MODE IN;PIN19:VALue OFF;PIN19:PWM:FREQuency 1000;PIN19:PWM:DUTY 32768;
+PIN20:MODE IN;PIN20:VALue OFF;PIN20:PWM:FREQuency 1000;PIN20:PWM:DUTY 32768;
+PIN21:MODE IN;PIN21:VALue OFF;PIN21:PWM:FREQuency 1000;PIN21:PWM:DUTY 32768;
+PIN22:MODE IN;PIN22:VALue OFF;PIN22:PWM:FREQuency 1000;PIN22:PWM:DUTY 32768;
+PIN25:MODE IN;PIN25:VALue OFF;PIN25:PWM:FREQuency 1000;PIN25:PWM:DUTY 32768;]{custom-style="StringTok"}
 
 ## PIN:MODE {.unnumbered #pin-mode}
 
 #### Syntax {-}
 
-[PIN\<pin\>:MODE \<mode\>]{custom-style="ExtensionTok"}
+[PIN\<pin\>:MODE \<mode\>]{custom-style="ControlFlowTok"}
 
 :   This command sets mode of specified IO pin.
 
@@ -336,7 +309,7 @@ _`PIN14:MODE IN;PIN14:VALue OFF;PIN14:PWM:FREQuency 1000;PIN14:PWM:DUTY 32768;PI
 
 #### Syntax {-}
 
-[PIN\<pin\>:MODE?]{custom-style="ExtensionTok"}
+[PIN\<pin\>:MODE?]{custom-style="ControlFlowTok"}
 
 :   This query returns status of specified IO pin's mode.
 
@@ -358,16 +331,17 @@ _`PIN14:MODE IN;PIN14:VALue OFF;PIN14:PWM:FREQuency 1000;PIN14:PWM:DUTY 32768;PI
 
 `PIN14:MODE?` [// Returns Pin14 pin mode]{custom-style="CommentTok"}
 
-:   Typical Response: _`INput`_
+:   Typical Response: [INput]{custom-style="StringTok"}
 
 ## PIN:VALue {.unnumbered #pin-value}
 
 #### Syntax {-}
 
-[PIN\<pin\>:VALue \<value\>]{custom-style="ExtensionTok"}
+[PIN\<pin\>:VALue \<value\>]{custom-style="ControlFlowTok"}
 
 :   This command sets logical value of specified IO pin.
-Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets logic LO.
+Numeric [1]{custom-style="PreprocessorTok"} and string [ON]{custom-style="PreprocessorTok"} sets logic HI.
+Numeric [0]{custom-style="PreprocessorTok"} and string [OFF]{custom-style="PreprocessorTok"} sets logic LO.
 
 #### Parameter {-}
 
@@ -391,9 +365,10 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Syntax {-}
 
-[PIN\<pin\>:VALue?]{custom-style="ExtensionTok"}
+[PIN\<pin\>:VALue?]{custom-style="ControlFlowTok"}
 
-:   This query returns logical value of specified IO pin. `ON` is a logic HI, `OFF` is a logic LO.
+:   This query returns logical value of specified IO pin. [ON]{custom-style="PreprocessorTok"} is a logic HI, \
+[OFF]{custom-style="PreprocessorTok"} is a logic LO.
 
 #### Parameter {-}
 
@@ -413,13 +388,13 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 `PIN14:VAL?` [// Returns Pin14 pin value]{custom-style="CommentTok"}
 
-:   Typical Response: _`ON`_
+:   Typical Response: [ON]{custom-style="StringTok"}
 
 ## PIN:ON {.unnumbered #pin-on}
 
 #### Syntax {-}
 
-[PIN\<pin\>:ON]{custom-style="ExtensionTok"}
+[PIN\<pin\>:ON]{custom-style="ControlFlowTok"}
 
 :   This command sets logical value of specified IO pin to logic HI.
 
@@ -443,7 +418,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Syntax {-}
 
-[PIN\<pin\>:OFF]{custom-style="ExtensionTok"}
+[PIN\<pin\>:OFF]{custom-style="ControlFlowTok"}
 
 :   This command sets logical value of specified IO pin to logic LO.
 
@@ -467,7 +442,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Syntax {-}
 
-[PIN\<pin\>:PWM:FREQuency \<frequency\>]{custom-style="ExtensionTok"}
+[PIN\<pin\>:PWM:FREQuency \<frequency\>]{custom-style="ControlFlowTok"}
 
 :   This command sets PWM frequency of specified IO pin in Hz.
 
@@ -492,7 +467,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Syntax {-}
 
-[PIN\<pin\>:PWM:FREQuency?]{custom-style="ExtensionTok"}
+[PIN\<pin\>:PWM:FREQuency?]{custom-style="ControlFlowTok"}
 
 :   This query returns PWM frequency of specified IO pin in Hz.
 
@@ -514,13 +489,13 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 `PIN14:PWM:FREQ?` [// Returns Pin14 PWM frequency in Hz]{custom-style="CommentTok"}
 
-:   Typical Response: _`500000`_
+:   Typical Response: [500000]{custom-style="StringTok"}
 
 ## PIN:PWM:DUTY {.unnumbered #pin-pwm-duty}
 
 #### Syntax {-}
 
-[PIN\<pin\>:PWM:DUTY \<duty\>]{custom-style="ExtensionTok"}
+[PIN\<pin\>:PWM:DUTY \<duty\>]{custom-style="ControlFlowTok"}
 
 :   This command sets PWM duty of specified IO pin in range of 1 to 65535.
 
@@ -545,7 +520,7 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 #### Syntax {-}
 
-[PIN\<pin\>:PWM:DUTY?]{custom-style="ExtensionTok"}
+[PIN\<pin\>:PWM:DUTY?]{custom-style="ControlFlowTok"}
 
 :   This query returns PWM duty of specified IO pin in range of 1 to 65535
 
@@ -567,31 +542,15 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 `PIN14:PWM:DUTY?` [// Returns Pin14 PWM duty in integer]{custom-style="CommentTok"}
 
-:   Typical Response: _`32768`_
+:   Typical Response: [32768]{custom-style="StringTok"}
 
-# LED Subsystem
-
-```{=openxml}
-<w:sdt>
-    <w:sdtContent xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-        <w:p>
-            <w:r>
-                <w:fldChar w:fldCharType="begin" w:dirty="true" />
-                <w:instrText xml:space="preserve">TOC \o "2-2" \h \b ”led-subsystem” \u</w:instrText>
-                <w:fldChar w:fldCharType="separate" />
-                <w:fldChar w:fldCharType="end" />
-            </w:r>
-        </w:p>
-    </w:sdtContent>
-</w:sdt>
-
-```
+# LED Subsystem {.subsection-toc}
 
 ## LED? {.unnumbered #led-query}
 
 #### Syntax {-}
 
-[PIN?]{custom-style="ExtensionTok"}
+[LED?]{custom-style="ControlFlowTok"}
 
 :   This query returns all status of onboard LED (value, PWM frequency, PWM duty).
 
@@ -601,14 +560,14 @@ Numeric `1` and string `ON` sets logic HI. Numeric `0` and string `OFF` sets log
 
 `LED?` [// Returns entire Pin status]{custom-style="CommentTok"}
 
-:   Typical Response:
-_`LED:VALue ON;LED:PWM:FREQuency 12345;LED:PWM:DUTY 12345`_
+:   Typical Response:\
+[LED:VALue ON;LED:PWM:FREQuency 12345;LED:PWM:DUTY 12345]{custom-style="StringTok"}
 
 ## LED:ON {.unnumbered #led-on}
 
 #### Syntax {-}
 
-[LED:ON]{custom-style="ExtensionTok"}
+[LED:ON]{custom-style="ControlFlowTok"}
 
 :   This command turns onboard LED on.
 
@@ -616,7 +575,7 @@ _`LED:VALue ON;LED:PWM:FREQuency 12345;LED:PWM:DUTY 12345`_
 
 #### Syntax {-}
 
-[LED:OFF]{custom-style="ExtensionTok"}
+[LED:OFF]{custom-style="ControlFlowTok"}
 
 :   This command turns onboard LED off.
 
@@ -624,10 +583,11 @@ _`LED:VALue ON;LED:PWM:FREQuency 12345;LED:PWM:DUTY 12345`_
 
 #### Syntax {-}
 
-[LED:VALue \<value\>]{custom-style="ExtensionTok"}
+[LED:VALue \<value\>]{custom-style="ControlFlowTok"}
 
-:   This command sets logical value of onboard LED. Numeric `1` and string `ON` turns on.
-Numeric `0` and string `OFF` turns off.
+:   This command sets logical value of onboard LED. Numeric [1]{custom-style="PreprocessorTok"} and
+string [ON]{custom-style="PreprocessorTok"} turns on.
+Numeric [0]{custom-style="PreprocessorTok"} and string [OFF]{custom-style="PreprocessorTok"} turns off.
 
 #### Parameter {-}
 
@@ -643,7 +603,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Syntax {-}
 
-[LED:VALue?]{custom-style="ExtensionTok"}
+[LED:VALue?]{custom-style="ControlFlowTok"}
 
 :   This query returns logical value of onboard LED.
 
@@ -655,13 +615,13 @@ Numeric `0` and string `OFF` turns off.
 
 `LED:VALue?`
 
-:   Typical Response: _`ON`_
+:   Typical Response: [ON]{custom-style="StringTok"}
 
 ## LED:PWM:ENable {.unnumbered #led-pwm-enable}
 
 #### Syntax {-}
 
-[LED:PWM:ENable]{custom-style="ExtensionTok"}
+[LED:PWM:ENable]{custom-style="ControlFlowTok"}
 
 :   This command enables PWM output for onboard LED.
 
@@ -669,7 +629,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Syntax {-}
 
-[LED:PWM:DISable]{custom-style="ExtensionTok"}
+[LED:PWM:DISable]{custom-style="ControlFlowTok"}
 
 :   This command disables PWM output for onboard LED.
 
@@ -677,7 +637,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Syntax {-}
 
-[LED:PWM:FREQuency \<frequency\>]{custom-style="ExtensionTok"}
+[LED:PWM:FREQuency \<frequency\>]{custom-style="ControlFlowTok"}
 
 :   This command sets PWM frequency of onboard LED in Hz.
 
@@ -695,7 +655,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Syntax {-}
 
-[LED:PWM:FREQuency?]{custom-style="ExtensionTok"}
+[LED:PWM:FREQuency?]{custom-style="ControlFlowTok"}
 
 :   This query returns PWM frequency of onboard LED in Hz.
 
@@ -707,13 +667,13 @@ Numeric `0` and string `OFF` turns off.
 
 `LED:PWM:FREQ?` [// Returns Pin14 PWM frequency in Hz]{custom-style="CommentTok"}
 
-:   Typical Response: _`500000`_
+:   Typical Response: [500000]{custom-style="StringTok"}
 
 ## LED:PWM:DUTY {.unnumbered #led-pwm-duty}
 
 #### Syntax {-}
 
-[LED:PWM:DUTY \<duty\>]{custom-style="ExtensionTok"}
+[LED:PWM:DUTY \<duty\>]{custom-style="ControlFlowTok"}
 
 :   This command sets PWM duty of onboard LED in range of 1 to 65535.
 
@@ -731,7 +691,7 @@ Numeric `0` and string `OFF` turns off.
 
 #### Syntax {-}
 
-[LED:PWM:DUTY?]{custom-style="ExtensionTok"}
+[LED:PWM:DUTY?]{custom-style="ControlFlowTok"}
 
 :   This query returns PWM duty of onboard LED in range of 1 to 65535.
 
@@ -743,31 +703,15 @@ Numeric `0` and string `OFF` turns off.
 
 `LED:PWM:DUTY?` [// Returns LED PWM duty in integer]{custom-style="CommentTok"}
 
-:   Typical Response: _`32768`_
+:   Typical Response: [32768]{custom-style="StringTok"}
 
-# I2C Subsystem
-
-```{=openxml}
-<w:sdt>
-    <w:sdtContent xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-        <w:p>
-            <w:r>
-                <w:fldChar w:fldCharType="begin" w:dirty="true" />
-                <w:instrText xml:space="preserve">TOC \o "2-2" \h \b ”i2c-subsystem” \u</w:instrText>
-                <w:fldChar w:fldCharType="separate" />
-                <w:fldChar w:fldCharType="end" />
-            </w:r>
-        </w:p>
-    </w:sdtContent>
-</w:sdt>
-
-```
+# I2C Subsystem {.subsection-toc}
 
 ## I2C? {.unnumbered #i2c-query}
 
 #### Syntax {-}
 
-[I2C?]{custom-style="ExtensionTok"}
+[I2C?]{custom-style="ControlFlowTok"}
 
 :   This query returns all status of I2C buses (addressing, clock frequency).
 
@@ -777,14 +721,14 @@ Numeric `0` and string `OFF` turns off.
 
 `I2C?` [// Returns I2C bus status]{custom-style="CommentTok"}
 
-:   Typical Response:
-_`I2C0:ADDRess:BIT 1;I2C0:FREQuency 100000;I2C1:ADDRess:BIT 1;I2C1:FREQuency 100000;`_
+:   Typical Response: \
+[I2C0:ADDRess:BIT 1;I2C0:FREQuency 100000;I2C1:ADDRess:BIT 1;I2C1:FREQuency 100000;]{custom-style="StringTok"}
 
 ## I2C:SCAN? {.unnumbered #i2c-scan-query}
 
 #### Syntax {-}
 
-[I2C\<bus\>:SCAN?]{custom-style="ExtensionTok"}
+[I2C\<bus\>:SCAN?]{custom-style="ControlFlowTok"}
 
 :   This query returns list of I2C slave device on the specified bus.
 
@@ -806,13 +750,14 @@ _`I2C0:ADDRess:BIT 1;I2C0:FREQuency 100000;I2C1:ADDRess:BIT 1;I2C1:FREQuency 100
 
 `I2C0:SCAN?` [// Scans slave devices on I2C0 bus]{custom-style="CommentTok"}
 
-:   Typical Response: _`A6,5A,80,EE`_ when 8-bit addressing. _`53,2D,40,77`_ when 7-bit addressing
+:   Typical Response: [A6,5A,80,EE]{custom-style="StringTok"} when 8-bit addressing.\
+[53,2D,40,77]{custom-style="StringTok"} when 7-bit addressing
 
 ## I2C:FREQuency {.unnumbered #i2c-frequency}
 
 #### Syntax {-}
 
-[I2C\<bus\>:FREQuency \<frequency\>]{custom-style="ExtensionTok"}
+[I2C\<bus\>:FREQuency \<frequency\>]{custom-style="ControlFlowTok"}
 
 :   This command sets clock frequency of specified bus.
 
@@ -831,7 +776,7 @@ _`I2C0:ADDRess:BIT 1;I2C0:FREQuency 100000;I2C1:ADDRess:BIT 1;I2C1:FREQuency 100
 
 #### Syntax {-}
 
-[I2C\<bus\>:FREQuency?]{custom-style="ExtensionTok"}
+[I2C\<bus\>:FREQuency?]{custom-style="ControlFlowTok"}
 
 :   This query returns clock frequency of specified bus.
 
@@ -853,13 +798,13 @@ _`I2C0:ADDRess:BIT 1;I2C0:FREQuency 100000;I2C1:ADDRess:BIT 1;I2C1:FREQuency 100
 
 `I2C1:FREQuency?` [// Returns bus clock frequency setting in Hz]{custom-style="CommentTok"}
 
-:   Typical Response: _`400000`_
+:   Typical Response: [400000]{custom-style="StringTok"}
 
 ## I2C:ADDRess:BIT {.unnumbered #i2c-address-bit}
 
 #### Syntax {-}
 
-[I2C\<bus\>:ADDRess:BIT \<bit\>]{custom-style="ExtensionTok"}
+[I2C\<bus\>:ADDRess:BIT \<bit\>]{custom-style="ControlFlowTok"}
 
 :   This command sets addressing of specified bus.
 
@@ -878,7 +823,7 @@ _`I2C0:ADDRess:BIT 1;I2C0:FREQuency 100000;I2C1:ADDRess:BIT 1;I2C1:FREQuency 100
 
 #### Syntax {-}
 
-[I2C\<bus\>:ADDRess:BIT?]{custom-style="ExtensionTok"}
+[I2C\<bus\>:ADDRess:BIT?]{custom-style="ControlFlowTok"}
 
 :   This query returns addressing of specified bus.
 
@@ -900,16 +845,16 @@ _`I2C0:ADDRess:BIT 1;I2C0:FREQuency 100000;I2C1:ADDRess:BIT 1;I2C1:FREQuency 100
 
 `I2C0:ADDRess:BIT?` [// Returns addressing setting in integer]{custom-style="CommentTok"}
 
-:   Typical Response: _`0`_
+:   Typical Response: [0]{custom-style="StringTok"}
 
 ## I2C:WRITE {.unnumbered #i2c-write}
 
 #### Syntax {-}
 
-[I2C\<bus\>:WRITE \<address\>,\<buffer\>,\<stop\>]{custom-style="ExtensionTok"}
+[I2C\<bus\>:WRITE \<address\>,\<buffer\>,\<stop\>]{custom-style="ControlFlowTok"}
 
 :   This command writes list of hexadecimal to specified slave device on the bus.
-Stop condition is configured by `\<stop\>`.
+Stop condition is configured by \<stop\>.
 
 #### Parameter {-}
 
@@ -928,10 +873,10 @@ Stop condition is configured by `\<stop\>`.
 
 #### Syntax {-}
 
-[I2C\<bus\>:READ? \<address\>,\<length\>,\<stop\>]{custom-style="ExtensionTok"}
+[I2C\<bus\>:READ? \<address\>,\<length\>,\<stop\>]{custom-style="ControlFlowTok"}
 
-:   This query reads `\<length\>` bytes of data from specified slave device on the bus.
-Stop condition is configured by `\<stop\>`.
+:   This query reads \<length\> bytes of data from specified slave device on the bus.
+Stop condition is configured by \<stop\>.
 
 #### Parameter {-}
 
@@ -954,13 +899,13 @@ Stop condition is configured by `\<stop\>`.
 
 `I2C0:READ? AA,4,1` [// Returns 4-bytes of data from slave device in list of hexadecimal texts]{custom-style="CommentTok"}
 
-:   Typical Response: _`DE,AD,BE,EF`_
+:   Typical Response: [DE,AD,BE,EF]{custom-style="StringTok"}
 
 ## I2C:MEMory:WRITE {.unnumbered #i2c-memory-write}
 
 #### Syntax {-}
 
-[I2C\<bus\>:MEMory:WRITE \<address\>,\<memaddress\>,<br>\<buffer\>,\<addrsize\>]{custom-style="ExtensionTok"}
+[I2C\<bus\>:MEMory:WRITE \<address\>,\<memaddress\>,<br>\<buffer\>,\<addrsize\>]{custom-style="ControlFlowTok"}
 
 :   This command sends stream of hexadecimal data into specified memory address of slave device.
 
@@ -982,7 +927,7 @@ Stop condition is configured by `\<stop\>`.
 
 #### Syntax {-}
 
-[I2C\<bus\>:MEMory:READ? \<address\>,\<memaddress\>,<br>\<nbytes\>,\<addrsize\>]{custom-style="ExtensionTok"}
+[I2C\<bus\>:MEMory:READ? \<address\>,\<memaddress\>,<br>\<nbytes\>,\<addrsize\>]{custom-style="ControlFlowTok"}
 
 :   This query returns comma separated list of hexadecimal data stored in specific memory address of
 the target I2C slave slave device.
@@ -1009,31 +954,15 @@ the target I2C slave slave device.
 
 `I2C1:MEMory:READ? 55,AA,4,1`  [// Returns 4-bytes of data from register 0xAA of slave device]{custom-style="CommentTok"}
 
-:   Typical Response: _`DE,AD,BE,EF`_
+:   Typical Response: [DE,AD,BE,EF]{custom-style="StringTok"}
 
-# SPI Subsystem
-
-```{=openxml}
-<w:sdt>
-    <w:sdtContent xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-        <w:p>
-            <w:r>
-                <w:fldChar w:fldCharType="begin" w:dirty="true" />
-                <w:instrText xml:space="preserve">TOC \o "2-2" \h \b ”spi-subsystem” \u</w:instrText>
-                <w:fldChar w:fldCharType="separate" />
-                <w:fldChar w:fldCharType="end" />
-            </w:r>
-        </w:p>
-    </w:sdtContent>
-</w:sdt>
-
-```
+# SPI Subsystem {.subsection-toc}
 
 ## SPI? {.unnumbered #spi-query}
 
 #### Syntax {-}
 
-[SPI?]{custom-style="ExtensionTok"}
+[SPI?]{custom-style="ControlFlowTok"}
 
 :   This query returns all status of SPI buses (chip select polarity, clock frequency, bus mode).
 
@@ -1045,14 +974,15 @@ the target I2C slave slave device.
 
 `SPI?` [// Returns SPI bus status]{custom-style="CommentTok"}
 
-:   Typical Response:
-_`SPI0:CSEL:POLarity 0;SPI0:FREQuency 1000000;SPI0:MODE 0;SPI1:CSEL:POLarity 0;SPI1:FREQuency 1000000;SPI1:MODE 0;`_
+:   Typical Response:\
+[SPI0:CSEL:POLarity 0;SPI0:FREQuency 1000000;SPI0:MODE 0;
+SPI1:CSEL:POLarity 0;SPI1:FREQuency 1000000;SPI1:MODE 0;]{custom-style="StringTok"}
 
 ## SPI:CSEL:POLarity {.unnumbered #spi-csel-polarity}
 
 #### Syntax {-}
 
-[SPI\<bus\>:CSEL:POLarity \<polarity\>]{custom-style="ExtensionTok"}
+[SPI\<bus\>:CSEL:POLarity \<polarity\>]{custom-style="ControlFlowTok"}
 
 :   This command sets chip select polarity for specified SPI bus
 
@@ -1075,7 +1005,7 @@ _`SPI0:CSEL:POLarity 0;SPI0:FREQuency 1000000;SPI0:MODE 0;SPI1:CSEL:POLarity 0;S
 
 #### Syntax {-}
 
-[SPI\<bus\>:CSEL:POLarity?]{custom-style="ExtensionTok"}
+[SPI\<bus\>:CSEL:POLarity?]{custom-style="ControlFlowTok"}
 
 :   This query returns chip select pin polarity for specified SPI bus
 
@@ -1097,16 +1027,16 @@ _`SPI0:CSEL:POLarity 0;SPI0:FREQuency 1000000;SPI0:MODE 0;SPI1:CSEL:POLarity 0;S
 
 `SPI0:CSEL:POLarity?` [// Returns SPI0 chip select polarity]{custom-style="CommentTok"}
 
-:   Typical Response: _`1`_
+:   Typical Response: [1]{custom-style="StringTok"}
 
 ## SPI:CSEL:VALue {-}
 
 #### Syntax {-}
 
-[SPI\<bus\>:CSEL:VALue \<value\>]{custom-style="ExtensionTok"}
+[SPI\<bus\>:CSEL:VALue \<value\>]{custom-style="ControlFlowTok"}
 
 :   This command sets logical value of chip select pin for specified bus.
-Numeric `1` and string `ON` selects bus. Numeric `0` and string `OFF` deselects bus.
+Numeric [1]{custom-style="PreprocessorTok"} and string [ON]{custom-style="PreprocessorTok"} selects bus. Numeric [0]{custom-style="PreprocessorTok"} and string [OFF]{custom-style="PreprocessorTok"} deselects bus.
 Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#spi-csel-polarity) command
 
 #### Parameter {-}
@@ -1124,9 +1054,10 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Syntax {-}
 
-[SPI\<bus\>:CSEL:VALue?]{custom-style="ExtensionTok"}
+[SPI\<bus\>:CSEL:VALue?]{custom-style="ControlFlowTok"}
 
-:   This query returns logical value of CS pin. `ON` is selecting bus, `OFF` is deselecting.
+:   This query returns logical value of CS pin. [ON]{custom-style="PreprocessorTok"} is selecting bus,
+[OFF]{custom-style="PreprocessorTok"} is deselecting.
 
 #### Parameter {-}
 
@@ -1146,13 +1077,13 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 `SPI0:CSEL:VALue?` [// Returns chip select pin value]{custom-style="CommentTok"}
 
-:   Typical Response: _`OFF`_
+:   Typical Response: [OFF]{custom-style="StringTok"}
 
 ## SPI:MODE {-}
 
 #### Syntax {-}
 
-[SPI\<bus\>:MODE \<mode\>]{custom-style="ExtensionTok"}
+[SPI\<bus\>:MODE \<mode\>]{custom-style="ControlFlowTok"}
 
 :   This command sets bus clock and phase mode for specified SPI bus
 
@@ -1182,7 +1113,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Syntax {-}
 
-[SPI\<bus\>:MODE?]{custom-style="ExtensionTok"}
+[SPI\<bus\>:MODE?]{custom-style="ControlFlowTok"}
 
 :   This query returns bus clock and phase mode for specified SPI bus
 
@@ -1204,13 +1135,13 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 `SPI1:MODE?` [// Returns clock and phase mode for bus 1]{custom-style="CommentTok"}
 
-:   Typical Response: _`2`_
+:   Typical Response: [2]{custom-style="StringTok"}
 
 ## SPI:FREQuency {-}
 
 #### Syntax {-}
 
-[SPI\<bus\>:FREQuency \<frequency\>]{custom-style="ExtensionTok"}
+[SPI\<bus\>:FREQuency \<frequency\>]{custom-style="ControlFlowTok"}
 
 :   This command sets bus clock frequency for specified bus.
 
@@ -1229,7 +1160,7 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 #### Syntax {-}
 
-[SPI\<bus\>:FREQuency?]{custom-style="ExtensionTok"}
+[SPI\<bus\>:FREQuency?]{custom-style="ControlFlowTok"}
 
 :   This query returns bus clock frequency for specified bus.
 
@@ -1251,13 +1182,13 @@ Chip select polarity is set by [[SPI:CSEL:POLarity]{custom-style="NormalTok"}](#
 
 `SPI0:FREQuency?` [// Returns SPI0 bus clock frequency in integer]{custom-style="CommentTok"}
 
-:   Typical Response: _`5000000`_
+:   Typical Response: [5000000]{custom-style="StringTok"}
 
 ## SPI:TRANSfer {-}
 
 #### Syntax {-}
 
-[SPI\<bus\>:TRANSfer \<data\>,\<pre_cs\>,\<post_cs\>]{custom-style="ExtensionTok"}
+[SPI\<bus\>:TRANSfer \<data\>,\<pre_cs\>,\<post_cs\>]{custom-style="ControlFlowTok"}
 
 :   This command sends a stream of hexadecimal data and returns what it reads from selected slave device
 at the same time. Also, it configures chip select pin for pre and post of data transfer respectively.
@@ -1283,13 +1214,13 @@ at the same time. Also, it configures chip select pin for pre and post of data t
 
 `SPI0:TRANSfer ABBA,ON,OFF`  [// Writes 2-bytes of data into SPI0 bus. Simultaneously the slave device returns the same size of data. Asserts CS before transfer; de-asserted after transfer]{custom-style="CommentTok"}
 
-:   Typical Response: _`BE,EF`_
+:   Typical Response: [BE,EF]{custom-style="StringTok"}
 
 ## SPI:WRITE {-}
 
 #### Syntax {-}
 
-[SPI\<bus\>:WRITE \<data\>,\<pre_cs\>,\<post_cs\>]{custom-style="ExtensionTok"}
+[SPI\<bus\>:WRITE \<data\>,\<pre_cs\>,\<post_cs\>]{custom-style="ControlFlowTok"}
 
 :   This command sends stream of hexadecimal data into selected slave device. Also, it configures chip select pin
 for pre and post of data transfer respectively.
@@ -1311,7 +1242,7 @@ for pre and post of data transfer respectively.
 
 #### Syntax {-}
 
-[SPI\<bus\>:READ? \<length\>,\<mask\>,\<pre_cs\>,\<post_cs\>]{custom-style="ExtensionTok"}
+[SPI\<bus\>:READ? \<length\>,\<mask\>,\<pre_cs\>,\<post_cs\>]{custom-style="ControlFlowTok"}
 
 :   This query returns comma separated list of hexadecimal data from selected slave device.
 Also, it configures chip select pin for pre and post of data transfer respectively.
@@ -1338,31 +1269,15 @@ Also, it configures chip select pin for pre and post of data transfer respective
 
 `SPI0:READ? 1,AA` [// Returns a byte of data]{custom-style="CommentTok"}
 
-:   Typical Response: _`DE`_
+:   Typical Response: [DE]{custom-style="StringTok"}
 
-# ADC Subsystem
-
-```{=openxml}
-<w:sdt>
-    <w:sdtContent xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-        <w:p>
-            <w:r>
-                <w:fldChar w:fldCharType="begin" w:dirty="true" />
-                <w:instrText xml:space="preserve">TOC \o "2-2" \h \b ”adc-subsystem” \u</w:instrText>
-                <w:fldChar w:fldCharType="separate" />
-                <w:fldChar w:fldCharType="end" />
-            </w:r>
-        </w:p>
-    </w:sdtContent>
-</w:sdt>
-
-```
+# ADC Subsystem {.subsection-toc}
 
 ## ADC:READ? {.unnumbered #adc-read-query}
 
 #### Syntax {-}
 
-[ADC\<channel\>:READ?]{custom-style="ExtensionTok"}
+[ADC\<channel\>:READ?]{custom-style="ControlFlowTok"}
 
 :   This query returns ADC conversion value in range of 0 to 65535
 
@@ -1384,36 +1299,20 @@ Also, it configures chip select pin for pre and post of data transfer respective
 
 `ADC2:READ?` [// Returns voltage at ADC2 in 16bit unsigned integer]{custom-style="CommentTok"}
 
-:   Typical Response: _`32768`_
+:   Typical Response: [32768]{custom-style="StringTok"}
 
-# IEEE-488.2 Common Commands {#ieee4882-common-commands}
-
-```{=openxml}
-<w:sdt>
-    <w:sdtContent xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-        <w:p>
-            <w:r>
-                <w:fldChar w:fldCharType="begin" w:dirty="true" />
-                <w:instrText xml:space="preserve">TOC \o "2-2" \h \b ”ieee4882-common-commands” \u</w:instrText>
-                <w:fldChar w:fldCharType="separate" />
-                <w:fldChar w:fldCharType="end" />
-            </w:r>
-        </w:p>
-    </w:sdtContent>
-</w:sdt>
-
-```
+# IEEE-488.2 Common Commands {#ieee4882-common-commands .subsection-toc}
 
 ## \*IDN? {.unnumbered #idn}
 
 #### Syntax {-}
 
-[*IDN?]{custom-style="ExtensionTok"}
+[*IDN?]{custom-style="ControlFlowTok"}
 
 :   This command reads the instrument's identification string which contains four
 comma-separated fields. The first field is the manufacturer's name, the second is
 the model number of the instrument, the third is the serial number, and the fourth
-is the firmware revision in `x.y.z` style.
+is the firmware revision in [x.y.z]{custom-style="PreprocessorTok"} style.
 
 #### Returned Query Format {-}
 
@@ -1423,13 +1322,13 @@ is the firmware revision in `x.y.z` style.
 
 `*IDN?` [// Returns the instrument's identification string]{custom-style="CommentTok"}
 
-:   Typical Response: `"RaspberryPiPico,RP001,{serial},0.0.1"`
+:   Typical Response: [RaspberryPiPico,RP001,{serial},0.0.1]{custom-style="StringTok"}
 
 ## \*RST {.unnumbered #rst}
 
 #### Syntax {-}
 
-[*RST]{custom-style="ExtensionTok"}
+[*RST]{custom-style="ControlFlowTok"}
 
 :   This command resets the target device, including System clock,
 GPIO mode and state, I2C and SPI bus clock, SPI chip select pin polarity and state.
@@ -1438,4 +1337,4 @@ GPIO mode and state, I2C and SPI bus clock, SPI chip select pin polarity and sta
 
 `*RST` [// Resets the target device including CPU clock.]{custom-style="CommentTok"}
 
-:   Typical Response: `"Soft reset"`
+:   Typical Response: [Soft reset]{custom-style="StringTok"}
