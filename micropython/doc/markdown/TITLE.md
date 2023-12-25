@@ -1338,3 +1338,11 @@ GPIO mode and state, I2C and SPI bus clock, SPI chip select pin polarity and sta
 `*RST` [// Resets the target device including CPU clock.]{custom-style="CommentTok"}
 
 :   Typical Response: [Soft reset]{custom-style="StringTok"}
+
+# あとがき {-}
+
+- いま25日なんですが、闇落ちことEdge of Darkness版にアップデートしてるのに、
+  **Escape from Tarkov Arena 招待がまだ来てません**。悲しすぎます。
+- Pandocの公式Dockerイメージ更新が遅れてきてるのでDOCX形式にチャレンジしてみた。`pandoc/latex`2.19版使用です。
+
+\newpage
