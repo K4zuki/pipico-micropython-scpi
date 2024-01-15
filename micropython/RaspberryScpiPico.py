@@ -197,9 +197,9 @@ adc4 = machine.ADC(machine.ADC.CORE_TEMP)  # temperature sensor
 
 class PinConfig(namedtuple("PinConfig", ["mode", "value", "pull"])):
     """
-    mode: Pin.IN|OUT|OPEN_DRAIN|ALT
-    value: 1/0
-    pull: Pin.PULL_UP|PULL_DOWN
+    * ``mode``: ``Pin.IN|OUT|OPEN_DRAIN|ALT``
+    * ``value``: ``1/0``
+    * ``pull``: ``Pin.PULL_UP|PULL_DOWN``
     """
 
 
@@ -544,16 +544,10 @@ class RaspberryScpiPico(MicroScpiDevice):
             # print("cb_pin_val", pin_number, param)
             if param == str(IO_ON) or self.kw_on.match(param).match:
                 pin.init(machine.Pin.OUT, value=IO_ON)
-                vals = list(conf)
-                vals[conf.index(conf.mode)] = machine.Pin.OUT
-                vals[conf.index(conf.value)] = IO_ON
-                self.pin_conf[pin_number] = PinConfig(*vals)
+                self.pin_conf[pin_number] = PinConfig(machine.Pin.OUT, IO_ON, conf.pull)
             elif param == str(IO_OFF) or self.kw_off.match(param).match:
                 pin.init(machine.Pin.OUT, value=IO_OFF)
-                vals = list(conf)
-                vals[conf.index(conf.mode)] = machine.Pin.OUT
-                vals[conf.index(conf.value)] = IO_OFF
-                self.pin_conf[pin_number] = PinConfig(*vals)
+                self.pin_conf[pin_number] = PinConfig(machine.Pin.OUT, IO_OFF, conf.pull)
             else:
                 self.error_push(E_INVALID_PARAMETER)
         else:
@@ -594,9 +588,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
             pin.init(mode, alt=alt, pull=conf.pull)
             self.pins[pin_number] = pin
-            vals = list(conf)
-            vals[conf.index(conf.mode)] = mode
-            self.pin_conf[pin_number] = PinConfig(*vals)
+            self.pin_conf[pin_number] = PinConfig(mode, conf.value, conf.pull)
             # print(pin)
         else:
             self.error_push(E_MISSING_PARAM)
