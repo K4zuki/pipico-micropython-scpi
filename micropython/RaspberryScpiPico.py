@@ -545,11 +545,13 @@ class RaspberryScpiPico(MicroScpiDevice):
             if param == str(IO_ON) or self.kw_on.match(param).match:
                 pin.init(machine.Pin.OUT, value=IO_ON)
                 vals = list(conf)
+                vals[conf.index(conf.mode)] = machine.Pin.OUT
                 vals[conf.index(conf.value)] = IO_ON
                 self.pin_conf[pin_number] = PinConfig(*vals)
             elif param == str(IO_OFF) or self.kw_off.match(param).match:
                 pin.init(machine.Pin.OUT, value=IO_OFF)
                 vals = list(conf)
+                vals[conf.index(conf.mode)] = machine.Pin.OUT
                 vals[conf.index(conf.value)] = IO_OFF
                 self.pin_conf[pin_number] = PinConfig(*vals)
             else:
