@@ -16,7 +16,7 @@ RUN apt-get update && apt upgrade -y && \
 
 WORKDIR /raspberrypi-pico
 
-RUN git clone https://github.com/micropython/micropython
+RUN git clone https://github.com/micropython/micropython.git -b v1.22.1
 
 WORKDIR /raspberrypi-pico/micropython/
 RUN make -j4 -C mpy-cross
