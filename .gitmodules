@@ -1,0 +1,3 @@
+[submodule "doc"]
+	path = doc
+	url = git@github.com:K4zuki/pipico-micropython-scpi-doc.git
