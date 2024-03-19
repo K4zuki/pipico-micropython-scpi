@@ -20,7 +20,7 @@ jobs:
           make docker
           make firmware
         with:
-          files: pipico-micropython-scpi.uf2
+          files: micropython/build/pipico-micropython-scpi.uf2
       - name: Upload artifact files (at a push)
         uses: actions/upload-artifact@v3
         with:
