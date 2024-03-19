@@ -13,16 +13,19 @@ jobs:
         run: |
           repo=${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}
           git config --global --add safe.directory /__w/${repo}/${repo}
-      - name: Build firmware (at a tag)
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+      - name: Build firmware (at a push)
+        if: github.event_name == 'push'
         uses: softprops/action-gh-release@v2
         run: |
           make docker
           make firmware
-        with:
-          files: micropython/build/pipico-micropython-scpi.uf2
       - name: Upload artifact files (at a push)
         uses: actions/upload-artifact@v3
         with:
           path: |
             micropython/build
+      - name: Build firmware (at a tag)
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: micropython/build/pipico-micropython-scpi.uf2
