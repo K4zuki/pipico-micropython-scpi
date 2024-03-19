@@ -15,9 +15,12 @@ jobs:
           git config --global --add safe.directory /__w/${repo}/${repo}
       - name: Build firmware (at a tag)
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        uses: softprops/action-gh-release@v2
         run: |
           make docker
           make firmware
+        with:
+          files: pipico-micropython-scpi.uf2
       - name: Upload artifact files (at a push)
         uses: actions/upload-artifact@v3
         with:
