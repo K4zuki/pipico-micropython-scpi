@@ -25,4 +25,4 @@ docker:
 
 firmware:
 	cd micropython && \
-	docker run --rm -it -v $(PWD)/micropython:/root rpi-pico-build bash /root/firmware_builder.sh
+	docker run --rm -v $(PWD)/micropython:/root rpi-pico-build bash /root/firmware_builder.sh
