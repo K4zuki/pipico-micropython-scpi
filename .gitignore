@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 *.pyc
-Out/
+doc/Out/
 .DS_Store
-svg/
-pd-images/
+doc/svg/
+doc/pd-images/
