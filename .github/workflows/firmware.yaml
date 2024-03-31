@@ -68,6 +68,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            doc/Out/${TARGET//.html/}.pdf
-            doc/Out/${TARGET//.html/}.docx
-            doc/Out/${TARGET}
+            doc/Out/*.pdf
+            doc/Out/*.docx
+            doc/Out/*.html
