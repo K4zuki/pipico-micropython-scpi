@@ -9,6 +9,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+          submodules: recursive
       - name: Setup safe directory for git
         run: |
           repo=${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}
@@ -23,7 +24,7 @@ jobs:
         with:
           path: |
             micropython/build
-      - name: Build firmware (at a tag)
+      - name: Release firmware (at a tag)
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         uses: softprops/action-gh-release@v2
         with:
