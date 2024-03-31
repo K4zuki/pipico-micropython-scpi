@@ -59,7 +59,7 @@ jobs:
           DOWNLOAD_URL_BASE=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download
           TARGET=`ls doc/Out/*.html`
           TARGET=${TARGET#doc/Out/}
-          qr ${DOWNLOAD_URL_BASE}/${RELEASE_VERSION}/${TARGET//.html/}.pdf > images/QRcode.png
+          qr ${DOWNLOAD_URL_BASE}/${RELEASE_VERSION}/${TARGET//.html/}.pdf > doc/images/QRcode.png
       - name: Build document
         run: |
           make initdir apidoc
