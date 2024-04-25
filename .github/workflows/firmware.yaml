@@ -4,6 +4,8 @@ jobs:
   make-firmware:
     name: Compile firmware
     runs-on: ubuntu-latest
+    env:
+      REF: ${{ github.ref }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
