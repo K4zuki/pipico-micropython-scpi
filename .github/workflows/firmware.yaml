@@ -29,7 +29,7 @@ jobs:
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         run: |
           echo "micropython/build/pipico-micropython-scpi-${REF##*/}.uf2"
-          cp micropython/build/pipico-micropython-scpi.uf2 "micropython/build/pipico-micropython-scpi-${REF##*/}.uf2"
+          sudo mv micropython/build/pipico-micropython-scpi.uf2 "micropython/build/pipico-micropython-scpi-${REF##*/}.uf2"
       - name: Release firmware (at a tag)
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         uses: softprops/action-gh-release@v2
