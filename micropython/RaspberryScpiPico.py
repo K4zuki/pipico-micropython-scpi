@@ -77,7 +77,7 @@ import time
 
 """
 import sys
-from micropython import const
+from micropython import const, viper
 import machine
 
 import re
@@ -572,7 +572,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         else:
             self.error_push(E_SYNTAX)
 
-    @micropython.viper
+    @viper
     def set_pin_hi(self, pin: int) -> None:
         """ Viper code to set pin high
         :param int pin: IO pin 0-29
@@ -580,10 +580,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         gpio_oe_set_p = ptr32(_REG_GPIO_OE_SET)
         gpio_out_set_p = ptr32(_REG_GPIO_OUT_SET)
 
-        gpio_oe_set_p[pin] = 1
-        gpio_out_set_p[pin] = 1
+        gpio_oe_set_p[0] = 1 << pin
+        gpio_out_set_p[0] = 1 << pin
 
-    @micropython.viper
+    @viper
     def set_pin_lo(self, pin: int) -> None:
         """ Viper code to set pin low
         :param int pin: IO pin 0-29
@@ -591,26 +591,26 @@ class RaspberryScpiPico(MicroScpiDevice):
         gpio_oe_set_p = ptr32(_REG_GPIO_OE_SET)
         gpio_out_clr_p = ptr32(_REG_GPIO_OUT_CLR)
 
-        gpio_oe_set_p[pin] = 1
-        gpio_out_clr_p[pin] = 1
+        gpio_oe_set_p[0] = 1 << pin
+        gpio_out_clr_p[0] = 1 << pin
 
-    @micropython.viper
+    @viper
     def set_pin_mode_in(self, pin: int) -> None:
         """ Viper code to set a pin input mode
         :param int pin: IO pin 0-29
         """
         gpio_oe_clr_p = ptr32(_REG_GPIO_OE_CLR)
 
-        gpio_oe_clr_p[pin] = 1
+        gpio_oe_clr_p[0] = 1 << pin
 
-    @micropython.viper
+    @viper
     def set_pin_mode_out(self, pin: int) -> None:
         """ Viper code to set a pin output mode
         :param int pin: IO pin 0-29
         """
         gpio_oe_set_p = ptr32(_REG_GPIO_OE_SET)
 
-        gpio_oe_set_p[pin] = 1
+        gpio_oe_set_p[0] = 1 << pin
 
     def cb_pin_val(self, param="", opt=None):
         """
