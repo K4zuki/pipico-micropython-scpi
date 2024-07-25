@@ -77,6 +77,7 @@ import time
 
 """
 import sys
+from micropython import const
 import machine
 
 import re
@@ -150,49 +151,98 @@ E_INVALID_PARAMETER = ScpiErrorNumber(-224, "Illegal parameter value")
 E_I2C_FAIL = ScpiErrorNumber(-333, "I2C bus error")
 E_SPI_FAIL = ScpiErrorNumber(-334, "SPI bus error")
 
-pin0 = machine.Pin(0, mode=machine.Pin.OUT, value=IO_ON)  # no-error indicator
-pin1 = machine.Pin(1, mode=machine.Pin.OUT, value=IO_OFF)  # error indicator
+_NO_ERROR_PIN = const(0)
+_ERROR_PIN = const(1)
 
-sck0 = machine.Pin(2)
-mosi0 = machine.Pin(3)
-miso0 = machine.Pin(4)
+_SPI0_SCK_PIN = const(2)
+_SPI0_MOSI_PIN = const(3)
+_SPI0_MISO_PIN = const(4)
+_SPI0_CS_PIN = const(5)
+
+_I2C1_SDA_PIN = const(6)
+_I2C1_SCL_PIN = const(7)
+
+_I2C0_SDA_PIN = const(8)
+_I2C0_SCL_PIN = const(9)
+
+_SPI1_SCK_PIN = const(10)
+_SPI1_MOSI_PIN = const(11)
+_SPI1_MISO_PIN = const(12)
+_SPI1_CS_PIN = const(13)
+
+_IO14_PIN = const(14)
+_IO15_PIN = const(15)
+_IO16_PIN = const(16)
+_IO17_PIN = const(17)
+_IO18_PIN = const(18)
+_IO19_PIN = const(19)
+_IO20_PIN = const(20)
+_IO21_PIN = const(21)
+_IO22_PIN = const(22)
+
+_IO23_PIN = const(23)
+_IO24_PIN = const(24)
+
+_IO25_PIN = const(25)
+
+_ADC0_PIN = const(26)
+_ADC1_PIN = const(27)
+_ADC2_PIN = const(28)
+_ADC3_PIN = const(29)
+
+pin0 = machine.Pin(_NO_ERROR_PIN, mode=machine.Pin.OUT, value=IO_ON)  # no-error indicator
+pin1 = machine.Pin(_ERROR_PIN, mode=machine.Pin.OUT, value=IO_OFF)  # error indicator
+
+sck0 = machine.Pin(_SPI0_SCK_PIN)
+mosi0 = machine.Pin(_SPI0_MOSI_PIN)
+miso0 = machine.Pin(_SPI0_MISO_PIN)
 spi0 = machine.SPI(0, sck=sck0, mosi=mosi0, miso=miso0)
-cs0 = machine.Pin(5, mode=machine.Pin.OUT, value=IO_ON)
+cs0 = machine.Pin(_SPI0_CS_PIN, mode=machine.Pin.OUT, value=IO_ON)
 
-sda1 = machine.Pin(6)
-scl1 = machine.Pin(7)
+sda1 = machine.Pin(_I2C1_SDA_PIN)
+scl1 = machine.Pin(_I2C1_SCL_PIN)
 i2c1 = machine.I2C(1, scl=scl1, sda=sda1)
 
-sda0 = machine.Pin(8)
-scl0 = machine.Pin(9)
+sda0 = machine.Pin(_I2C0_SDA_PIN)
+scl0 = machine.Pin(_I2C0_SCL_PIN)
 i2c0 = machine.I2C(0, scl=scl0, sda=sda0)
 
-sck1 = machine.Pin(10)
-mosi1 = machine.Pin(11)
-miso1 = machine.Pin(12)
+sck1 = machine.Pin(_SPI1_SCK_PIN)
+mosi1 = machine.Pin(_SPI1_MOSI_PIN)
+miso1 = machine.Pin(_SPI1_MISO_PIN)
 spi1 = machine.SPI(1, sck=sck1, mosi=mosi1, miso=miso1)
-cs1 = machine.Pin(13, mode=machine.Pin.OUT, value=IO_ON)
+cs1 = machine.Pin(_SPI1_CS_PIN, mode=machine.Pin.OUT, value=IO_ON)
 
-pin14 = machine.Pin(14, machine.Pin.IN)
-pin15 = machine.Pin(15, machine.Pin.IN)
-pin16 = machine.Pin(16, machine.Pin.IN)
-pin17 = machine.Pin(17, machine.Pin.IN)
-pin18 = machine.Pin(18, machine.Pin.IN)
-pin19 = machine.Pin(19, machine.Pin.IN)
-pin20 = machine.Pin(20, machine.Pin.IN)
-pin21 = machine.Pin(21, machine.Pin.IN)
-pin22 = machine.Pin(22, machine.Pin.IN)
+pin14 = machine.Pin(_IO14_PIN, machine.Pin.IN)
+pin15 = machine.Pin(_IO15_PIN, machine.Pin.IN)
+pin16 = machine.Pin(_IO16_PIN, machine.Pin.IN)
+pin17 = machine.Pin(_IO17_PIN, machine.Pin.IN)
+pin18 = machine.Pin(_IO18_PIN, machine.Pin.IN)
+pin19 = machine.Pin(_IO19_PIN, machine.Pin.IN)
+pin20 = machine.Pin(_IO20_PIN, machine.Pin.IN)
+pin21 = machine.Pin(_IO21_PIN, machine.Pin.IN)
+pin22 = machine.Pin(_IO22_PIN, machine.Pin.IN)
 
-pin23 = machine.Pin(23)  # Regulator PWM(Hi)-PFM(Lo) switch
-pin24 = machine.Pin(24)  # VBUS sense
+pin23 = machine.Pin(_IO23_PIN)  # Regulator PWM(Hi)-PFM(Lo) switch
+pin24 = machine.Pin(_IO24_PIN)  # VBUS sense
 
-pin25 = machine.Pin(25, machine.Pin.OUT, value=IO_OFF)  # Onboard LED
+pin25 = machine.Pin(_IO25_PIN, machine.Pin.OUT, value=IO_OFF)  # Onboard LED
 
-adc0 = machine.ADC(machine.Pin(26))
-adc1 = machine.ADC(machine.Pin(27))
-adc2 = machine.ADC(machine.Pin(28))
-adc3 = machine.ADC(machine.Pin(29))  # VSYS/3
+adc0 = machine.ADC(machine.Pin(_ADC0_PIN))
+adc1 = machine.ADC(machine.Pin(_ADC1_PIN))
+adc2 = machine.ADC(machine.Pin(_ADC2_PIN))
+adc3 = machine.ADC(machine.Pin(_ADC3_PIN))  # VSYS/3
 adc4 = machine.ADC(machine.ADC.CORE_TEMP)  # temperature sensor
+
+_REG_GPIO_OUT = const(0xD0000010)
+_REG_GPIO_OUT_SET = const(0xD0000014)
+_REG_GPIO_OUT_CLR = const(0xD0000018)
+_REG_GPIO_OUT_XOR = const(0xD000001C)
+
+_REG_GPIO_OE = const(0xD0000020)
+_REG_GPIO_OE_SET = const(0xD0000024)
+_REG_GPIO_OE_CLR = const(0xD0000028)
+_REG_GPIO_OE_XOR = const(0xD000002C)
 
 
 class PinConfig(namedtuple("PinConfig", ["mode", "value", "pull"])):
@@ -522,6 +572,46 @@ class RaspberryScpiPico(MicroScpiDevice):
         else:
             self.error_push(E_SYNTAX)
 
+    @micropython.viper
+    def set_pin_hi(self, pin: int) -> None:
+        """ Viper code to set pin high
+        :param int pin: IO pin 0-29
+        """
+        gpio_oe_set_p = ptr32(_REG_GPIO_OE_SET)
+        gpio_out_set_p = ptr32(_REG_GPIO_OUT_SET)
+
+        gpio_oe_set_p[pin] = 1
+        gpio_out_set_p[pin] = 1
+
+    @micropython.viper
+    def set_pin_lo(self, pin: int) -> None:
+        """ Viper code to set pin low
+        :param int pin: IO pin 0-29
+        """
+        gpio_oe_set_p = ptr32(_REG_GPIO_OE_SET)
+        gpio_out_clr_p = ptr32(_REG_GPIO_OUT_CLR)
+
+        gpio_oe_set_p[pin] = 1
+        gpio_out_clr_p[pin] = 1
+
+    @micropython.viper
+    def set_pin_mode_in(self, pin: int) -> None:
+        """ Viper code to set a pin input mode
+        :param int pin: IO pin 0-29
+        """
+        gpio_oe_clr_p = ptr32(_REG_GPIO_OE_CLR)
+
+        gpio_oe_clr_p[pin] = 1
+
+    @micropython.viper
+    def set_pin_mode_out(self, pin: int) -> None:
+        """ Viper code to set a pin output mode
+        :param int pin: IO pin 0-29
+        """
+        gpio_oe_set_p = ptr32(_REG_GPIO_OE_SET)
+
+        gpio_oe_set_p[pin] = 1
+
     def cb_pin_val(self, param="", opt=None):
         """
         - PIN[14|15|16|17|18|19|20|21|22|25]:VALue[?] 0|1|OFF|ON
@@ -543,10 +633,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         elif param is not None:
             # print("cb_pin_val", pin_number, param)
             if param == str(IO_ON) or self.kw_on.match(param).match:
-                pin.init(machine.Pin.OUT, value=IO_ON)
+                self.set_pin_hi(pin_number)
                 self.pin_conf[pin_number] = PinConfig(machine.Pin.OUT, IO_ON, conf.pull)
             elif param == str(IO_OFF) or self.kw_off.match(param).match:
-                pin.init(machine.Pin.OUT, value=IO_OFF)
+                self.set_pin_lo(pin_number)
                 self.pin_conf[pin_number] = PinConfig(machine.Pin.OUT, IO_OFF, conf.pull)
             else:
                 self.error_push(E_INVALID_PARAMETER)
