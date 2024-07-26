@@ -31,4 +31,5 @@ pico = RaspberryScpiPico()
 while True:
     line = gets().strip()
     if len(line) > 0:
-        pico.parse_and_process(line)
+        for _line in line.split(";"):
+            pico.parse_and_process(_line)
