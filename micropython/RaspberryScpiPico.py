@@ -537,7 +537,6 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - MACHINE:FREQuency[?] num
 
-        :return:
         """
 
         machine_freq = param
@@ -565,9 +564,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - ``SYSTem:ERRor?``
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         query = (opt[-1] == "?")
@@ -591,9 +589,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - ``PIN?``
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         query = (opt[-1] == "?")
@@ -620,9 +617,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - PIN[14|15|16|17|18|19|20|21|22|25]:VALue[?] 0|1|OFF|ON
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         pin_number = int(opt[0])
@@ -651,9 +647,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - PIN[14|15|16|17|18|19|20|21|22|25]:MODE INput|OUTput|ODrain|PWM
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         pin_number = int(opt[0])
@@ -694,9 +689,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         - PIN[14|15|16|17|18|19|20|21|22|25]:ON
         - PIN[14|15|16|17|18|19|20|21|22|25]:OFF
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         pin_number = int(opt[0])
@@ -714,9 +708,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         - PIN[14|15|16|17|18|19|20|21|22|25]:ON
         - PIN[14|15|16|17|18|19|20|21|22|25]:OFF
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         pin_number = int(opt[0])
@@ -733,9 +726,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - PIN[14|15|16|17|18|19|20|21|22|25]:PWM:FREQuency[?] num
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         pin_number = int(opt[0])
@@ -770,9 +762,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - PIN[14|15|16|17|18|19|20|21|22|25]:PWM:DUTY[?] num
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         pin_number = int(opt[0])
@@ -807,9 +798,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - ``LED?``
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         pin_number = 25
@@ -829,9 +819,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - LED:ON
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         opt[0] = "25"
@@ -848,9 +837,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - LED:OFF
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         opt[0] = "25"
@@ -867,9 +855,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - LED:VALue[?] 0|1|OFF|ON
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         opt[0] = "25"
@@ -881,9 +868,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - LED:PWM:FREQuency[?] num
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         opt[0] = "25"
@@ -896,9 +882,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - LED:PWM:DUTY[?] num
 
-        :param param:
-        :param List[str] opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         opt[0] = "25"
@@ -911,9 +896,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - ``I2C?``
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         query = (opt[-1] == "?")
@@ -933,9 +917,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - I2C[01]:SCAN?
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         query = (opt[-1] == "?")
@@ -960,9 +943,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - I2C[01]:FREQuency[?] num
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         query = (opt[-1] == "?")
@@ -995,9 +977,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - I2C[01]:ADDRess:BIT[?] 0|1|DEFault
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         query = (opt[-1] == "?")
@@ -1033,9 +1014,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         buffer: data
         stop: 0|1
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         query = (opt[-1] == "?")
@@ -1074,9 +1054,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         length: 1-99
         stop: 0|1
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         query = (opt[-1] == "?")
@@ -1122,9 +1101,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         buf: data
         addrsize: 1|2
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         query = (opt[-1] == "?")
@@ -1170,9 +1148,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         nbytes: 1-99
         addrsize: 1|2
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         query = (opt[-1] == "?")
@@ -1215,9 +1192,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - ADC[01234]:READ?
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         query = (opt[-1] == "?")
@@ -1235,9 +1211,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - ``SPI?``
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         query = (opt[-1] == "?")
@@ -1257,9 +1232,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - SPI[01]:CSEL:POLarity[?] 0|1|DEFault
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         query = (opt[-1] == "?")
@@ -1292,9 +1266,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - SPI[01]:CSEL:VALue[?] 0|1|OFF|ON
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         query = (opt[-1] == "?")
@@ -1323,7 +1296,6 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         :param param:
         :param opt:
-        :return:
         """
 
         query = (opt[-1] == "?")
@@ -1368,7 +1340,6 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         :param param:
         :param opt:
-        :return:
         """
 
         query = (opt[-1] == "?")
@@ -1410,7 +1381,6 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         :param param:
         :param opt:
-        :return:
         """
 
         query = (opt[-1] == "?")
@@ -1454,7 +1424,6 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         :param param:
         :param opt:
-        :return:
         """
         query = (opt[-1] == "?")
         bus_number = int(opt[0])
@@ -1489,9 +1458,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
         - ``SPI[01]:READ? length,mask,pre_cs,post_cs``
 
-        :param param:
-        :param opt:
-        :return:
+        :param str param: parameter string
+        :param list(str) | none opt: list of option strings
         """
 
         query = (opt[-1] == "?")
