@@ -22,7 +22,7 @@ jobs:
           make firmware
           sudo mv micropython/build/pipico-micropython-scpi.uf2 "micropython/build/pipico-micropython-scpi-${REF##*/}.uf2"
       - name: Upload artifact files (at a push)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: |
             micropython/build
