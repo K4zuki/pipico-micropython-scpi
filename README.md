@@ -14,3 +14,8 @@ Experimental repo for an SCPI device emulation using **Raspberry Pi Pico** + **m
 1. Clone the repository
 2. Run `make docker` to build a Docker image
 3. Run `make firmware` to build the UF2 firmware, which appears in `build` directory
+
+# Documentation
+
+[
+`c103` tag](https://github.com/K4zuki/pipico-micropython-scpi/releases/tag/c103) is old but stable version with API document PDF prepared.
