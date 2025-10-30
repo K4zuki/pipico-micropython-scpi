@@ -268,4 +268,17 @@ class TMCInterface(Interface):
         # possible return values.
 
         # Handle standard and class-specific interface control transfers
+        bmRequestType, bRequest, wValue, wIndex, wLength = struct.unpack("BBHHH", request)
+
+        recipient, req_type, data_direction = split_bmRequestType(bmRequestType)
+
+        if stage == _STAGE_SETUP:
+            if req_type == _REQ_TYPE_STANDARD:
+                # HID Spec p48: 7.1 Standard Requests
+                return False  # Unsupported request
+            elif req_type == _REQ_TYPE_CLASS:
+                # HID Spec p50: 7.2 Class-Specific Requests
+                if bRequest == _REQ_CONTROL_GET_CAPABILITIES:
+                    return self.get_capabilities()
+            return False  # Unsupported request
         return False  # Unsupported request
