@@ -142,12 +142,17 @@ _REQ_CONTROL_INDICATOR_PULSE = const(64)
 
 
 class TMCInterface(Interface):
-    def __init__(self, **kwargs):
+    def __init__(self,
+                 protocol=_PROTOCOL_NONE,
+                 interface_str=None,
+                 ):
         super().__init__()
         self.ep_out = None  # Set during enumeration. RX direction (host to device)
         self.ep_in = None  # TX direction (device to host)
         self._rx = Buffer(64)
         self._tx = Buffer(64)
+        self.protocol = protocol
+        self.interface_str = interface_str
 
     def desc_cfg(self, desc, itf_num, ep_num, strs):
         # Function to build configuration descriptor contents for this interface
@@ -158,7 +163,16 @@ class TMCInterface(Interface):
         #
         # - At least one standard Interface descriptor (can call
         # - desc.interface()).
-        desc.interface(itf_num, 0, _INTERFACE_CLASS_TMC, _INTERFACE_SUBCLASS_TMC, _PROTOCOL_488)
+        desc.interface(itf_num,
+                       0,
+                       _INTERFACE_CLASS_TMC,
+                       _INTERFACE_SUBCLASS_TMC,
+                       self.protocol,
+                       len(strs) if self.interface_str else 0,
+                       )
+
+        if self.interface_str:
+            strs.append(self.interface_str)
 
         # Plus, optionally:
         #
