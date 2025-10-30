@@ -81,4 +81,4 @@ class TMCInterface(Interface):
         #
         # This value can be zero, if the USB Host only communicates with this
         # interface using control transfers.
-        return 2  # 1x Bulk + 1x Interrupt
+        return 2  # 1x Bulk IN|OUT + 1x Interrupt IN
