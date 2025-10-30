@@ -202,4 +202,56 @@ class TMCInterface(Interface):
         #
         # This value can be zero, if the USB Host only communicates with this
         # interface using control transfers.
+        """
+        A USBTMC interface with a bInterfaceProtocol = 0x00 must have exactly one Bulk-OUT endpoint, exactly
+        one Bulk-IN endpoint, and may have at most one Interrupt-IN endpoint. Additional endpoints must be
+        placed in another interface.
+        """
         return 2  # 1x Bulk IN|OUT + 1x Interrupt IN
+
+    def on_device_control_xfer(self, stage, request):
+        # Control transfer callback. Override to handle a non-standard device
+        # control transfer where bmRequestType Recipient is Device, Type is
+        # utils.REQ_TYPE_CLASS, and the lower byte of wIndex indicates this interface.
+        #
+        # (See USB 2.0 specification 9.4 Standard Device Requests, p250).
+        #
+        # This particular request type seems pretty uncommon for a device class
+        # driver to need to handle, most hosts will not send this so most
+        # implementations won't need to override it.
+        #
+        # Parameters:
+        #
+        # - stage is one of utils.STAGE_SETUP, utils.STAGE_DATA, utils.STAGE_ACK.
+        #
+        # - request is a memoryview into a USB request packet, as per USB 2.0
+        #   specification 9.3 USB Device Requests, p250.  the memoryview is only
+        #   valid while the callback is running.
+        #
+        # The function can call split_bmRequestType(request[0]) to split
+        # bmRequestType into (Recipient, Type, Direction).
+        #
+        # Result, any of:
+        #
+        # - True to continue the request, False to STALL the endpoint.
+        # - Buffer interface object to provide a buffer to the host as part of the
+        #   transfer, if applicable.
+        return False
+
+    def on_interface_control_xfer(self, stage, request):
+        # Control transfer callback. Override to handle a device control
+        # transfer where bmRequestType Recipient is Interface, and the lower byte
+        # of wIndex indicates this interface.
+        #
+        # (See USB 2.0 specification 9.4 Standard Device Requests, p250).
+        #
+        # bmRequestType Type field may have different values. It's not necessary
+        # to handle the mandatory Standard requests (bmRequestType Type ==
+        # utils.REQ_TYPE_STANDARD), if the driver returns False in these cases then
+        # TinyUSB will provide the necessary responses.
+        #
+        # See on_device_control_xfer() for a description of the arguments and
+        # possible return values.
+
+        # Handle standard and class-specific interface control transfers
+        return False  # Unsupported request
