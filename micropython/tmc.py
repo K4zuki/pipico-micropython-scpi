@@ -1,4 +1,4 @@
-# MicroPython USB tmc module
+# MicroPython USB TMC module
 #
 # Test and Measurement Class
 #
