@@ -289,7 +289,8 @@ class TMCInterface(Interface):
         one Bulk-IN endpoint, and may have at most one Interrupt-IN endpoint. Additional endpoints must be
         placed in another interface.
         """
-        return 2  # 1x Bulk IN|OUT + 1x Interrupt IN
+        # 1x Bulk IN|OUT + ~1x Interrupt IN
+        return 1 + (1 if self.interrupt_ep else 0)
 
     def on_device_control_xfer(self, stage, request):
         # Control transfer callback. Override to handle a non-standard device
