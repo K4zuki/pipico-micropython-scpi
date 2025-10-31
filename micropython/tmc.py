@@ -142,14 +142,14 @@ Table 15 -- USBTMC bRequest values
 ------------------------------------------------------------------------------------------------------------------------
 """
 # USBTMC bRequest values
-_REQ_CONTROL_INITIATE_ABORT_BULK_OUT = const(1)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
-_REQ_CONTROL_CHECK_ABORT_BULK_OUT_STATUS = const(2)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
-_REQ_CONTROL_INITIATE_ABORT_BULK_IN = const(3)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
-_REQ_CONTROL_CHECK_ABORT_BULK_IN_STATUS = const(4)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
-_REQ_CONTROL_INITIATE_CLEAR = const(5)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
-_REQ_CONTROL_CHECK_CLEAR_STATUS = const(6)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
-_REQ_CONTROL_GET_CAPABILITIES = const(7)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
-_REQ_CONTROL_INDICATOR_PULSE = const(64)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
+_REQ_INITIATE_ABORT_BULK_OUT = const(1)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
+_REQ_CHECK_ABORT_BULK_OUT_STATUS = const(2)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
+_REQ_INITIATE_ABORT_BULK_IN = const(3)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
+_REQ_CHECK_ABORT_BULK_IN_STATUS = const(4)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
+_REQ_INITIATE_CLEAR = const(5)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
+_REQ_CHECK_CLEAR_STATUS = const(6)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
+_REQ_GET_CAPABILITIES = const(7)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
+_REQ_INDICATOR_PULSE = const(64)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
 
 """
 Table 16 -- USBTMC_status values
@@ -345,17 +345,17 @@ class TMCInterface(Interface):
             if req_type == _REQ_TYPE_STANDARD:
                 return True  # Let tinyUSB work
             elif req_type == _REQ_TYPE_CLASS:
-                if bRequest == _REQ_CONTROL_INITIATE_CLEAR:
-                    # _REQ_CONTROL_INITIATE_CLEAR = const(5)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
+                if bRequest == _REQ_INITIATE_CLEAR:
+                    # _REQ_INITIATE_CLEAR = const(5)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
                     return True
-                elif bRequest == _REQ_CONTROL_CHECK_CLEAR_STATUS:
-                    # _REQ_CONTROL_CHECK_CLEAR_STATUS = const(6)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
+                elif bRequest == _REQ_CHECK_CLEAR_STATUS:
+                    # _REQ_CHECK_CLEAR_STATUS = const(6)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
                     return True
-                elif bRequest == _REQ_CONTROL_GET_CAPABILITIES:
-                    # _REQ_CONTROL_GET_CAPABILITIES = const(7)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
+                elif bRequest == _REQ_GET_CAPABILITIES:
+                    # _REQ_GET_CAPABILITIES = const(7)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
                     return self.get_capabilities()
-                elif bRequest == _REQ_CONTROL_INDICATOR_PULSE:
-                    # _REQ_CONTROL_INDICATOR_PULSE = const(64)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
+                elif bRequest == _REQ_INDICATOR_PULSE:
+                    # _REQ_INDICATOR_PULSE = const(64)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
                     return True
             return False  # Unsupported request
         return False  # Unsupported request
@@ -385,17 +385,17 @@ class TMCInterface(Interface):
             if req_type == _REQ_TYPE_STANDARD:
                 return True  # Let tinyUSB work
             elif req_type == _REQ_TYPE_CLASS:
-                if bRequest == _REQ_CONTROL_INITIATE_ABORT_BULK_OUT:
-                    # _REQ_CONTROL_INITIATE_ABORT_BULK_OUT = const(1)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
+                if bRequest == _REQ_INITIATE_ABORT_BULK_OUT:
+                    # _REQ_INITIATE_ABORT_BULK_OUT = const(1)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
                     return True
-                elif bRequest == _REQ_CONTROL_CHECK_ABORT_BULK_OUT_STATUS:
-                    # _REQ_CONTROL_CHECK_ABORT_BULK_OUT_STATUS = const(2)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
+                elif bRequest == _REQ_CHECK_ABORT_BULK_OUT_STATUS:
+                    # _REQ_CHECK_ABORT_BULK_OUT_STATUS = const(2)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
                     return True
-                elif bRequest == _REQ_CONTROL_INITIATE_ABORT_BULK_IN:
-                    # _REQ_CONTROL_INITIATE_ABORT_BULK_IN = const(3)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
+                elif bRequest == _REQ_INITIATE_ABORT_BULK_IN:
+                    # _REQ_INITIATE_ABORT_BULK_IN = const(3)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
                     return True
-                elif bRequest == _REQ_CONTROL_CHECK_ABORT_BULK_IN_STATUS:
-                    # _REQ_CONTROL_CHECK_ABORT_BULK_IN_STATUS = const(4)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
+                elif bRequest == _REQ_CHECK_ABORT_BULK_IN_STATUS:
+                    # _REQ_CHECK_ABORT_BULK_IN_STATUS = const(4)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
                     return True
             return False  # Unsupported request
         return False  # Unsupported request
