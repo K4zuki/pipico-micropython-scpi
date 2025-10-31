@@ -80,8 +80,7 @@ Table 14 -- USBTMC class specific request format
 |       |               |       |           |           specified in this USBTMC specification and for all
 |       |               |       |           |           control endpoint requests specified in USBTMC
 |       |               |       |           |           subclass specifications.
-|       |               |       |           |D4...D0
-|       |               |       |           |           Recipient               0 - Device
+|       |               |       |           |D4...D0    Recipient               0 - Device
 |       |               |       |           |                                   1 - Interface
 |       |               |       |           |                                   2 - Endpoint
 |       |               |       |           |                                   3 - Other
