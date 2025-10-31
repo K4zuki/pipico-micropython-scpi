@@ -230,6 +230,71 @@ Table 37 -- GET_CAPABILITIES response format
 """
 _bcdUSBTMC = const(0x0100)
 
+"""
+3.2 Bulk-OUT endpoint
+The Host uses the Bulk-OUT endpoint to send USBTMC command messages to the device. For all Bulk-
+OUT USBTMC command messages, whether defined in this specification, a USBTMC subclass
+specification, or some other specification, the Host must begin the first USB transaction in each Bulk-OUT
+transfer of command message content with a Bulk-OUT Header. The Bulk-OUT Header is defined below
+in Table 1.
+
+Table 1 -- USBTMC message Bulk-OUT Header
+------------------------------------------------------------------------------------------------------------------------
+|Offset |Field              |Size   |Value              |Description
+------------------------------------------------------------------------------------------------------------------------
+|0      |MsgID              |1      |Value              |Specifies the USBTMC message and the type of the
+|       |                   |       |                   |USBTMC message. See Table 2.
+|1      |bTag               |1      |Value              |A transfer identifier. The Host must set bTag
+|       |                   |       |                   |different than the bTag used in the previous Bulk-
+|       |                   |       |                   |OUT Header. The Host should increment the bTag
+|       |                   |       |                   |by 1 each time it sends a new Bulk-OUT Header.
+|       |                   |       |                   |The Host must set bTag such that 1<=bTag<=255.
+|2      |bTagInverse        |1      |Value              |The inverse (one’s complement) of the bTag. For
+|       |                   |       |                   |example, the bTagInverse of 0x5B is 0xA4.
+|3      |Reserved           |1      |0x00               |Reserved. Must be 0x00.
+|4-11   |USBTMC command     |8      |USBTMC command     |USBTMC command message specific. See section
+|       |message specific   |       |message specific   |3.2.1.
+------------------------------------------------------------------------------------------------------------------------
+
+Table 2 -- MsgID values
+------------------------------------------------------------------------------------------------------------------------
+|MsgID      |Direction                  |MACRO                      |Description
+|           |OUT=Host-to-device         |                           |
+|           |IN=Device-to-Host          |                           |
+------------------------------------------------------------------------------------------------------------------------
+|0          |Reserved                   |Reserved                   |Reserved
+|1          |OUT                        |DEV_DEP_MSG_OUT            |The USBTMC message is a USBTMC device dependent
+|           |                           |                           |command message. See section 3.2.1.1.
+|           |IN                         |(no defined response)      |There is no defined response for this USBTMC command
+|           |                           |                           |message.
+|2          |OUT                        |REQUEST_DEV_DEP_MSG_IN     |The USBTMC message is a USBTMC command message
+|           |                           |                           |that requests the device to send a USBTMC response
+|           |                           |                           |message on the Bulk-IN endpoint. See section 3.2.1.2.
+|           |IN                         |DEV_DEP_MSG_IN             |The USBTMC message is a USBTMC response message to
+|           |                           |                           |the REQUEST_DEV_DEP_MSG_IN. See section 3.3.1.1.
+|3-125      |Reserved                   |Reserved                   |Reserved for USBTMC use.
+|126        |OUT                        |VENDOR_SPECIFIC_OUT        |The USBTMC message is a USBTMC vendor specific
+|           |                           |                           |command message. See section 3.2.1.3.
+|           |IN                         |(no defined response)      |There is no defined response for this USBTMC command
+|           |                           |                           |message.
+|127        |OUT                        |REQUEST_VENDOR_SPECIFIC_IN |The USBTMC message is a USBTMC command message
+|           |                           |                           |that requests the device to send a vendor specific USBTMC
+|           |                           |                           |response message on the Bulk-IN endpoint. See section
+|           |                           |                           |3.2.1.4
+|           |IN                         |VENDOR_SPECIFIC_IN         |The USBTMC message is a USBTMC response message to
+|           |                           |                           |the REQUEST_VENDOR_SPECIFIC_IN. See section
+|           |                           |                           |3.3.1.2.
+|128-191    |Reserved                   |Reserved                   |Reserved for USBTMC subclass use.
+|192-255    |Reserved                   |Reserved                   |Reserved for VISA specification use.
+------------------------------------------------------------------------------------------------------------------------
+"""
+_MSGID_DEV_DEP_MSG_OUT = const(1)
+_MSGID_REQUEST_DEV_DEP_MSG_IN = const(2)
+_MSGID_DEV_DEP_MSG_IN = const(2)
+_MSGID_VENDOR_SPECIFIC_OUT = const(126)
+_MSGID_REQUEST_VENDOR_SPECIFIC_IN = const(127)
+_MSGID_VENDOR_SPECIFIC_IN = const(127)
+
 
 class TMCInterface(Interface):
     def __init__(self,
