@@ -343,12 +343,20 @@ class TMCInterface(Interface):
 
         if stage == _STAGE_SETUP:
             if req_type == _REQ_TYPE_STANDARD:
-                # HID Spec p48: 7.1 Standard Requests
-                return False  # Unsupported request
+                return True  # Let tinyUSB work
             elif req_type == _REQ_TYPE_CLASS:
-                # HID Spec p50: 7.2 Class-Specific Requests
-                if bRequest == _REQ_CONTROL_GET_CAPABILITIES:
+                if bRequest == _REQ_CONTROL_INITIATE_CLEAR:
+                    # _REQ_CONTROL_INITIATE_CLEAR = const(5)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
+                    return True
+                elif bRequest == _REQ_CONTROL_CHECK_CLEAR_STATUS:
+                    # _REQ_CONTROL_CHECK_CLEAR_STATUS = const(6)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
+                    return True
+                elif bRequest == _REQ_CONTROL_GET_CAPABILITIES:
+                    # _REQ_CONTROL_GET_CAPABILITIES = const(7)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
                     return self.get_capabilities()
+                elif bRequest == _REQ_CONTROL_INDICATOR_PULSE:
+                    # _REQ_CONTROL_INDICATOR_PULSE = const(64)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
+                    return True
             return False  # Unsupported request
         return False  # Unsupported request
 
