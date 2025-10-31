@@ -340,3 +340,43 @@ class TMCInterface(Interface):
                     return self.get_capabilities()
             return False  # Unsupported request
         return False  # Unsupported request
+
+    def on_endpoint_control_xfer(self, stage, request):
+        # Control transfer callback. Override to handle a device
+        # control transfer where bmRequestType Recipient is Endpoint and
+        # the lower byte of wIndex indicates an endpoint address associated
+        # with this interface.
+        #
+        # bmRequestType Type will generally have any value except
+        # utils.REQ_TYPE_STANDARD, as Standard endpoint requests are handled by
+        # TinyUSB. The exception is the the Standard "Set Feature" request. This
+        # is handled by Tiny USB but also passed through to the driver in case it
+        # needs to change any internal state, but most drivers can ignore and
+        # return False in this case.
+        #
+        # (See USB 2.0 specification 9.4 Standard Device Requests, p250).
+        #
+        # See on_device_control_xfer() for a description of the parameters and
+        # possible return values.
+        bmRequestType, bRequest, wValue, wIndex, wLength = struct.unpack("BBHHH", request)
+
+        recipient, req_type, data_direction = split_bmRequestType(bmRequestType)
+
+        if stage == _STAGE_SETUP:
+            if req_type == _REQ_TYPE_STANDARD:
+                return True  # Let tinyUSB work
+            elif req_type == _REQ_TYPE_CLASS:
+                if bRequest == _REQ_CONTROL_INITIATE_ABORT_BULK_OUT:
+                    # _REQ_CONTROL_INITIATE_ABORT_BULK_OUT = const(1)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
+                    return True
+                elif bRequest == _REQ_CONTROL_CHECK_ABORT_BULK_OUT_STATUS:
+                    # _REQ_CONTROL_CHECK_ABORT_BULK_OUT_STATUS = const(2)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
+                    return True
+                elif bRequest == _REQ_CONTROL_INITIATE_ABORT_BULK_IN:
+                    # _REQ_CONTROL_INITIATE_ABORT_BULK_IN = const(3)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
+                    return True
+                elif bRequest == _REQ_CONTROL_CHECK_ABORT_BULK_IN_STATUS:
+                    # _REQ_CONTROL_CHECK_ABORT_BULK_IN_STATUS = const(4)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
+                    return True
+            return False  # Unsupported request
+        return False  # Unsupported request
