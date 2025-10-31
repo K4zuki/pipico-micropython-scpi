@@ -151,6 +151,47 @@ _REQ_CONTROL_CHECK_CLEAR_STATUS = const(6)  # 0xA1 (Dir = IN, Type = Class, Reci
 _REQ_CONTROL_GET_CAPABILITIES = const(7)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
 _REQ_CONTROL_INDICATOR_PULSE = const(64)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
 
+"""
+Table 16 -- USBTMC_status values
+------------------------------------------------------------------------------------------------------------------------
+|USBTMC_status  |MACRO              |Recommended    |Description
+|               |                   |interpretation |
+|               |                   |by Host        |
+|               |                   |software       |
+------------------------------------------------------------------------------------------------------------------------
+|0x00           |Reserved           |Reserved       |Reserved
+|0x01           |STATUS_SUCCESS     |Success        |Success
+|0x02           |STATUS_PENDING     |Warning        |This status is valid if a device has received a
+|               |                   |               |USBTMC split transaction CHECK_STATUS
+|               |                   |               |request and the request is still being processed.
+|               |                   |               |See 4.2.1.1.
+|0x03-0x1F      |Reserved           |Warning        |Reserved for USBTMC use.
+|0x20-0x3F      |Reserved           |Warning        |Reserved for subclass use.
+|0x40-0x7F      |Reserved           |Warning        |Reserved for VISA use.
+|0x80           |STATUS_FAILED      |Failure        |Failure, unspecified reason, and a more specific
+|               |                   |               |USBTMC_status is not defined.
+|0x81           |STATUS_TRANSFER_   |               |This status is only valid if a device has received
+|               |NOT_IN_PROGRESS    |               |an INITIATE_ABORT_BULK_OUT or
+|               |                   |               |INITIATE_ABORT_BULK_IN request and the
+|               |                   |               |specified transfer to abort is not in progress.
+|0x82           |STATUS_SPLIT_NOT_  |               |Failure This status is valid if the device received a
+|               |IN_PROGRESS        |               |CHECK_STATUS request and the device is not
+|               |                   |               |processing an INITIATE request.
+|0x83           |STATUS_SPLIT_      |Failure        |This status is valid if the device received a new
+|               |IN_PROGRESS        |               |class-specific request and the device is still
+|               |                   |               |processing an INITIATE.
+|0x84-0x9F      |Reserved           |Failure        |Reserved for USBTMC use.
+|0xA0-0xBF      |Reserved           |Failure        |Reserved for subclass use.
+|0xC0-0xFF      |Reserved           |Failure        |Reserved for VISA use.
+------------------------------------------------------------------------------------------------------------------------
+"""
+_TMC_STATUS_SUCCESS = const(0x01)
+_TMC_STATUS_PENDING = const(0x02)
+_TMC_STATUS_FAILED = const(0x80)
+_TMC_STATUS_TRANSFER_NOT_IN_PROGRESS = const(0x81)
+_TMC_STATUS_SPLIT_NOT_IN_PROGRESS = const(0x82)
+_TMC_STATUS_SPLIT_IN_PROGRESS = const(0x83)
+
 
 class TMCInterface(Interface):
     def __init__(self,
