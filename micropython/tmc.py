@@ -342,7 +342,7 @@ class TMCInterface(Interface):
 
         if stage == _STAGE_SETUP:
             if req_type == _REQ_TYPE_STANDARD:
-                return True  # Let tinyUSB work
+                return False  # Let tinyUSB work
             elif req_type == _REQ_TYPE_CLASS:
                 if bRequest == _REQ_INITIATE_CLEAR:
                     # _REQ_INITIATE_CLEAR = const(5)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
@@ -356,7 +356,10 @@ class TMCInterface(Interface):
                 elif bRequest == _REQ_INDICATOR_PULSE:
                     # _REQ_INDICATOR_PULSE = const(64)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
                     return True
-            return False  # Unsupported request
+                else:
+                    return False  # Unsupported request
+            else:
+                return False  # Unsupported request
         return False  # Unsupported request
 
     def on_endpoint_control_xfer(self, stage, request):
@@ -382,7 +385,7 @@ class TMCInterface(Interface):
 
         if stage == _STAGE_SETUP:
             if req_type == _REQ_TYPE_STANDARD:
-                return True  # Let tinyUSB work
+                return False  # Let tinyUSB work
             elif req_type == _REQ_TYPE_CLASS:
                 if bRequest == _REQ_INITIATE_ABORT_BULK_OUT:
                     # _REQ_INITIATE_ABORT_BULK_OUT = const(1)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
@@ -396,5 +399,8 @@ class TMCInterface(Interface):
                 elif bRequest == _REQ_CHECK_ABORT_BULK_IN_STATUS:
                     # _REQ_CHECK_ABORT_BULK_IN_STATUS = const(4)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
                     return True
-            return False  # Unsupported request
+                else:
+                    return False  # Unsupported request
+            else:
+                return False  # Unsupported request
         return False  # Unsupported request
