@@ -443,3 +443,6 @@ class TMCInterface(Interface):
             else:
                 return False  # Unsupported request
         return False  # Unsupported request
+
+    def get_capabilities(self):
+        pass
