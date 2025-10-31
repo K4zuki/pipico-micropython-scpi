@@ -191,6 +191,45 @@ _TMC_STATUS_TRANSFER_NOT_IN_PROGRESS = const(0x81)
 _TMC_STATUS_SPLIT_NOT_IN_PROGRESS = const(0x82)
 _TMC_STATUS_SPLIT_IN_PROGRESS = const(0x83)
 
+"""
+Table 37 -- GET_CAPABILITIES response format
+------------------------------------------------------------------------------------------------------------------------
+|Offset         |Field          |Size   |Value      |Description
+------------------------------------------------------------------------------------------------------------------------
+|0              |USBTMC_status  |1      |Value      |Status indication for this request. See Table 16.
+|1              |Reserved       |1      |0x00       |Reserved. Must be 0x00.
+|2              |bcdUSBTMC      |2      |BCD        |BCD version number of the relevant USBTMC specification for
+|               |               |       |(0x0100 or |this USBTMC interface. Format is as specified for bcdUSB in the
+|               |               |       |greater)   |USB 2.0 specification, section 9.6.1.
+|4              |USBTMC         |1      |Bitmap     |D7...D3    |Reserved. All bits must be 0.
+|               |Interface      |       |           |D2         |1 – The USBTMC interface accepts the
+|               |Capabilities   |       |           |           |INDICATOR_PULSE request.
+|               |               |       |           |           |0 – The USBTMC interface does not accept the
+|               |               |       |           |           |INDICATOR_PULSE request. The device, when
+|               |               |       |           |           |an INDICATOR_PULSE request is received,
+|               |               |       |           |           |must treat this command as a non-defined
+|               |               |       |           |           |command and return a STALL handshake
+|               |               |       |           |           |packet.
+|               |               |       |           |D1         |1 – The USBTMC interface is talk-only.
+|               |               |       |           |           |0 – The USBTMC interface is not talk-only.
+|               |               |       |           |D0         |1 – The USBTMC interface is listen-only.
+|               |               |       |           |           |0 – The USBTMC interface is not listen-only.
+|5              |USBTMC         |1      |Bitmap     |D7...D1    |Reserved. All bits must be 0.
+|               |Device         |       |           |D0         |1 – The device supports ending a Bulk-IN transfer
+|               |Capabilities   |       |           |           |from this USBTMC interface when a byte
+|               |               |       |           |           |matches a specified TermChar.
+|               |               |       |           |           |0 – The device does not support ending a Bulk-IN
+|               |               |       |           |           |transfer from this USBTMC interface when a
+|               |               |       |           |           |byte matches a specified TermChar.
+|6              |Reserved       |6      |All bytes  |Reserved for USBTMC use. All bytes must be 0x00.
+|               |               |       |must be    |
+|               |               |       |0x00.      |
+|12             |Reserved       |12     |Reserved   |Reserved for USBTMC subclass use. If no subclass specification
+|               |               |       |           |applies, all bytes must be 0x00.
+------------------------------------------------------------------------------------------------------------------------
+"""
+_bcdUSBTMC = const(0x0100)
+
 
 class TMCInterface(Interface):
     def __init__(self,
