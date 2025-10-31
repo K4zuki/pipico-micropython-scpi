@@ -226,11 +226,13 @@ class TMCInterface(Interface):
                        _INTERFACE_CLASS_TMC,
                        _INTERFACE_SUBCLASS_TMC,
                        self.protocol,
-                       len(strs) if self.interface_str else 0,
+                       len(strs) if self.interface_str else 0
                        )
 
         if self.interface_str:
             strs.append(self.interface_str)
+
+            desc.endpoint(self.ep_int, "interrupt", 8, 8)
 
         # Plus, optionally:
         #
@@ -238,6 +240,14 @@ class TMCInterface(Interface):
         # - An Interface Association Descriptor, prepended before.
         # - Other class-specific configuration descriptor data.
         #
+        self.ep_out = ep_num
+        desc.endpoint(self.ep_out, "bulk", 8, 8)
+        self.ep_in = ep_num | _EP_IN_FLAG
+        desc.endpoint(self.ep_in, "bulk", 8, 8)
+
+        if self.interrupt_ep:
+            self.ep_int = (ep_num + 1) | _EP_IN_FLAG
+
         # This function is called twice per call to USBDevice.init(). The first
         # time the values of all arguments are dummies that are used only to
         # calculate the total length of the descriptor. Therefore, anything this
