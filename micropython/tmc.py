@@ -23,7 +23,9 @@ _STAGE_ACK = const(3)
 5.5 Interface Descriptor
 
 Table 43 -- Interface Descriptor
+------------------------------------------------------------------------------------------------------------------------
 |Offset |Field              |Size   |Value          |Description
+------------------------------------------------------------------------------------------------------------------------
 |0      |bLength            |1      |0x09           |Size of this descriptor in bytes.
 |1      |bDescriptorType    |1      |0x04           |INTERFACE Descriptor Type. See USB 2.0
 |       |                   |       |               |specification, Table 9-5.
@@ -41,16 +43,20 @@ Table 43 -- Interface Descriptor
 |6      |bInterfaceSubClass |1      |0x03           |Subclass code, assigned by USB-IF.
 |7      |bInterfaceProtocol |1      |Protocol       |Protocol code. See Table 44.
 |8      |iInterface         |1      |Index          |Index of string descriptor describing this interface.
+------------------------------------------------------------------------------------------------------------------------
 """
 _INTERFACE_CLASS_TMC = const(0xFE)
 _INTERFACE_SUBCLASS_TMC = const(0x03)
 
 """
 Table 44 -- USBTMC bInterfaceProtocol values
+------------------------------------------------------------------------------------------------------------------------
 |bInterfaceProtocol Value   |Description
+------------------------------------------------------------------------------------------------------------------------
 |0                          |USBTMC interface. No subclass specification applies.
 |1                          |USBTMC USB488 interface. See the USB488 subclass specification.
 |2-127                      |Reserved
+------------------------------------------------------------------------------------------------------------------------
 """
 _PROTOCOL_NONE = const(0x00)
 _PROTOCOL_488 = const(0x01)
@@ -60,7 +66,9 @@ _PROTOCOL_488 = const(0x01)
 All USBTMC class specific requests must be sent with a Setup packet as shown below in Table 14.
 
 Table 14 -- USBTMC class specific request format
+------------------------------------------------------------------------------------------------------------------------
 |Offset |Field          |Size   |Value      |Description
+------------------------------------------------------------------------------------------------------------------------
 |0      |bmRequestType  |1      |Bitmap     |D7         Data transfer direction 0 - Host-to-device
 |       |               |       |           |                                   1 - Device-to-host
 |       |               |       |           |           Varies according to request.
@@ -86,6 +94,7 @@ Table 14 -- USBTMC class specific request format
 |       |               |       |or Offset  |an index or offset. See the USB 2.0 specification, section 9.3.4.
 |6      |wLength        |2      |Count      |Number of bytes to transfer if there is a Data stage. See the USB 2.0
 |       |               |       |           |specification, section 9.3.5. Varies according to request.
+------------------------------------------------------------------------------------------------------------------------
 """
 _REQ_TYPE_STANDARD = const(0x0)
 _REQ_TYPE_CLASS = const(0x1)
@@ -105,8 +114,9 @@ If bmRequestType.Type = Class
 Table 15 below shows the USBTMC specific requests.
 
 Table 15 -- USBTMC bRequest values
+------------------------------------------------------------------------------------------------------------------------
 |bRequest   |Name                           |Required/Optional  |Comment
-|           |                               |                   |
+------------------------------------------------------------------------------------------------------------------------
 |0          |Reserved                       |Reserved           |Reserved.
 |1          |INITIATE_ABORT_BULK_OUT        |Required           |Aborts a Bulk-OUT transfer.
 |2          |CHECK_ABORT_BULK_OUT_STATUS    |Required           |Returns the status of the previously sent 
@@ -129,6 +139,7 @@ Table 15 -- USBTMC bRequest values
 |65-127     |Reserved                       |Reserved           |Reserved for use by the USBTMC specification.
 |128-191    |Reserved                       |Reserved           |Reserved for use by USBTMC subclass specifications.
 |192-255    |Reserved                       |Reserved           |Reserved for use by the VISA specification
+------------------------------------------------------------------------------------------------------------------------
 """
 # USBTMC bRequest values
 _REQ_CONTROL_INITIATE_ABORT_BULK_OUT = const(1)
