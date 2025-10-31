@@ -197,14 +197,20 @@ class TMCInterface(Interface):
     def __init__(self,
                  protocol=_PROTOCOL_NONE,
                  interface_str=None,
+                 interrupt_ep=False,
+                 indicator_pulse=False
                  ):
         super().__init__()
         self.ep_out = None  # Set during enumeration. RX direction (host to device)
         self.ep_in = None  # TX direction (device to host)
+        self.ep_int = None  # set during enumeration
         self._rx = Buffer(64)
         self._tx = Buffer(64)
+
         self.protocol = protocol
         self.interface_str = interface_str
+        self.interrupt_ep = interrupt_ep
+        self.indicator_pulse = indicator_pulse
 
     def desc_cfg(self, desc, itf_num, ep_num, strs):
         # Function to build configuration descriptor contents for this interface
