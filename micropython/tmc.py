@@ -153,35 +153,35 @@ _REQ_INDICATOR_PULSE = const(64)  # 0xA1 (Dir = IN, Type = Class, Recipient = In
 """
 Table 16 -- USBTMC_status values
 ------------------------------------------------------------------------------------------------------------------------
-|USBTMC_status  |MACRO              |Recommended    |Description
-|               |                   |interpretation |
-|               |                   |by Host        |
-|               |                   |software       |
+|USBTMC_status  |MACRO                              |Recommended    |Description
+|               |                                   |interpretation |
+|               |                                   |by Host        |
+|               |                                   |software       |
 ------------------------------------------------------------------------------------------------------------------------
-|0x00           |Reserved           |Reserved       |Reserved
-|0x01           |STATUS_SUCCESS     |Success        |Success
-|0x02           |STATUS_PENDING     |Warning        |This status is valid if a device has received a
-|               |                   |               |USBTMC split transaction CHECK_STATUS
-|               |                   |               |request and the request is still being processed.
-|               |                   |               |See 4.2.1.1.
-|0x03-0x1F      |Reserved           |Warning        |Reserved for USBTMC use.
-|0x20-0x3F      |Reserved           |Warning        |Reserved for subclass use.
-|0x40-0x7F      |Reserved           |Warning        |Reserved for VISA use.
-|0x80           |STATUS_FAILED      |Failure        |Failure, unspecified reason, and a more specific
-|               |                   |               |USBTMC_status is not defined.
-|0x81           |STATUS_TRANSFER_   |               |This status is only valid if a device has received
-|               |NOT_IN_PROGRESS    |               |an INITIATE_ABORT_BULK_OUT or
-|               |                   |               |INITIATE_ABORT_BULK_IN request and the
-|               |                   |               |specified transfer to abort is not in progress.
-|0x82           |STATUS_SPLIT_NOT_  |               |Failure This status is valid if the device received a
-|               |IN_PROGRESS        |               |CHECK_STATUS request and the device is not
-|               |                   |               |processing an INITIATE request.
-|0x83           |STATUS_SPLIT_      |Failure        |This status is valid if the device received a new
-|               |IN_PROGRESS        |               |class-specific request and the device is still
-|               |                   |               |processing an INITIATE.
-|0x84-0x9F      |Reserved           |Failure        |Reserved for USBTMC use.
-|0xA0-0xBF      |Reserved           |Failure        |Reserved for subclass use.
-|0xC0-0xFF      |Reserved           |Failure        |Reserved for VISA use.
+|0x00           |Reserved                           |Reserved       |Reserved
+|0x01           |STATUS_SUCCESS                     |Success        |Success
+|0x02           |STATUS_PENDING                     |Warning        |This status is valid if a device has received a
+|               |                                   |               |USBTMC split transaction CHECK_STATUS
+|               |                                   |               |request and the request is still being processed.
+|               |                                   |               |See 4.2.1.1.
+|0x03-0x1F      |Reserved                           |Warning        |Reserved for USBTMC use.
+|0x20-0x3F      |Reserved                           |Warning        |Reserved for subclass use.
+|0x40-0x7F      |Reserved                           |Warning        |Reserved for VISA use.
+|0x80           |STATUS_FAILED                      |Failure        |Failure, unspecified reason, and a more specific
+|               |                                   |               |USBTMC_status is not defined.
+|0x81           |STATUS_TRANSFER_NOT_IN_PROGRESS    |               |This status is only valid if a device has received
+|               |                                   |               |an INITIATE_ABORT_BULK_OUT or
+|               |                                   |               |INITIATE_ABORT_BULK_IN request and the
+|               |                                   |               |specified transfer to abort is not in progress.
+|0x82           |STATUS_SPLIT_NOT_|IN_PROGRESS      |               |Failure This status is valid if the device received a
+|                                                   |               |CHECK_STATUS request and the device is not
+|               |                                   |               |processing an INITIATE request.
+|0x83           |STATUS_SPLIT_IN_PROGRESS           |Failure        |This status is valid if the device received a new
+|               |                                   |               |class-specific request and the device is still
+|               |                                   |               |processing an INITIATE.
+|0x84-0x9F      |Reserved                           |Failure        |Reserved for USBTMC use.
+|0xA0-0xBF      |Reserved                           |Failure        |Reserved for subclass use.
+|0xC0-0xFF      |Reserved                           |Failure        |Reserved for VISA use.
 ------------------------------------------------------------------------------------------------------------------------
 """
 _TMC_STATUS_SUCCESS = const(0x01)
@@ -295,25 +295,33 @@ _MSGID_VENDOR_SPECIFIC_OUT = const(126)
 _MSGID_REQUEST_VENDOR_SPECIFIC_IN = const(127)
 _MSGID_VENDOR_SPECIFIC_IN = const(127)
 
+_wMaxPacketSize = const(64)
+
 
 class TMCInterface(Interface):
     def __init__(self,
                  protocol=_PROTOCOL_NONE,
                  interface_str=None,
                  interrupt_ep=False,
-                 indicator_pulse=False
+                 talk_only=False,
+                 listen_only=False,
+                 indicator_pulse=False,
+                 termchar=False
                  ):
         super().__init__()
         self.ep_out = None  # Set during enumeration. RX direction (host to device)
         self.ep_in = None  # TX direction (device to host)
         self.ep_int = None  # set during enumeration
-        self._rx = Buffer(64)
-        self._tx = Buffer(64)
+        self._rx = Buffer(_wMaxPacketSize)
+        self._tx = Buffer(_wMaxPacketSize)
 
         self.protocol = protocol
         self.interface_str = interface_str
         self.interrupt_ep = interrupt_ep
         self.indicator_pulse = indicator_pulse
+        self.talk_only = talk_only
+        self.listen_only = listen_only
+        self.termchar = termchar
 
     def desc_cfg(self, desc, itf_num, ep_num, strs):
         # Function to build configuration descriptor contents for this interface
@@ -344,9 +352,9 @@ class TMCInterface(Interface):
         # - Other class-specific configuration descriptor data.
         #
         self.ep_out = ep_num
-        desc.endpoint(self.ep_out, "bulk", 8, 8)
+        desc.endpoint(self.ep_out, "bulk", _wMaxPacketSize)
         self.ep_in = ep_num | _EP_IN_FLAG
-        desc.endpoint(self.ep_in, "bulk", 8, 8)
+        desc.endpoint(self.ep_in, "bulk", _wMaxPacketSize)
 
         if self.interrupt_ep:
             self.ep_int = (ep_num + 1) | _EP_IN_FLAG
@@ -510,4 +518,16 @@ class TMCInterface(Interface):
         return False  # Unsupported request
 
     def get_capabilities(self):
-        pass
+        interface_capability = ((1 if self.indicator_pulse else 0) << 2) | ((1 if self.talk_only else 0) << 1) | \
+                               ((1 if self.listen_only else 0) << 0)
+
+        resp = struct.pack("BBHBB" + "B" * 6 + "B" * 12,
+                           _TMC_STATUS_SUCCESS,
+                           0,
+                           _bcdUSBTMC,
+                           interface_capability,
+                           1 if self.termchar else 0,
+                           b"\x00" * 6,
+                           b"\x00" * 12
+                           )
+        return resp
