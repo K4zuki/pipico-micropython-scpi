@@ -96,3 +96,14 @@ class Usb488Interface(TMCInterface):
             interface_str="MicroPython USB488 device",
             interrupt_ep=True
         )
+
+    def get_capabilities(self):
+        usb488_dev_capabilities = 1 << 3 | 1 << 2  # SCPI, SR1, RL0, DT0
+        usb488_itf_capabilities = 1 << 2 | 0 << 1 | 0  # USB488, not accept REN_CONTROL, GO_TO_LOCAL, LOCAL_LOCKOUT, TRIGGER
+
+        resp = super().get_capabilities()
+        resp.pack_into("H", 12, _bcdUSB488)
+        resp.pack_into("B", 14, usb488_itf_capabilities)
+        resp.pack_into("B", 15, usb488_dev_capabilities)
+
+        return resp.b
