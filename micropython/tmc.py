@@ -521,13 +521,13 @@ class TMCInterface(Interface):
         interface_capability = ((1 if self.indicator_pulse else 0) << 2) | ((1 if self.talk_only else 0) << 1) | \
                                ((1 if self.listen_only else 0) << 0)
 
-        resp = struct.pack("BBHBB" + "B" * 6 + "B" * 12,
-                           _TMC_STATUS_SUCCESS,
-                           0,
-                           _bcdUSBTMC,
-                           interface_capability,
-                           1 if self.termchar else 0,
-                           b"\x00" * 6,
-                           b"\x00" * 12
-                           )
-        return resp
+        resp = Descriptor(bytearray(6 + 6 + 12))
+        resp.pack_into("BBHBB",
+                       0,
+                       _TMC_STATUS_SUCCESS,
+                       0,
+                       _bcdUSBTMC,
+                       interface_capability,
+                       1 if self.termchar else 0,
+                       )
+        return resp.b
