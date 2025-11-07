@@ -531,3 +531,7 @@ class TMCInterface(Interface):
                        1 if self.termchar else 0,
                        )
         return resp.b
+
+    def busy(self, ep):
+        # Returns True if endpoint ep is busy (i.e. existing transfer is pending)
+        return self.is_open() and self.xfer_pending(ep)
