@@ -162,3 +162,4 @@ cython_debug/
 
 host/port_config.py
 *.uf2
+usb/
