@@ -88,6 +88,28 @@ USB488InterfaceCapabilities.D2 must = 1 (488.2 USB488 interface).
 """
 _bcdUSB488 = const(0x0100)
 
+"""
+3.2.1 USB488 defined Bulk-OUT command messages
+The USBTMC specification reserves a range of MsgID values for USBTMC subclasses to define. Table 1
+below shows the MsgID definitions for the USB488 subclass.
+
+Table 1 -- USB488 defined MsgID values
+------------------------------------------------------------------------------------------------------------------------
+|MsgID      |Direction          |MACRO                  |Description
+|           |OUT=Host-to-device |                       |
+|           |IN=Device-to-Host  |                       |
+------------------------------------------------------------------------------------------------------------------------
+|128        |OUT                |TRIGGER                |The TRIGGER command message provides a
+|           |                   |                       |mechanism for the Host to trigger device dependent
+|           |                   |                       |actions on a device synchronously with other Bulk-OUT
+|           |                   |                       |messages. Support for this MsgID is optional. See 4.2.2.
+|           |IN                 |(no defined response)  |There is no defined response for this command.
+|129-191    |Reserved           |Reserved               |Reserved for USBTMC subclass use.
+------------------------------------------------------------------------------------------------------------------------
+"""
+_MSGID_DEV_DEP_MSG_OUT = const(1)
+_MSGID_TRIGGER = const(128)
+
 
 class Usb488Interface(TMCInterface):
     def __init__(self):
