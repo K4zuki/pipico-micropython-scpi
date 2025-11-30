@@ -76,6 +76,7 @@ import time
 - ADC[01234]:READ?
 
 """
+from micropython import const
 import sys
 import machine
 
@@ -84,40 +85,40 @@ from math import ceil
 from collections import namedtuple
 from MicroScpiDevice import ScpiKeyword, ScpiCommand, ScpiErrorNumber, MicroScpiDevice, cb_do_nothing, ERROR_LIST
 
-ABS_MAX_CLOCK = 275_000_000
-DEFAULT_CPU_CLOCK = 125_000_000
-ABS_MIN_CLOCK = 100_000_000
-MAX_PWM_CLOCK = 100_000
-MIN_PWM_CLOCK = 1_000
-MAX_PWM_DUTY = 65535
-MIN_PWM_DUTY = 0
-MAX_I2C_CLOCK = 400_000
-MIN_I2C_CLOCK = 10_000
-MAX_SPI_CLOCK = 10_000_000
-MIN_SPI_CLOCK = 10_000
-MAX_UART_BAUD = 500_000
-MIN_UART_BAUD = 300
-IO_ON = 1
-IO_OFF = 0
+ABS_MAX_CLOCK = const(275_000_000)
+DEFAULT_CPU_CLOCK = const(125_000_000)
+ABS_MIN_CLOCK = const(100_000_000)
+MAX_PWM_CLOCK = const(100_000)
+MIN_PWM_CLOCK = const(1_000)
+MAX_PWM_DUTY = const(65535)
+MIN_PWM_DUTY = const(0)
+MAX_I2C_CLOCK = const(400_000)
+MIN_I2C_CLOCK = const(10_000)
+MAX_SPI_CLOCK = const(10_000_000)
+MIN_SPI_CLOCK = const(10_000)
+MAX_UART_BAUD = const(500_000)
+MIN_UART_BAUD = const(300)
+IO_ON = const(1)
+IO_OFF = const(0)
 IO_VALUE_STRINGS = {IO_ON: "ON", IO_OFF: "OFF"}
 IO_MODE_STRINGS = {machine.Pin.IN: "IN", machine.Pin.OUT: "OUT",
                    machine.Pin.OPEN_DRAIN: "ODrain", machine.Pin.ALT: "PWM"}
-DEFAULT_I2C_BIT = 1
-SPI_MODE0 = 0
-SPI_MODE1 = 1
-SPI_MODE2 = 2
-SPI_MODE3 = 3
+DEFAULT_I2C_BIT = const(1)
+SPI_MODE0 = const(0)
+SPI_MODE1 = const(1)
+SPI_MODE2 = const(2)
+SPI_MODE3 = const(3)
 DEFAULT_SPI_MODE = SPI_MODE0
-SPI_CSPOL_HI = 1
-SPI_CSPOL_LO = 0
+SPI_CSPOL_HI = const(1)
+SPI_CSPOL_LO = const(0)
 DEFAULT_SPI_CSPOL = SPI_CSPOL_LO
-SPI_MASK_CKPOL = 0x02
-SPI_CKPOL_HI = 1
-SPI_CKPOL_LO = 0
+SPI_MASK_CKPOL = const(0x02)
+SPI_CKPOL_HI = const(1)
+SPI_CKPOL_LO = const(0)
 DEFAULT_SPI_CKPOL = SPI_CKPOL_LO
-SPI_MASK_CKPH = 0x01
-SPI_CKPH_HI = 1
-SPI_CKPH_LO = 0
+SPI_MASK_CKPH = const(0x01)
+SPI_CKPH_HI = const(1)
+SPI_CKPH_LO = const(0)
 DEFAULT_SPI_CKPH = SPI_CKPH_LO
 
 """
@@ -149,6 +150,8 @@ E_DATA_OVERFLOW = ScpiErrorNumber(-223, "Too much data")
 E_INVALID_PARAMETER = ScpiErrorNumber(-224, "Illegal parameter value")
 E_I2C_FAIL = ScpiErrorNumber(-333, "I2C bus error")
 E_SPI_FAIL = ScpiErrorNumber(-334, "SPI bus error")
+
+ENDCHAR = const("\n")
 
 pin0 = machine.Pin(0, mode=machine.Pin.OUT, value=IO_ON)  # no-error indicator
 pin1 = machine.Pin(1, mode=machine.Pin.OUT, value=IO_OFF)  # error indicator
@@ -418,7 +421,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         query = (opt[-1] == "?")
         if query:
-            print(f"RaspberryPiPico,RP001,{serial},0.0.1")
+            print(f"RaspberryPiPico,RP001,{serial},0.0.1", end=ENDCHAR)
         else:
             self.error_push(E_SYNTAX)
 
@@ -437,7 +440,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """The command returns a string in the form of “YYYY.V”, where “YYYY” represents
         the year of the version and “V” represents a version for that year (e.g. 1997.0).
         """
-        print("2023.04")
+        print("2023.04", end=ENDCHAR)
 
     def cb_machine_freq(self, param="", opt=None):
         """
@@ -452,7 +455,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         # print("cb_machine_freq", param, opt)
         if query:
             machine_freq = machine.freq()
-            print(f"{machine_freq}")
+            print(f"{machine_freq}", end=ENDCHAR)
         elif machine_freq is not None:
             # print("cb_machine_freq", param)
 
@@ -480,13 +483,13 @@ class RaspberryScpiPico(MicroScpiDevice):
         if query:
             if self.error_counter > 0:
                 err = ERROR_LIST[self.error_rd_pointer]
-                print(f"{err.id}, '{err.message}'")
+                print(f"{err.id}, '{err.message}'", end=ENDCHAR)
                 ERROR_LIST[self.error_rd_pointer] = E_NONE
                 self.error_rd_pointer = (self.error_rd_pointer + 1) & 0xFF
                 self.error_counter = max(self.error_counter - 1, 0)
             else:
                 err = E_NONE
-                print(f"{err.id}, '{err.message}'")
+                print(f"{err.id}, '{err.message}'", end=ENDCHAR)
 
             self.error_indicate(True if self.error_counter > 0 else False)
 
@@ -518,7 +521,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                                     f"PIN{pin}:PWM:DUTY {duty}"
                                     ])
                 print(message, end=";")
-            print()
+            print("", end=ENDCHAR)
         else:
             self.error_push(E_SYNTAX)
 
@@ -539,7 +542,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         if query:
             # print("cb_pin_val", pin_number, "Query", param)
             val = pin.value()
-            print(IO_VALUE_STRINGS[val])
+            print(IO_VALUE_STRINGS[val], end=ENDCHAR)
         elif param is not None:
             # print("cb_pin_val", pin_number, param)
             if param == str(IO_ON) or self.kw_on.match(param).match:
@@ -571,7 +574,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_pin_mode", pin_number, "Query", param)
-            print(IO_MODE_STRINGS[conf.mode])
+            print(IO_MODE_STRINGS[conf.mode], end=ENDCHAR)
         elif param is not None:
             # print("cb_pin_mode", pin_number, param)
             if self.kw_in.match(param).match:
@@ -651,7 +654,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         if query:
             # print("cb_pin_pwm_freq", pin_number, "Query", param)
             pwm_freq = conf.freq
-            print(f"{pwm_freq}")
+            print(f"{pwm_freq}", end=ENDCHAR)
         elif pwm_freq is not None:
             # print("cb_pin_pwm_freq", pin_number, param)
 
@@ -688,7 +691,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         if query:
             # print("cb_pin_pwm_duty", pin_number, "Query", param)
             pwm_duty = conf.duty_u16
-            print(f"{pwm_duty}")
+            print(f"{pwm_duty}", end=ENDCHAR)
         elif pwm_duty is not None:
             # print("cb_pin_pwm_duty", pin_number, param)
 
@@ -725,7 +728,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         duty = pwm_conf.duty_u16
 
         if query:
-            print(f"LED:VALue {IO_VALUE_STRINGS[value]};LED:PWM:FREQuency {freq};LED:PWM:DUTY {duty}")
+            print(f"LED:VALue {IO_VALUE_STRINGS[value]};LED:PWM:FREQuency {freq};LED:PWM:DUTY {duty}", end=ENDCHAR)
         else:
             self.error_push(E_SYNTAX)
 
@@ -829,7 +832,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 freq = conf.freq
                 print(f"I2C{bus}:ADDRess:BIT {shift};I2C{bus}:FREQuency {freq};", end="")
             else:
-                print()
+                print("", end=ENDCHAR)
         else:
             self.error_push(E_MISSING_PARAM)
 
@@ -852,9 +855,9 @@ class RaspberryScpiPico(MicroScpiDevice):
                 # print("cb_i2c_scan", "Query", param)
                 scanned = bus.scan()
                 if not scanned:
-                    print(BUS_FAIL_CODE)
+                    print(BUS_FAIL_CODE, end=ENDCHAR)
                 else:
-                    print(",".join([f"{(int(s) << shift):02x}" for s in scanned]))
+                    print(",".join([f"{(int(s) << shift):02x}" for s in scanned]), end=ENDCHAR)
             else:
                 self.error_push(E_SYNTAX)
         else:
@@ -878,7 +881,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             # print("cb_i2c_freq", bus_number, "Query", param)
 
             bus_freq = conf.freq
-            print(f"{bus_freq}")
+            print(f"{bus_freq}", end=ENDCHAR)
         elif bus_freq is not None:
             # print("cb_i2c_freq", bus_number, param)
 
@@ -913,7 +916,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             # print("cb_i2c_address_bit", "Query", param)
 
             bit = conf.bit
-            print(f"{bit}")
+            print(f"{bit}", end=ENDCHAR)
         elif bit is not None:
             # print("cb_i2c_address_bit", param)
             if param in ["0", "1"]:
@@ -1004,18 +1007,18 @@ class RaspberryScpiPico(MicroScpiDevice):
                     try:
                         read = bus.readfrom(int(address), int(length), stop)
                         data = ",".join(f"{d:02x}" for d in read)
-                        print(data)
+                        print(data, end=ENDCHAR)
                         return
                     except OSError:
                         self.error_push(E_I2C_FAIL)
-                        print(BUS_FAIL_CODE)
+                        print(BUS_FAIL_CODE, end=ENDCHAR)
                 else:
                     self.error_push(E_INVALID_PARAMETER)
             else:
                 self.error_push(E_MISSING_PARAM)
         else:
             self.error_push(E_SYNTAX)
-            print(BUS_FAIL_CODE)
+            print(BUS_FAIL_CODE, end=ENDCHAR)
 
     def cb_i2c_write_memory(self, param, opt):
         """
@@ -1102,18 +1105,18 @@ class RaspberryScpiPico(MicroScpiDevice):
                     try:
                         read = bus.readfrom_mem(address, memaddress, length)
                         data = ",".join(f"{d:02x}" for d in read)
-                        print(data)
+                        print(data, end=ENDCHAR)
                         return
                     except OSError:
                         self.error_push(E_I2C_FAIL)
-                        print(BUS_FAIL_CODE)
+                        print(BUS_FAIL_CODE, end=ENDCHAR)
                 else:
                     self.error_push(E_INVALID_PARAMETER)
             else:
                 self.error_push(E_MISSING_PARAM)
         else:
             self.error_push(E_SYNTAX)
-        print(BUS_FAIL_CODE)
+        print(BUS_FAIL_CODE, end=ENDCHAR)
 
     def cb_adc_read(self, param, opt):
         """
@@ -1131,7 +1134,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         if query:
             # print("cb_adc_read", "Query", param)
             value = adc.read_u16()
-            print(f"{value}")  # decimal
+            print(f"{value}", end=ENDCHAR)  # decimal
         else:
             self.error_push(E_SYNTAX)
 
@@ -1153,7 +1156,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 freq = conf.freq
                 mode = conf.mode
                 print(f"SPI{bus}:CSEL:POLarity {cspol};SPI{bus}:FREQuency {freq};SPI{bus}:MODE {mode};", end="")
-            print()
+            print("", end=ENDCHAR)
         else:
             self.error_push(E_MISSING_PARAM)
 
@@ -1174,7 +1177,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         if query:
             # print("cb_spi_cs_pol", "Query", param)
             cspol = conf.cspol
-            print(cspol)
+            print(cspol, end=ENDCHAR)
         elif cspol is not None:
             # print("cb_spi_cs_pol", param)
             if cspol in ["0", "1"]:
@@ -1209,7 +1212,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_spi_cs_val", "Query", param)
-            print(IO_VALUE_STRINGS[int(cs_pin.value() ^ (not cs_pol))])
+            print(IO_VALUE_STRINGS[int(cs_pin.value() ^ (not cs_pol))], end=ENDCHAR)
         elif param is not None:
             # print("cb_spi_cs_val", param)
             if param == str(SPI_CSPOL_HI) or self.kw_on.match(param).match:
@@ -1239,7 +1242,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_spi_clock_phase", "Query", param)
-            print(conf.mode)
+            print(conf.mode, end=ENDCHAR)
         elif mode is not None:
             # print("cb_spi_clock_phase", param)
             if self.kw_def.match(param).match:
@@ -1285,7 +1288,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             # print("cb_spi_freq", bus_number, "Query", param)
 
             bus_freq = conf.freq
-            print(f"{bus_freq}")
+            print(f"{bus_freq}", end=ENDCHAR)
         elif bus_freq is not None:
             # print("cb_spi_freq", bus_number, param)
             try:
@@ -1343,10 +1346,10 @@ class RaspberryScpiPico(MicroScpiDevice):
                     bus.write_readinto(bytes(data_array), read_data_array)
                     self.cb_spi_cs_val(post_cs, [bus_number, ""])
                     data = ",".join(f"{d:02x}" for d in read_data_array)
-                    print(data)
+                    print(data, end=ENDCHAR)
                 except OSError:
                     self.error_push(E_SPI_FAIL)
-                    print(BUS_FAIL_CODE)
+                    print(BUS_FAIL_CODE, end=ENDCHAR)
             else:
                 self.error_push(E_INVALID_PARAMETER)
         else:
@@ -1418,7 +1421,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                     bus.readinto(data_array, mask)
                     self.cb_spi_cs_val(post_cs, [bus_number, ""])
                     data = ",".join(f"{d:02x}" for d in data_array)
-                    print(data)
+                    print(data, end=ENDCHAR)
                     return
                 except OSError:
                     self.error_push(E_SPI_FAIL)
