@@ -343,8 +343,6 @@ class TMCInterface(Interface):
         if self.interface_str:
             strs.append(self.interface_str)
 
-            desc.endpoint(self.ep_int, "interrupt", 8, 8)
-
         # Plus, optionally:
         #
         # - One or more endpoint descriptors (can call desc.endpoint()).
@@ -358,6 +356,7 @@ class TMCInterface(Interface):
 
         if self.interrupt_ep:
             self.ep_int = (ep_num + 1) | _EP_IN_FLAG
+            desc.endpoint(self.ep_int, "interrupt", 8, 8)
 
         # This function is called twice per call to USBDevice.init(). The first
         # time the values of all arguments are dummies that are used only to
