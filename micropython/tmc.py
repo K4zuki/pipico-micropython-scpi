@@ -322,6 +322,7 @@ class TMCInterface(Interface):
         self.talk_only = talk_only
         self.listen_only = listen_only
         self.termchar = termchar
+        self.capabilities = self.get_capabilities()
 
     def desc_cfg(self, desc, itf_num, ep_num, strs):
         # Function to build configuration descriptor contents for this interface
@@ -471,7 +472,7 @@ class TMCInterface(Interface):
                     return False  # Unsupported request
             else:
                 return False  # Unsupported request
-        return False  # Unsupported request
+        return True  # Unsupported request
 
     def on_endpoint_control_xfer(self, stage, request):
         # Control transfer callback. Override to handle a device
