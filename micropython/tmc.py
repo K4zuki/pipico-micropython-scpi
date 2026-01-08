@@ -334,7 +334,7 @@ class TMCInterface(Interface):
         # - At least one standard Interface descriptor (can call
         # - desc.interface()).
         desc.interface(itf_num,
-                       0,
+                       self.num_eps(),
                        _INTERFACE_CLASS_TMC,
                        _INTERFACE_SUBCLASS_TMC,
                        self.protocol,
