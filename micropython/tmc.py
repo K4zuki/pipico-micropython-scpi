@@ -467,7 +467,15 @@ class TMCInterface(Interface):
                     return self.get_capabilities()
                 elif bRequest == _REQ_INDICATOR_PULSE:
                     # _REQ_INDICATOR_PULSE = const(64)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
-                    return True
+                    if self.indicator_pulse:
+                        resp = Descriptor(bytearray(1))
+                        resp.pack_into("B",
+                                       0,
+                                       _TMC_STATUS_SUCCESS,
+                                       )
+                        return resp.b
+                    else:
+                        return False
                 else:
                     return False  # Unsupported request
             else:
