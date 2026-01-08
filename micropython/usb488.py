@@ -123,7 +123,7 @@ class Usb488Interface(TMCInterface):
 
         resp = Descriptor(super().get_capabilities())
         resp.pack_into("H", 12, _bcdUSB488)
-        resp.pack_into("B", 14, usb488_itf_capabilities)
-        resp.pack_into("B", 15, usb488_dev_capabilities)
+        resp.pack_into("B", 14, usb488_itf_capabilities)  # USB488InterfaceCapabilities
+        resp.pack_into("B", 15, usb488_dev_capabilities)  # USB488DeviceCapabilities
 
         return resp.b
