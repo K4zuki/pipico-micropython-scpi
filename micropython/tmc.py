@@ -508,8 +508,27 @@ class TMCInterface(Interface):
                 return False  # Let tinyUSB work
             elif req_type == _REQ_TYPE_CLASS:
                 if bRequest == _REQ_INITIATE_ABORT_BULK_OUT:
-                    # _REQ_INITIATE_ABORT_BULK_OUT = const(1)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
-                    return True
+                    """ Table 18 -- INITIATE_ABORT_BULK_OUT Setup packet
+                    bmRequestType   |0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
+                    bRequest        |INITIATE_ABORT_BULK_OUT (1), see Table 15.
+                    wValue          |D7...D0    |The bTag value associated with the transfer to abort.
+                                    |D15...D8   |Reserved. Must be 0x00.
+                    """
+                    """ Table 19 -- INITIATE_ABORT_BULK_OUT response packet
+                    Offset  |Field          |Size   |Value  |Description
+                    0       |USBTMC_status  |1      |Value  |Status indication for this request. See Table 20.
+                    1       |bTag           |1      |Value  |The bTag for the the current Bulk-OUT transfer. If there is no current
+                            |               |       |       |Bulk-OUT transfer, bTag must be set to the bTag for the most recent
+                            |               |       |       |bulk-OUT transfer. If no Bulk-OUT transfer has ever been started, bTag
+                            |               |       |       |must be 0x00.
+                    """
+                    resp = Descriptor(bytearray(2))
+                    resp.pack_into("BB",
+                                   0,
+                                   _TMC_STATUS_SUCCESS,
+                                   wValue & 0xff
+                                   )
+                    return resp.b
                 elif bRequest == _REQ_CHECK_ABORT_BULK_OUT_STATUS:
                     # _REQ_CHECK_ABORT_BULK_OUT_STATUS = const(2)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
                     return True
@@ -517,8 +536,29 @@ class TMCInterface(Interface):
                     # _REQ_INITIATE_ABORT_BULK_IN = const(3)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
                     return True
                 elif bRequest == _REQ_CHECK_ABORT_BULK_IN_STATUS:
-                    # _REQ_CHECK_ABORT_BULK_IN_STATUS = const(4)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
-                    return True
+                    """ Table 24 -- INITIATE_ABORT_BULK_IN Setup packet
+                    bmRequestType   |0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
+                    bRequest        |INITIATE_ABORT_BULK_IN, see Table 15.
+                    wValue          |D7...D0    |The bTag value associated with the transfer to abort.
+                                    |D15...D8   |Reserved. Must be 0x00.
+                    wIndex          |Must specify direction and endpoint number per the USB 2.0 specification, section 9.3.4.
+                    wLength         |0x0002. Number of bytes to transfer per the USB 2.0 specification, section 9.3.5.
+                    """
+                    """ Table 25 -- INITIATE_ABORT_BULK_IN response format
+                    Offset  |Field          |Size   |Value  |Description
+                    0       |USBTMC_status  |1      |Value  |Status indication for this request. See Table 26.
+                    1       |bTag           |1      |Value  |The bTag for the current Bulk-IN transfer. If there is no current
+                            |               |       |       |Bulk-IN transfer, bTag must be set to the bTag for the most recent
+                            |               |       |       |bulk-IN transfer. If no Bulk-IN transfer has ever been started, bTag
+                            |               |       |       |must be 0x00.
+                    """
+                    resp = Descriptor(bytearray(2))
+                    resp.pack_into("BB",
+                                   0,
+                                   _TMC_STATUS_SUCCESS,
+                                   wValue & 0xff
+                                   )
+                    return resp.b
                 else:
                     return False  # Unsupported request
             else:
