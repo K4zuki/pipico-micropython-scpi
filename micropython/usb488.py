@@ -114,6 +114,7 @@ class Usb488Interface(TMCInterface):
         super().__init__(
             protocol=_PROTOCOL_488,
             interface_str="MicroPython USB488 device",
+            indicator_pulse=True,
             interrupt_ep=True
         )
 
