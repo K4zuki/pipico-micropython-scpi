@@ -584,3 +584,31 @@ class TMCInterface(Interface):
     def busy(self, ep):
         # Returns True if endpoint ep is busy (i.e. existing transfer is pending)
         return self.is_open() and self.xfer_pending(ep)
+
+    def _tx_xfer(self):
+        # Keep an active IN transfer to send data to the host, whenever
+        # there is data to send.
+        if not self.is_open() and not self.xfer_pending(self.ep_in) and self._tx.readable():
+            self.submit_xfer(self.ep_in, self._tx.pend_read(), self._tx_cb)
+
+    def _tx_cb(self, ep, res, num_bytes):
+        if res == 0:
+            self._tx.finish_read(num_bytes)
+        self._tx_xfer()
+
+    def _rx_xfer(self):
+        # Keep an active OUT transfer to receive MIDI events from the host
+        if self.is_open() and not self.xfer_pending(self.ep_out) and self._rx.writable():
+            self.submit_xfer(self.ep_out, self._rx.pend_write(), self._rx_cb)
+
+    def _rx_cb(self, ep, res, num_bytes):
+        if res == 0:
+            self._rx.finish_write(num_bytes)
+            schedule(self._on_rx, None)
+        self._rx_xfer()
+
+    def on_open(self):
+        super().on_open()
+        # kick off any transfers that may have queued while the device was not open
+        self._tx_xfer()
+        self._rx_xfer()
