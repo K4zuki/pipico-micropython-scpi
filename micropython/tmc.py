@@ -4,7 +4,7 @@
 #
 # MIT license; Copyright (c) 2025 Kazuki Yamamoto
 
-from micropython import const
+from micropython import const, schedule
 import machine
 import struct
 import time
@@ -288,6 +288,7 @@ Table 2 -- MsgID values
 |192-255    |Reserved                   |Reserved                   |Reserved for VISA specification use.
 ------------------------------------------------------------------------------------------------------------------------
 """
+_BULK_OUT_HEADER_SIZE = const(12)
 _MSGID_DEV_DEP_MSG_OUT = const(1)
 _MSGID_REQUEST_DEV_DEP_MSG_IN = const(2)
 _MSGID_DEV_DEP_MSG_IN = const(2)
