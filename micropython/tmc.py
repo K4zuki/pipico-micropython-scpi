@@ -452,28 +452,67 @@ class TMCInterface(Interface):
         bmRequestType, bRequest, wValue, wIndex, wLength = struct.unpack("BBHHH", request)
 
         recipient, req_type, data_direction = split_bmRequestType(bmRequestType)
+        resp = Descriptor(bytearray(1))
+        resp.pack("B", _TMC_STATUS_SUCCESS)
 
         if stage == _STAGE_SETUP:
             if req_type == _REQ_TYPE_STANDARD:
                 return False  # Let tinyUSB work
             elif req_type == _REQ_TYPE_CLASS:
                 if bRequest == _REQ_INITIATE_CLEAR:
-                    # _REQ_INITIATE_CLEAR = const(5)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
-                    return True
+                    """ Table 30 -- INITIATE_CLEAR Setup packet
+                    bmRequestType   |0xA1 (Dir = IN, Type = Class, Recipient = Interface)
+                    bRequest        |INITIATE_CLEAR, see Table 15.
+                    wValue          |0x0000
+                    wIndex          |Must specify interface number per the USB 2.0 specification, section 9.3.4.
+                    wLength         |0x0001. Number of bytes to transfer per the USB 2.0 specification, section 9.3.5.
+                    """
+                    """ Table 31 -- INITIATE_CLEAR response format
+                    Offset  |Field          |Size   |Value  |Description
+                    0       |USBTMC_status  |1      |Value  |Status indication for this request. See Table 32.
+                    """
+                    return resp.b
                 elif bRequest == _REQ_CHECK_CLEAR_STATUS:
-                    # _REQ_CHECK_CLEAR_STATUS = const(6)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
-                    return True
+                    """ Table 33 -- CHECK_CLEAR_STATUS Setup packet
+                    bmRequestType   |0xA1 (Dir = IN, Type = Class, Recipient = Interface)
+                    bRequest        |CHECK_CLEAR_STATUS, see Table 15.
+                    wValue          |Reserved. Must be 0x0000.
+                    wIndex          |Must specify interface number per the USB 2.0 specification, section 9.3.4.
+                    wLength         |0x0002. Number of bytes to transfer per the USB 2.0 specification, section 9.3.5.
+                    """
+                    """ Table 34 -- CHECK_CLEAR_STATUS response format
+                    Offset  |Field          |Size   |Value  |Description
+                    0       |USBTMC_status  |1      |Value  |Status indication for this request. See Table 35.
+                    1       |bmClear        |1      |Bitmap |D7...D1    |Reserved. All bits must be 0.
+                            |               |       |       |D0         |BulkInFifoBytes
+                            |               |       |       |           |1 - The device either has some queued DATA bytes
+                            |               |       |       |           |in the Bulk-IN FIFO that it could not remove,
+                            |               |       |       |           |or has a short packet that needs to be sent to
+                            |               |       |       |           |the Host. The USBTMC_status must not be
+                            |               |       |       |           |STATUS_SUCCESS.
+                            |               |       |       |           |0 – The device has completely removed queued
+                            |               |       |       |           |DATA in the Bulk-IN FIFO and the Bulk-IN
+                            |               |       |       |           |FIFO is empty.
+                    """
+                    resp = Descriptor(bytearray(2))
+                    resp.pack("BB", _TMC_STATUS_SUCCESS, 0)
+                    return resp.b
                 elif bRequest == _REQ_GET_CAPABILITIES:
                     # _REQ_GET_CAPABILITIES = const(7)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
                     return self.get_capabilities()
                 elif bRequest == _REQ_INDICATOR_PULSE:
-                    # _REQ_INDICATOR_PULSE = const(64)  # 0xA1 (Dir = IN, Type = Class, Recipient = Interface)
+                    """ Table 38 -- INDICATOR_PULSE Setup packet
+                    bmRequestType   |0xA1 (Dir = IN, Type = Class, Recipient = Interface)
+                    bRequest        |INDICATOR_PULSE, see Table 15.
+                    wValue          |0x0000
+                    wIndex          |Must specify interface number per the USB 2.0 specification, section 9.3.4.
+                    wLength         |0x0001. Number of bytes to transfer per the USB 2.0 specification, section 9.3.5.
+                    """
+                    """ Table 39 -- INDICATOR_PULSE response format
+                    Offset  |Field          |Size   |Value  |Description
+                    0       |USBTMC_status  |1      |Value  |Status indication for this request. See Table 32.
+                    """
                     if self.indicator_pulse:
-                        resp = Descriptor(bytearray(1))
-                        resp.pack_into("B",
-                                       0,
-                                       _TMC_STATUS_SUCCESS,
-                                       )
                         return resp.b
                     else:
                         return False
@@ -503,6 +542,8 @@ class TMCInterface(Interface):
         bmRequestType, bRequest, wValue, wIndex, wLength = struct.unpack("BBHHH", request)
 
         recipient, req_type, data_direction = split_bmRequestType(bmRequestType)
+        resp = Descriptor(bytearray(1))
+        resp.pack("B", _TMC_STATUS_SUCCESS)
 
         if stage == _STAGE_SETUP:
             if req_type == _REQ_TYPE_STANDARD:
@@ -524,18 +565,49 @@ class TMCInterface(Interface):
                             |               |       |       |must be 0x00.
                     """
                     resp = Descriptor(bytearray(2))
-                    resp.pack_into("BB",
-                                   0,
-                                   _TMC_STATUS_SUCCESS,
-                                   wValue & 0xff
-                                   )
+                    resp.pack("BB", _TMC_STATUS_SUCCESS, wValue & 0xff)
                     return resp.b
                 elif bRequest == _REQ_CHECK_ABORT_BULK_OUT_STATUS:
-                    # _REQ_CHECK_ABORT_BULK_OUT_STATUS = const(2)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
-                    return True
+                    """Table 18 -- INITIATE_ABORT_BULK_OUT Setup packet
+                    bmRequestType   |0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
+                    bRequest        |INITIATE_ABORT_BULK_OUT, see Table 15.
+                    wValue          |D7...D0    |The bTag value associated with the transfer to abort.
+                                    |D15...D8   |Reserved. Must be 0x00.
+                    wIndex          |Must specify direction and endpoint number per the USB 2.0 specification, section 9.3.4.
+                    wLength         |0x0002. Number of bytes to transfer per the USB 2.0 specification, section 9.3.5.
+                    """
+                    """ Table 19 -- INITIATE_ABORT_BULK_OUT response packet
+                    Offset  |Field          |Size   |Value  |Description
+                    0       |USBTMC_status  |1      |Value  |Status indication for this request. See Table 20.
+                    1       |bTag           |1      |Value  |The bTag for the the current Bulk-OUT transfer. If there is no current
+                            |               |       |       |Bulk-OUT transfer, bTag must be set to the bTag for the most recent
+                            |               |       |       |bulk-OUT transfer. If no Bulk-OUT transfer has ever been started, bTag
+                            |               |       |       |must be 0x00.
+                    """
+                    resp = Descriptor(bytearray(2))
+                    resp.pack("BB", _TMC_STATUS_SUCCESS, wValue & 0xff)
+                    return resp.b
                 elif bRequest == _REQ_INITIATE_ABORT_BULK_IN:
-                    # _REQ_INITIATE_ABORT_BULK_IN = const(3)  # 0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
-                    return True
+                    """ Table 21 -- CHECK_ABORT_BULK_OUT_STATUS Setup packet
+                    bmRequestType   |0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
+                    bRequest        |CHECK_ABORT_BULK_OUT_STATUS, see Table 15.
+                    wValue          |Reserved. Must be 0x0000.
+                    wIndex          |Must specify direction and endpoint number per the USB 2.0 specification, section 9.3.4.
+                    wLength         |0x0008. Number of bytes to transfer per the USB 2.0 specification, section 9.3.5.
+                    """
+                    """ Table 22 -- CHECK_ABORT_BULK_OUT_STATUS response format
+                    Offset  |Field          |Size   |Value      |Description
+                    0       |USBTMC_status  |1      |Value      |Status indication for this request. See Table 23.
+                    1-3     |Reserved       |3      |0x000000   |Reserved. Must be 0x000000.
+                    4       |NBYTES_RXD     |4      |Number     |The total number of USBTMC message data bytes (not including
+                            |               |       |           |Bulk-OUT Header or alignment bytes) in the transfer received,
+                            |               |       |           |and not discarded, by the device. The device must always send
+                            |               |       |           |NBYTES_RXD bytes to the Function Layer. Sent least significant
+                            |               |       |           |byte first, most significant byte last.
+                    """
+                    resp = Descriptor(bytearray(8))
+                    resp.pack("<B3xI", _TMC_STATUS_SUCCESS, 0x00)
+                    return resp.b
                 elif bRequest == _REQ_CHECK_ABORT_BULK_IN_STATUS:
                     """ Table 24 -- INITIATE_ABORT_BULK_IN Setup packet
                     bmRequestType   |0xA2 (Dir = IN, Type = Class, Recipient = Endpoint)
@@ -554,11 +626,7 @@ class TMCInterface(Interface):
                             |               |       |       |must be 0x00.
                     """
                     resp = Descriptor(bytearray(2))
-                    resp.pack_into("BB",
-                                   0,
-                                   _TMC_STATUS_SUCCESS,
-                                   wValue & 0xff
-                                   )
+                    resp.pack("BB", _TMC_STATUS_SUCCESS, wValue & 0xff)
                     return resp.b
                 else:
                     return False  # Unsupported request
