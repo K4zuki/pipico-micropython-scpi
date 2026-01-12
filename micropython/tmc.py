@@ -469,6 +469,7 @@ class TMCInterface(Interface):
                     """
                     """ Table 31 -- INITIATE_CLEAR response format
                     Offset  |Field          |Size   |Value  |Description
+                    ------------------------------------------------------------------------------------------------------------------------
                     0       |USBTMC_status  |1      |Value  |Status indication for this request. See Table 32.
                     """
                     return resp.b
@@ -482,6 +483,7 @@ class TMCInterface(Interface):
                     """
                     """ Table 34 -- CHECK_CLEAR_STATUS response format
                     Offset  |Field          |Size   |Value  |Description
+                    ------------------------------------------------------------------------------------------------------------------------
                     0       |USBTMC_status  |1      |Value  |Status indication for this request. See Table 35.
                     1       |bmClear        |1      |Bitmap |D7...D1    |Reserved. All bits must be 0.
                             |               |       |       |D0         |BulkInFifoBytes
@@ -510,6 +512,7 @@ class TMCInterface(Interface):
                     """
                     """ Table 39 -- INDICATOR_PULSE response format
                     Offset  |Field          |Size   |Value  |Description
+                    ------------------------------------------------------------------------------------------------------------------------
                     0       |USBTMC_status  |1      |Value  |Status indication for this request. See Table 32.
                     """
                     if self.indicator_pulse:
@@ -558,6 +561,7 @@ class TMCInterface(Interface):
                     """
                     """ Table 19 -- INITIATE_ABORT_BULK_OUT response packet
                     Offset  |Field          |Size   |Value  |Description
+                    ------------------------------------------------------------------------------------------------------------------------
                     0       |USBTMC_status  |1      |Value  |Status indication for this request. See Table 20.
                     1       |bTag           |1      |Value  |The bTag for the the current Bulk-OUT transfer. If there is no current
                             |               |       |       |Bulk-OUT transfer, bTag must be set to the bTag for the most recent
@@ -578,6 +582,7 @@ class TMCInterface(Interface):
                     """
                     """ Table 19 -- INITIATE_ABORT_BULK_OUT response packet
                     Offset  |Field          |Size   |Value  |Description
+                    ------------------------------------------------------------------------------------------------------------------------
                     0       |USBTMC_status  |1      |Value  |Status indication for this request. See Table 20.
                     1       |bTag           |1      |Value  |The bTag for the the current Bulk-OUT transfer. If there is no current
                             |               |       |       |Bulk-OUT transfer, bTag must be set to the bTag for the most recent
@@ -597,6 +602,7 @@ class TMCInterface(Interface):
                     """
                     """ Table 22 -- CHECK_ABORT_BULK_OUT_STATUS response format
                     Offset  |Field          |Size   |Value      |Description
+                    ------------------------------------------------------------------------------------------------------------------------
                     0       |USBTMC_status  |1      |Value      |Status indication for this request. See Table 23.
                     1-3     |Reserved       |3      |0x000000   |Reserved. Must be 0x000000.
                     4       |NBYTES_RXD     |4      |Number     |The total number of USBTMC message data bytes (not including
@@ -619,6 +625,7 @@ class TMCInterface(Interface):
                     """
                     """ Table 25 -- INITIATE_ABORT_BULK_IN response format
                     Offset  |Field          |Size   |Value  |Description
+                    ------------------------------------------------------------------------------------------------------------------------
                     0       |USBTMC_status  |1      |Value  |Status indication for this request. See Table 26.
                     1       |bTag           |1      |Value  |The bTag for the current Bulk-IN transfer. If there is no current
                             |               |       |       |Bulk-IN transfer, bTag must be set to the bTag for the most recent
@@ -680,3 +687,42 @@ class TMCInterface(Interface):
         # kick off any transfers that may have queued while the device was not open
         self._tx_xfer()
         self._rx_xfer()
+
+    def _on_rx(self, _):
+        # Receive MIDI events. Called via micropython.schedule, outside of the USB callback function.
+        message = self._rx.pend_read()
+        if _BULK_OUT_HEADER_SIZE <= message <= _wMaxPacketSize:
+            self.on_bulk_out(message)
+        self._rx.finish_read(len(message))
+
+    def on_bulk_out(self, message):
+        msgID, bTag, bTagInverse, tmcSpecific = struct.unpack_from("BBBx8s", message, 0)
+        assert (bTag + bTagInverse) == 0
+
+        if msgID == _MSGID_DEV_DEP_MSG_OUT:
+            self.on_device_specific_out(bTag, tmcSpecific)
+        elif msgID == _MSGID_VENDOR_SPECIFIC_OUT:
+            self.on_vendor_specific_out(bTag, tmcSpecific)
+        elif msgID == _MSGID_REQUEST_DEV_DEP_MSG_IN:
+            self.on_request_device_specific_in(bTag, tmcSpecific)
+        elif msgID == _MSGID_REQUEST_VENDOR_SPECIFIC_IN:
+            self.on_request_vendor_specific_in(bTag, tmcSpecific)
+
+    def on_device_specific_out(self, btag, tmcSpecific):
+        transfer_size, attribute = struct.unpack_from("<IB3x", tmcSpecific, 4)
+        print("Transfer size:", transfer_size)
+        print("Attribute:", attribute)
+
+    def on_vendor_specific_out(self, btag, tmcSpecific):
+        transfer_size = struct.unpack_from("<I4x", tmcSpecific, 4)
+        print("Transfer size:", transfer_size)
+
+    def on_request_device_specific_in(self, btag, tmcSpecific):
+        transfer_size, attribute, termchar = struct.unpack_from("<IBB2x", tmcSpecific, 4)
+        print("Transfer size:", transfer_size)
+        print("Attribute:", attribute)
+        print("termchar:", termchar)
+
+    def on_request_vendor_specific_in(self, btag, tmcSpecific):
+        transfer_size = struct.unpack_from("<I4x", tmcSpecific, 4)
+        print("Transfer size:", transfer_size)
