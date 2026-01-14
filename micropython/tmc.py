@@ -696,19 +696,29 @@ class TMCInterface(Interface):
         self._rx.finish_read(len(message))
 
     def on_bulk_out(self, message):
+        """
+        :param message:
+        :return:
+        """
         msgID, bTag, bTagInverse, tmcSpecific = struct.unpack_from("BBBx8s", message, 0)
-        assert (bTag + bTagInverse) == 0
+        assert (bTag & bTagInverse) == 0 and (bTag | bTagInverse) == 0xff
+        if len(message) > 12:
+            message = message[12:]
+        else:
+            message = b""
 
         if msgID == _MSGID_DEV_DEP_MSG_OUT:
-            self.on_device_specific_out(bTag, tmcSpecific)
+            self.on_device_dependent_out(bTag, tmcSpecific, message)
         elif msgID == _MSGID_VENDOR_SPECIFIC_OUT:
-            self.on_vendor_specific_out(bTag, tmcSpecific)
+            # Unlikely
+            self.on_vendor_specific_out(bTag, tmcSpecific, message)
         elif msgID == _MSGID_REQUEST_DEV_DEP_MSG_IN:
-            self.on_request_device_specific_in(bTag, tmcSpecific)
+            self.on_request_device_dependent_in(bTag, tmcSpecific, message)
         elif msgID == _MSGID_REQUEST_VENDOR_SPECIFIC_IN:
-            self.on_request_vendor_specific_in(bTag, tmcSpecific)
+            # Unlikely
+            self.on_request_vendor_specific_in(bTag, tmcSpecific, message)
 
-    def on_device_specific_out(self, btag, tmcSpecific):
+    def on_device_dependent_out(self, btag, tmcSpecific, message):
         transfer_size, attribute = struct.unpack_from("<IB3x", tmcSpecific, 4)
         print("Transfer size:", transfer_size)
         print("Attribute:", attribute)
@@ -717,7 +727,8 @@ class TMCInterface(Interface):
         transfer_size = struct.unpack_from("<I4x", tmcSpecific, 4)
         print("Transfer size:", transfer_size)
 
-    def on_request_device_specific_in(self, btag, tmcSpecific):
+
+    def on_request_device_dependent_in(self, btag, tmcSpecific, message):
         transfer_size, attribute, termchar = struct.unpack_from("<IBB2x", tmcSpecific, 4)
         print("Transfer size:", transfer_size)
         print("Attribute:", attribute)
