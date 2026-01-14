@@ -689,9 +689,12 @@ class TMCInterface(Interface):
         self._rx_xfer()
 
     def _on_rx(self, _):
-        # Receive MIDI events. Called via micropython.schedule, outside of the USB callback function.
-        message = self._rx.pend_read()
-        if _BULK_OUT_HEADER_SIZE <= message <= _wMaxPacketSize:
+        """ Receive USBTMC messages. Called via micropython.schedule, outside of the USB callback function.
+
+        :param _: dummy argument for micropython.schedule()
+        """
+        message: memoryview = self._rx.pend_read()
+        if _BULK_OUT_HEADER_SIZE <= len(message) <= _wMaxPacketSize:
             self.on_bulk_out(message)
         self._rx.finish_read(len(message))
 
@@ -724,6 +727,25 @@ class TMCInterface(Interface):
         print("Attribute:", attribute)
 
     def on_vendor_specific_out(self, btag, tmcSpecific, message):
+        """
+        :param btag:
+        :param tmcSpecific:
+        :param message:
+        :return:
+        """
+        """ Table 5 -- VENDOR_SPECIFIC_OUT Bulk-OUT Header with command specific content
+                    |Offset |Field          |Size   |Value          |Description
+        ------------------------------------------------------------------------------------------------------------------------
+                    |0-3    |See Table 1.   |4      |See Table 1.   |See Table 1.
+        ------------------------------------------------------------------------------------------------------------------------
+        USBTMC      |4-7    |TransferSize   |4      |Number         |Total number of USBTMC message data bytes to be
+        command     |       |               |       |               |sent in this USB transfer. This does not include the
+        specific    |       |               |       |               |number of bytes in this Bulk-OUT Header or
+        content     |       |               |       |               |alignment bytes. Sent least significant byte first,
+                    |       |               |       |               |most significant byte last. TransferSize must be >
+                    |       |               |       |               |0x00000000.
+                    |8-11   |Reserved       |4      |0x00000000     |Reserved. Must be 0x0000000.
+        """
         transfer_size = struct.unpack_from("<I4x", tmcSpecific, 4)
         print("Transfer size:", transfer_size)
 
@@ -735,5 +757,11 @@ class TMCInterface(Interface):
         print("termchar:", termchar)
 
     def on_request_vendor_specific_in(self, btag, tmcSpecific, message):
+        """
+        :param btag:
+        :param tmcSpecific:
+        :param message:
+        :return:
+        """
         transfer_size = struct.unpack_from("<I4x", tmcSpecific, 4)
         print("Transfer size:", transfer_size)
