@@ -723,7 +723,7 @@ class TMCInterface(Interface):
         print("Transfer size:", transfer_size)
         print("Attribute:", attribute)
 
-    def on_vendor_specific_out(self, btag, tmcSpecific):
+    def on_vendor_specific_out(self, btag, tmcSpecific, message):
         transfer_size = struct.unpack_from("<I4x", tmcSpecific, 4)
         print("Transfer size:", transfer_size)
 
@@ -734,6 +734,6 @@ class TMCInterface(Interface):
         print("Attribute:", attribute)
         print("termchar:", termchar)
 
-    def on_request_vendor_specific_in(self, btag, tmcSpecific):
+    def on_request_vendor_specific_in(self, btag, tmcSpecific, message):
         transfer_size = struct.unpack_from("<I4x", tmcSpecific, 4)
         print("Transfer size:", transfer_size)
