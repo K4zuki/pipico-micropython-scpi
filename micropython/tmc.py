@@ -776,6 +776,35 @@ class TMCInterface(Interface):
         transfer_size = struct.unpack_from("<I4x", tmcSpecific, 4)
         print("Transfer size:", transfer_size)
 
+    def draft_bulk_in_header(self, msgID, btag):
+        """
+        :param btag:
+        :return:
+        """
+        """ Table 8 -- USBTMC Bulk-IN Header
+        Offset  |Field                              |Size   |Value      |Description
+        ------------------------------------------------------------------------------------------------------------------------
+        0       |MsgID                              |1      |Value      |Must match MsgID in the USBTMC command
+                |                                   |       |           |message transfer causing this response.
+        1       |bTag                               |1      |Value      |Must match bTag in the USBTMC command message
+                |                                   |       |           |transfer causing this response.
+        2       |bTagInverse                        |1      |Value      |Must match bTagInverse in the USBTMC command
+                |                                   |       |           |message transfer causing this response.
+        3       |Reserved                           |1      |0x00       |Reserved. Must be 0x00.
+        4-11    |USBTMC response message specific   |8      |USBTMC     | USBTMC response message specific. See section 3.3.1.
+                |                                   |       |response   |
+                |                                   |       |message    |
+                |                                   |       |specific   |
+        """
+        assert msgID in (_MSGID_DEV_DEP_MSG_IN, _MSGID_VENDOR_SPECIFIC_IN)
+        resp = Descriptor(bytearray(12))
+        resp.pack_into("BBB",
+                       0,
+                       msgID,
+                       btag & 0xff,
+                       (~btag) & 0xff
+                       )
+        return resp
 
     def on_request_device_dependent_in(self, btag, tmcSpecific, message):
         """
