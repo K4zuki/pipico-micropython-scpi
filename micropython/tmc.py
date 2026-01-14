@@ -722,6 +722,33 @@ class TMCInterface(Interface):
             self.on_request_vendor_specific_in(bTag, tmcSpecific, message)
 
     def on_device_dependent_out(self, btag, tmcSpecific, message):
+        """
+        :param btag:
+        :param tmcSpecific:
+        :param message:
+        :return:
+        """
+        """ Table 3 -- DEV_DEP_MSG_OUT Bulk-OUT Header with command specific content
+                    |Offset  |Field          |Size   |Value          |Description
+        ------------------------------------------------------------------------------------------------------------------------
+                    |0-3     |See Table 1.   |4      |See Table 1.   |See Table 1.
+        ------------------------------------------------------------------------------------------------------------------------
+        USBTMC      |4-7     |TransferSize   |4      |Number         |Total number of USBTMC message data bytes to be
+        command     |        |               |       |               |sent in this USB transfer. This does not include the
+        specific    |        |               |       |               |number of bytes in this Bulk-OUT Header or
+        content     |        |               |       |               |alignment bytes. Sent least significant byte first,
+                    |        |               |       |               |most significant byte last. TransferSize must be >
+                    |        |               |       |               |0x00000000.
+                    |8       |bmTransfer     |1      |Bitmap         |D7...D1   |Reserved. All bits must be 0.
+                    |        |Attributes     |       |               |D0        |EOM.
+                    |        |               |       |               |          |1 - The last USBTMC message data byte
+                    |        |               |       |               |          |   in the transfer is the last byte of the
+                    |        |               |       |               |          |   USBTMC message.
+                    |        |               |       |               |          |0 – The last USBTMC message data byte
+                    |        |               |       |               |          |   in the transfer is not the last byte of
+                    |        |               |       |               |          |   the USBTMC message.
+                    |9-11    |Reserved       |3      |0x000000       |Reserved. Must be 0x000000.
+        """
         transfer_size, attribute = struct.unpack_from("<IB3x", tmcSpecific, 4)
         print("Transfer size:", transfer_size)
         print("Attribute:", attribute)
@@ -751,6 +778,41 @@ class TMCInterface(Interface):
 
 
     def on_request_device_dependent_in(self, btag, tmcSpecific, message):
+        """
+        :param btag:
+        :param tmcSpecific:
+        :param message:
+        :return:
+        """
+        """ Table 4 -- REQUEST_DEV_DEP_MSG_IN Bulk-OUT Header with command specific content
+                    |Offset |Field          |Size   |Value          |Description
+        ------------------------------------------------------------------------------------------------------------------------
+                    |0-3    |See Table 1.   |4      |See Table 1.   |See Table 1.
+        ------------------------------------------------------------------------------------------------------------------------
+        USBTMC      |4-7    |TransferSize   |4      |Number         |Total number of USBTMC message data bytes to be
+        command     |       |               |       |               |sent in this USB transfer. This does not include the
+        specific    |       |               |       |               |number of bytes in this Bulk-OUT Header or
+        content     |       |               |       |               |alignment bytes. Sent least significant byte first,
+                    |       |               |       |               |most significant byte last. TransferSize must be >
+                    |       |               |       |               |0x00000000.
+                    |8      |bmTransfer     |1      |Bitmap         |D7...D2    |Reserved. All bits must be 0.
+                    |       |Attributes     |       |               |D1         |TermCharEnabled.
+                    |       |               |       |               |           |1 – The Bulk-IN transfer must terminate
+                    |       |               |       |               |           |   on the specified TermChar. The Host
+                    |       |               |       |               |           |   may only set this bit if the USBTMC
+                    |       |               |       |               |           |   interface indicates it supports
+                    |       |               |       |               |           |   TermChar in the GET_CAPABILITIES
+                    |       |               |       |               |           |   response packet.
+                    |       |               |       |               |           |0 – The device must ignore TermChar.
+                    |       |               |       |               |D0         |Must be 0.
+                    |9      |TermChar       |1      |Value          |If bmTransferAttributes.D1 = 1, TermChar is an 8-bit
+                    |       |               |       |               |value representing a termination character. If
+                    |       |               |       |               |supported, the device must terminate the Bulk-IN
+                    |       |               |       |               |transfer after this character is sent.
+                    |       |               |       |               |If bmTransferAttributes.D1 = 0, the device must ignore
+                    |       |               |       |               |this field.
+                    |10-11  |Reserved       |2      |0x0000         |Reserved. Must be 0x0000.
+        """
         transfer_size, attribute, termchar = struct.unpack_from("<IBB2x", tmcSpecific, 4)
         print("Transfer size:", transfer_size)
         print("Attribute:", attribute)
