@@ -749,7 +749,7 @@ class TMCInterface(Interface):
                     |        |               |       |               |          |   the USBTMC message.
                     |9-11    |Reserved       |3      |0x000000       |Reserved. Must be 0x000000.
         """
-        transfer_size, attribute = struct.unpack_from("<IB3x", tmcSpecific, 4)
+        transfer_size, attribute = struct.unpack_from("<IB3x", tmcSpecific, 0)
         print("Transfer size:", transfer_size)
         print("Attribute:", attribute)
 
@@ -773,7 +773,7 @@ class TMCInterface(Interface):
                     |       |               |       |               |0x00000000.
                     |8-11   |Reserved       |4      |0x00000000     |Reserved. Must be 0x0000000.
         """
-        transfer_size = struct.unpack_from("<I4x", tmcSpecific, 4)
+        transfer_size = struct.unpack_from("<I4x", tmcSpecific, 0)
         print("Transfer size:", transfer_size)
 
     def draft_bulk_in_header(self, msgID, btag):
@@ -842,7 +842,7 @@ class TMCInterface(Interface):
                     |       |               |       |               |this field.
                     |10-11  |Reserved       |2      |0x0000         |Reserved. Must be 0x0000.
         """
-        transfer_size, attribute, termchar = struct.unpack_from("<IBB2x", tmcSpecific, 4)
+        transfer_size, attribute, termchar = struct.unpack_from("<IBB2x", tmcSpecific, 0)
         print("Transfer size:", transfer_size)
         print("Attribute:", attribute)
         print("termchar:", termchar)
@@ -854,5 +854,5 @@ class TMCInterface(Interface):
         :param message:
         :return:
         """
-        transfer_size = struct.unpack_from("<I4x", tmcSpecific, 4)
+        transfer_size = struct.unpack_from("<I4x", tmcSpecific, 0)
         print("Transfer size:", transfer_size)
