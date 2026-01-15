@@ -699,7 +699,7 @@ class TMCInterface(Interface):
         self._rx.finish_read(len(message))
 
     def on_bulk_out(self, message):
-        """
+        """ Selects callbacks by given megID
         :param message:
         :return:
         """
@@ -722,7 +722,9 @@ class TMCInterface(Interface):
             self.on_request_vendor_specific_in(bTag, tmcSpecific, message)
 
     def on_device_dependent_out(self, btag, tmcSpecific, message):
-        """
+        """ Action on Bulk out transfer with megID==DEV_DEP_MSG_OUT.
+        Subclasses must override this method.
+
         :param btag:
         :param tmcSpecific:
         :param message:
@@ -754,9 +756,9 @@ class TMCInterface(Interface):
         print("Attribute:", attribute)
 
     def draft_bulk_in_header(self, msgID, btag):
-        """
+        """ Draft a bulk in header. Subclasses may override this method.
         :param btag:
-        :return:
+        :return Descriptor:
         """
         """ Table 8 -- USBTMC Bulk-IN Header
         Offset  |Field                              |Size   |Value      |Description
@@ -784,11 +786,12 @@ class TMCInterface(Interface):
         return resp
 
     def on_request_device_dependent_in(self, btag, tmcSpecific, message):
-        """
+        """ Action on Bulk out transfer with megID==DEV_DEP_MSG_IN.
+        Subclasses must override this method.
+
         :param btag:
         :param tmcSpecific:
         :param message:
-        :return:
         """
         """ Table 4 -- REQUEST_DEV_DEP_MSG_IN Bulk-OUT Header with command specific content
                     |Offset |Field          |Size   |Value          |Description
@@ -825,11 +828,12 @@ class TMCInterface(Interface):
         print("termchar:", termchar)
 
     def on_vendor_specific_out(self, btag, tmcSpecific, message):
-        """
+        """ Action on Bulk out transfer with megID==VENDOR_SPECIFIC_OUT
+        Subclasses must override this method.
+
         :param btag:
         :param tmcSpecific:
         :param message:
-        :return:
         """
         """ Table 5 -- VENDOR_SPECIFIC_OUT Bulk-OUT Header with command specific content
                     |Offset |Field          |Size   |Value          |Description
@@ -848,11 +852,12 @@ class TMCInterface(Interface):
         print("Transfer size:", transfer_size)
 
     def on_request_vendor_specific_in(self, btag, tmcSpecific, message):
-        """
+        """ Action on Bulk out transfer with megID==REQUEST_VENDOR_SPECIFIC_IN
+        Subclasses must override this method.
+
         :param btag:
         :param tmcSpecific:
         :param message:
-        :return:
         """
         transfer_size = struct.unpack_from("<I4x", tmcSpecific, 0)
         print("Transfer size:", transfer_size)
