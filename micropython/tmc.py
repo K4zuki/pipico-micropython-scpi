@@ -712,11 +712,11 @@ class TMCInterface(Interface):
 
         if msgID == _MSGID_DEV_DEP_MSG_OUT:
             self.on_device_dependent_out(bTag, tmcSpecific, message)
+        elif msgID == _MSGID_REQUEST_DEV_DEP_MSG_IN:
+            self.on_request_device_dependent_in(bTag, tmcSpecific, message)
         elif msgID == _MSGID_VENDOR_SPECIFIC_OUT:
             # Unlikely
             self.on_vendor_specific_out(bTag, tmcSpecific, message)
-        elif msgID == _MSGID_REQUEST_DEV_DEP_MSG_IN:
-            self.on_request_device_dependent_in(bTag, tmcSpecific, message)
         elif msgID == _MSGID_REQUEST_VENDOR_SPECIFIC_IN:
             # Unlikely
             self.on_request_vendor_specific_in(bTag, tmcSpecific, message)
