@@ -753,29 +753,6 @@ class TMCInterface(Interface):
         print("Transfer size:", transfer_size)
         print("Attribute:", attribute)
 
-    def on_vendor_specific_out(self, btag, tmcSpecific, message):
-        """
-        :param btag:
-        :param tmcSpecific:
-        :param message:
-        :return:
-        """
-        """ Table 5 -- VENDOR_SPECIFIC_OUT Bulk-OUT Header with command specific content
-                    |Offset |Field          |Size   |Value          |Description
-        ------------------------------------------------------------------------------------------------------------------------
-                    |0-3    |See Table 1.   |4      |See Table 1.   |See Table 1.
-        ------------------------------------------------------------------------------------------------------------------------
-        USBTMC      |4-7    |TransferSize   |4      |Number         |Total number of USBTMC message data bytes to be
-        command     |       |               |       |               |sent in this USB transfer. This does not include the
-        specific    |       |               |       |               |number of bytes in this Bulk-OUT Header or
-        content     |       |               |       |               |alignment bytes. Sent least significant byte first,
-                    |       |               |       |               |most significant byte last. TransferSize must be >
-                    |       |               |       |               |0x00000000.
-                    |8-11   |Reserved       |4      |0x00000000     |Reserved. Must be 0x0000000.
-        """
-        transfer_size = struct.unpack_from("<I4x", tmcSpecific, 0)
-        print("Transfer size:", transfer_size)
-
     def draft_bulk_in_header(self, msgID, btag):
         """
         :param btag:
@@ -846,6 +823,29 @@ class TMCInterface(Interface):
         print("Transfer size:", transfer_size)
         print("Attribute:", attribute)
         print("termchar:", termchar)
+
+    def on_vendor_specific_out(self, btag, tmcSpecific, message):
+        """
+        :param btag:
+        :param tmcSpecific:
+        :param message:
+        :return:
+        """
+        """ Table 5 -- VENDOR_SPECIFIC_OUT Bulk-OUT Header with command specific content
+                    |Offset |Field          |Size   |Value          |Description
+        ------------------------------------------------------------------------------------------------------------------------
+                    |0-3    |See Table 1.   |4      |See Table 1.   |See Table 1.
+        ------------------------------------------------------------------------------------------------------------------------
+        USBTMC      |4-7    |TransferSize   |4      |Number         |Total number of USBTMC message data bytes to be
+        command     |       |               |       |               |sent in this USB transfer. This does not include the
+        specific    |       |               |       |               |number of bytes in this Bulk-OUT Header or
+        content     |       |               |       |               |alignment bytes. Sent least significant byte first,
+                    |       |               |       |               |most significant byte last. TransferSize must be >
+                    |       |               |       |               |0x00000000.
+                    |8-11   |Reserved       |4      |0x00000000     |Reserved. Must be 0x0000000.
+        """
+        transfer_size = struct.unpack_from("<I4x", tmcSpecific, 0)
+        print("Transfer size:", transfer_size)
 
     def on_request_vendor_specific_in(self, btag, tmcSpecific, message):
         """
