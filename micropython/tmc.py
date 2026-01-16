@@ -707,8 +707,8 @@ class TMCInterface(Interface):
         """
         msgID, bTag, bTagInverse, tmcSpecific = struct.unpack_from("BBBx8s", message, 0)
         assert (bTag & bTagInverse) == 0 and (bTag | bTagInverse) == 0xff
-        if len(message) > 12:
-            message = message[12:]
+        if len(message) > _BULK_OUT_HEADER_SIZE:
+            message = message[_BULK_OUT_HEADER_SIZE:]
         else:
             message = b""
 
