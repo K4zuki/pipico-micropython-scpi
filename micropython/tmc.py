@@ -663,7 +663,7 @@ class TMCInterface(Interface):
     def _tx_xfer(self):
         # Keep an active IN transfer to send data to the host, whenever
         # there is data to send.
-        if not self.is_open() and not self.xfer_pending(self.ep_in) and self._tx.readable():
+        if self.is_open() and not self.xfer_pending(self.ep_in) and self._tx.readable():
             self.submit_xfer(self.ep_in, self._tx.pend_read(), self._tx_cb)
 
     def _tx_cb(self, ep, res, num_bytes):
