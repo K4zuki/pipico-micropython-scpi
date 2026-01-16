@@ -913,3 +913,24 @@ class TMCInterface(Interface):
         """
         transfer_size = struct.unpack_from("<I4x", tmcSpecific, 0)
         print("Transfer size:", transfer_size)
+
+    def draft_vendor_specific_in_header(self, btag, transfer_size):
+        """ Draft a bulk in header for DEV_DEP_MSG_IN message
+        :param btag:
+        :param transfer_size:
+        :return Descriptor:
+        """
+        """ Table 10 – VENDOR_SPECIFIC_IN Bulk-IN Header with response specific content
+                    |Offset |Field                              |Size   |Value          |Description
+        ------------------------------------------------------------------------------------------------------------------------
+        USBTMC      |0-3    |See Table 8.                       |4      |See Table 8.   |See Table 8.
+        response    |4-7    |TransferSize                       |4      |Number         |Total number of message data bytes to be sent in this
+        specific    |       |                                   |       |               |USB transfer. This does not include the number of bytes
+        content     |       |                                   |       |               |in this header or alignment bytes. Sent least significant
+                    |       |                                   |       |               |byte first, most significant byte last. TransferSize must be
+                    |       |                                   |       |               |> 0x00000000.
+                    |8-11   |Reserved                           |4      |0x00000000     |Reserved. Must be 0x00000000.
+        """
+        header: Descriptor = self.draft_bulk_in_header(_MSGID_VENDOR_SPECIFIC_IN, btag, transfer_size)
+
+        return header
