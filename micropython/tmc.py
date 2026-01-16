@@ -6,6 +6,7 @@
 
 from micropython import const, schedule
 import machine
+from collections import deque
 import struct
 import time
 
