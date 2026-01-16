@@ -916,6 +916,7 @@ class TMCInterface(Interface):
         :param message:
         """
         transfer_size = struct.unpack_from("<I4x", tmcSpecific, 0)
+        header: Descriptor = self.draft_vendor_specific_in_header(btag, transfer_size)
         print("Transfer size:", transfer_size)
 
     def draft_vendor_specific_in_header(self, btag, transfer_size):
