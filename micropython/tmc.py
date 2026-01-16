@@ -327,6 +327,8 @@ class TMCInterface(Interface):
         self.listen_only = listen_only
         self.termchar = termchar
         self.capabilities = self.get_capabilities()
+        self.last_bulkout_msgID = None
+        self.dev_dep_out_messages = deque([], 16)
 
     def desc_cfg(self, desc, itf_num, ep_num, strs):
         # Function to build configuration descriptor contents for this interface
