@@ -829,6 +829,49 @@ class TMCInterface(Interface):
         print("Attribute:", attribute)
         print("termchar:", termchar)
 
+    def draft_device_dependent_in_header(self, btag, transfer_size=256):
+        """ Draft a bulk in header for DEV_DEP_MSG_IN message
+
+        :param btag:
+        :param transfer_size:
+        :return Descriptor:
+        """
+        """ Table 9 -- DEV_DEP_MSG_IN Bulk-IN Header with response specific content
+                    |Offset |Field                              |Size   |Value          |Description
+        ------------------------------------------------------------------------------------------------------------------------
+        USBTMC      |0-3    |See Table 8.                       |4      |See Table 8.   |See Table 8.
+        response    |4-7    |TransferSize                       |4      |Number         |Total number of message data bytes to be sent in this
+        specific    |       |                                   |       |               |USB transfer. This does not include the number of bytes
+        content     |       |                                   |       |               |in this header or alignment bytes. Sent least significant
+                    |       |                                   |       |               |byte first, most significant byte last. TransferSize must be
+                    |       |                                   |       |               |> 0x00000000.
+                    |8      |bmTransferAttributes               |1      |Bitmap         |D7...D2    |Reserved. All bits must be 0.
+                    |       |                                   |       |               |D1         |1 – All of the following are true:
+                    |       |                                   |       |               |           |   - The USBTMC interface supports
+                    |       |                                   |       |               |           |       TermChar
+                    |       |                                   |       |               |           |   - The bmTransferAttributes.
+                    |       |                                   |       |               |           |       TermCharEnabled bit was set in the
+                    |       |                                   |       |               |           |       REQUEST_DEV_DEP_MSG_IN.
+                    |       |                                   |       |               |           |   - The last USBTMC message data byte in
+                    |       |                                   |       |               |           |       this transfer matches the TermChar in
+                    |       |                                   |       |               |           |       the REQUEST_DEV_DEP_MSG_IN.
+                    |       |                                   |       |               |           |0 – One or more of the above conditions is
+                    |       |                                   |       |               |           |   not met.
+                    |       |                                   |       |               |D0         |EOM.
+                    |       |                                   |       |               |           |1 - The last USBTMC message data byte in
+                    |       |                                   |       |               |           |   the transfer is the last byte of the
+                    |       |                                   |       |               |           |   USBTMC message.
+                    |       |                                   |       |               |           |0 – The last USBTMC message data byte in
+                    |       |                                   |       |               |           |   the transfer is not the last byte of the
+                    |       |                                   |       |               |           |   USBTMC message.
+                    |9-11   |Reserved                           |3      |0x000000       |Reserved. Must be 0x000000.
+        """
+        attr = (1 if self.termchar else 0) << 1 | 1
+        header: Descriptor = self.draft_bulk_in_header(_MSGID_DEV_DEP_MSG_IN, btag, transfer_size)
+        header.pack_into("B", 8, attr)
+
+        return header
+
     def on_vendor_specific_out(self, btag, tmcSpecific, message):
         """ Action on Bulk out transfer with megID==VENDOR_SPECIFIC_OUT
         Subclasses must override this method.
