@@ -757,9 +757,12 @@ class TMCInterface(Interface):
         print("Transfer size:", transfer_size)
         print("Attribute:", attribute)
 
-    def draft_bulk_in_header(self, msgID, btag):
+    def draft_bulk_in_header(self, msgID, btag, transfer_size):
         """ Draft a bulk in header. Subclasses may override this method.
+
+        :param msgID:
         :param btag:
+        :param transfer_size:
         :return Descriptor:
         """
         """ Table 8 -- USBTMC Bulk-IN Header
@@ -778,7 +781,7 @@ class TMCInterface(Interface):
                 |                                   |       |specific   |
         """
         assert msgID in (_MSGID_DEV_DEP_MSG_IN, _MSGID_VENDOR_SPECIFIC_IN)
-        resp = Descriptor(bytearray(12))
+        resp = Descriptor(bytearray(transfer_size))
         resp.pack_into("BBB",
                        0,
                        msgID,
@@ -828,6 +831,10 @@ class TMCInterface(Interface):
         print("Transfer size:", transfer_size)
         print("Attribute:", attribute)
         print("termchar:", termchar)
+        header: Descriptor = self.draft_device_dependent_in_header(btag, transfer_size)
+        message = b"REQUEST_DEV_DEP_MSG_IN\n"
+        self.send_device_dependent_in(header, message)
+        return True
 
     def draft_device_dependent_in_header(self, btag, transfer_size=256):
         """ Draft a bulk in header for DEV_DEP_MSG_IN message
