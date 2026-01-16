@@ -297,6 +297,8 @@ _MSGID_REQUEST_VENDOR_SPECIFIC_IN = const(127)
 _MSGID_VENDOR_SPECIFIC_IN = const(127)
 
 _wMaxPacketSize = const(64)
+_BULK_IN_HEADER_SIZE = const(12)
+_HEADERS_BASE_SIZE = const(4)
 
 
 class TMCInterface(Interface):
