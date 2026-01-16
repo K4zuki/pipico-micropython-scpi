@@ -934,3 +934,24 @@ class TMCInterface(Interface):
         header: Descriptor = self.draft_bulk_in_header(_MSGID_VENDOR_SPECIFIC_IN, btag, transfer_size)
 
         return header
+
+    def send_device_dependent_in(self, header: Descriptor, message=b""):
+        """
+        :param header:
+        :param message:
+        :return bool:
+        """
+        if self.last_bulkout_msgID == _MSGID_REQUEST_DEV_DEP_MSG_IN:
+            mes_len = len(message)
+            header.pack_into("<I", 4, mes_len)
+            padding_len = _HEADERS_BASE_SIZE - (len(message) % _HEADERS_BASE_SIZE)
+            end_pos = _BULK_IN_HEADER_SIZE + mes_len + padding_len
+
+            assert end_pos % _HEADERS_BASE_SIZE == 0
+
+            header.pack_into(f"{mes_len}B", 12, *list(message))
+            self._tx.write(header.b[:end_pos])
+            self._tx_xfer()
+            return True
+
+        return False
