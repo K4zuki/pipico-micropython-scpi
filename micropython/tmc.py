@@ -715,6 +715,7 @@ class TMCInterface(Interface):
         else:
             message = b""
 
+        self.last_bulkout_msgID = msgID
         if msgID == _MSGID_DEV_DEP_MSG_OUT:
             self.on_device_dependent_out(bTag, tmcSpecific, message)
         elif msgID == _MSGID_REQUEST_DEV_DEP_MSG_IN:
