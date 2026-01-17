@@ -703,36 +703,36 @@ class TMCInterface(Interface):
             self.on_bulk_out(message)
         self._rx.finish_read(len(message))
 
-    def on_bulk_out(self, message):
+    def on_bulk_out(self, message: bytes):
         """ Selects callbacks by given megID
         :param message:
         :return:
         """
-        msgID, bTag, bTagInverse, tmcSpecific = struct.unpack_from("BBBx8s", message, 0)
-        assert (bTag & bTagInverse) == 0 and (bTag | bTagInverse) == 0xff
+        msg_id, b_tag, b_tag_inverse, tmc_specific = struct.unpack_from("BBBx8s", message, 0)
+        assert (b_tag & b_tag_inverse) == 0 and (b_tag | b_tag_inverse) == 0xff
         if len(message) > _BULK_OUT_HEADER_SIZE:
             message = message[_BULK_OUT_HEADER_SIZE:]
         else:
             message = b""
 
-        self.last_bulkout_msgID = msgID
-        if msgID == _MSGID_DEV_DEP_MSG_OUT:
-            self.on_device_dependent_out(bTag, tmcSpecific, message)
-        elif msgID == _MSGID_REQUEST_DEV_DEP_MSG_IN:
-            self.on_request_device_dependent_in(bTag, tmcSpecific, message)
-        elif msgID == _MSGID_VENDOR_SPECIFIC_OUT:
+        self.last_bulkout_msgID = msg_id
+        if msg_id == _MSGID_DEV_DEP_MSG_OUT:
+            self.on_device_dependent_out(b_tag, tmc_specific, message)
+        elif msg_id == _MSGID_REQUEST_DEV_DEP_MSG_IN:
+            self.on_request_device_dependent_in(b_tag, tmc_specific, message)
+        elif msg_id == _MSGID_VENDOR_SPECIFIC_OUT:
             # Unlikely
-            self.on_vendor_specific_out(bTag, tmcSpecific, message)
-        elif msgID == _MSGID_REQUEST_VENDOR_SPECIFIC_IN:
+            self.on_vendor_specific_out(b_tag, tmc_specific, message)
+        elif msg_id == _MSGID_REQUEST_VENDOR_SPECIFIC_IN:
             # Unlikely
-            self.on_request_vendor_specific_in(bTag, tmcSpecific, message)
+            self.on_request_vendor_specific_in(b_tag, tmc_specific, message)
 
-    def on_device_dependent_out(self, btag, tmcSpecific, message):
+    def on_device_dependent_out(self, b_tag: int, tmc_specific: int, message: bytes) -> None:
         """ Action on Bulk out transfer with megID==DEV_DEP_MSG_OUT.
         Subclasses must override this method.
 
-        :param btag:
-        :param tmcSpecific:
+        :param b_tag:
+        :param tmc_specific:
         :param message:
         :return:
         """
@@ -757,15 +757,15 @@ class TMCInterface(Interface):
                     |        |               |       |               |          |   the USBTMC message.
                     |9-11    |Reserved       |3      |0x000000       |Reserved. Must be 0x000000.
         """
-        transfer_size, attribute = struct.unpack_from("<IB3x", tmcSpecific, 0)
+        transfer_size, attribute = struct.unpack_from("<IB3x", tmc_specific, 0)
         print("Transfer size:", transfer_size)
         print("Attribute:", attribute)
 
-    def draft_bulk_in_header(self, msgID, btag, transfer_size):
+    def draft_bulk_in_header(self, msg_id: int, b_tag: int, transfer_size: int) -> Descriptor:
         """ Draft a bulk in header. Subclasses may override this method.
 
-        :param msgID:
-        :param btag:
+        :param msg_id:
+        :param b_tag:
         :param transfer_size:
         :return Descriptor:
         """
@@ -784,22 +784,22 @@ class TMCInterface(Interface):
                 |                                   |       |message    |
                 |                                   |       |specific   |
         """
-        assert msgID in (_MSGID_DEV_DEP_MSG_IN, _MSGID_VENDOR_SPECIFIC_IN)
+        assert msg_id in (_MSGID_DEV_DEP_MSG_IN, _MSGID_VENDOR_SPECIFIC_IN)
         resp = Descriptor(bytearray(transfer_size))
         resp.pack_into("BBB",
                        0,
-                       msgID,
-                       btag & 0xff,
-                       (~btag) & 0xff
+                       msg_id,
+                       b_tag & 0xff,
+                       (~b_tag) & 0xff
                        )
         return resp
 
-    def on_request_device_dependent_in(self, btag, tmcSpecific, message):
-        """ Action on Bulk out transfer with megID==DEV_DEP_MSG_IN.
+    def on_request_device_dependent_in(self, b_tag: int, tmc_specific: int, message: bytes) -> None:
+        """ Action on Bulk out transfer with megID==REQUEST_DEV_DEP_MSG_IN.
         Subclasses must override this method.
 
-        :param btag:
-        :param tmcSpecific:
+        :param b_tag:
+        :param tmc_specific:
         :param message:
         """
         """ Table 4 -- REQUEST_DEV_DEP_MSG_IN Bulk-OUT Header with command specific content
@@ -831,19 +831,19 @@ class TMCInterface(Interface):
                     |       |               |       |               |this field.
                     |10-11  |Reserved       |2      |0x0000         |Reserved. Must be 0x0000.
         """
-        transfer_size, attribute, termchar = struct.unpack_from("<IBB2x", tmcSpecific, 0)
-        print("Transfer size:", transfer_size)
-        print("Attribute:", attribute)
-        print("termchar:", termchar)
-        header: Descriptor = self.draft_device_dependent_in_header(btag, transfer_size)
-        message = b"REQUEST_DEV_DEP_MSG_IN\n"
+        transfer_size, attribute, termchar = struct.unpack_from("<IBB2x", tmc_specific, 0)
+
+        header: Descriptor = self.draft_device_dependent_in_header(b_tag, transfer_size)
+        message: bytes = self.prepare_dev_dep_msg_in()
+
         self.send_device_dependent_in(header, message)
+
         return True
 
-    def draft_device_dependent_in_header(self, btag, transfer_size=256):
+    def draft_device_dependent_in_header(self, b_tag: int, transfer_size: int = 256):
         """ Draft a bulk in header for DEV_DEP_MSG_IN message
 
-        :param btag:
+        :param b_tag:
         :param transfer_size:
         :return Descriptor:
         """
@@ -878,17 +878,17 @@ class TMCInterface(Interface):
                     |9-11   |Reserved                           |3      |0x000000       |Reserved. Must be 0x000000.
         """
         attr = (1 if self.termchar else 0) << 1 | 1
-        header: Descriptor = self.draft_bulk_in_header(_MSGID_DEV_DEP_MSG_IN, btag, transfer_size)
+        header: Descriptor = self.draft_bulk_in_header(_MSGID_DEV_DEP_MSG_IN, b_tag, transfer_size)
         header.pack_into("B", 8, attr)
 
         return header
 
-    def on_vendor_specific_out(self, btag, tmcSpecific, message):
+    def on_vendor_specific_out(self, b_tag: int, tmc_specific: int, message: bytes) -> None:
         """ Action on Bulk out transfer with megID==VENDOR_SPECIFIC_OUT
         Subclasses must override this method.
 
-        :param btag:
-        :param tmcSpecific:
+        :param b_tag:
+        :param tmc_specific:
         :param message:
         """
         """ Table 5 -- VENDOR_SPECIFIC_OUT Bulk-OUT Header with command specific content
@@ -904,24 +904,24 @@ class TMCInterface(Interface):
                     |       |               |       |               |0x00000000.
                     |8-11   |Reserved       |4      |0x00000000     |Reserved. Must be 0x0000000.
         """
-        transfer_size = struct.unpack_from("<I4x", tmcSpecific, 0)
+        transfer_size = struct.unpack_from("<I4x", tmc_specific, 0)
         print("Transfer size:", transfer_size)
 
-    def on_request_vendor_specific_in(self, btag, tmcSpecific, message):
+    def on_request_vendor_specific_in(self, b_tag: int, tmc_specific: int, message: bytes) -> None:
         """ Action on Bulk out transfer with megID==REQUEST_VENDOR_SPECIFIC_IN
         Subclasses must override this method.
 
-        :param btag:
-        :param tmcSpecific:
+        :param b_tag:
+        :param tmc_specific:
         :param message:
         """
-        transfer_size = struct.unpack_from("<I4x", tmcSpecific, 0)
-        header: Descriptor = self.draft_vendor_specific_in_header(btag, transfer_size)
+        transfer_size = struct.unpack_from("<I4x", tmc_specific, 0)
+        header: Descriptor = self.draft_vendor_specific_in_header(b_tag, transfer_size)
         print("Transfer size:", transfer_size)
 
-    def draft_vendor_specific_in_header(self, btag, transfer_size):
+    def draft_vendor_specific_in_header(self, b_tag, transfer_size):
         """ Draft a bulk in header for DEV_DEP_MSG_IN message
-        :param btag:
+        :param b_tag:
         :param transfer_size:
         :return Descriptor:
         """
@@ -936,7 +936,7 @@ class TMCInterface(Interface):
                     |       |                                   |       |               |> 0x00000000.
                     |8-11   |Reserved                           |4      |0x00000000     |Reserved. Must be 0x00000000.
         """
-        header: Descriptor = self.draft_bulk_in_header(_MSGID_VENDOR_SPECIFIC_IN, btag, transfer_size)
+        header: Descriptor = self.draft_bulk_in_header(_MSGID_VENDOR_SPECIFIC_IN, b_tag, transfer_size)
 
         return header
 
