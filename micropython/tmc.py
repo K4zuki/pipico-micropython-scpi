@@ -840,6 +840,13 @@ class TMCInterface(Interface):
 
         return True
 
+    def prepare_dev_dep_msg_in(self) -> bytes:
+        """ Prepares Bulk-IN transfer message.
+        Subclasses must override this method.
+        """
+        ret = f"REQUEST_DEV_DEP_MSG_IN; last msgID = 0x{self.last_bulkout_msgID:02x}\n"
+        return ret.encode()
+
     def draft_device_dependent_in_header(self, b_tag: int, transfer_size: int = 256):
         """ Draft a bulk in header for DEV_DEP_MSG_IN message
 

@@ -128,3 +128,94 @@ class Usb488Interface(TMCInterface):
         resp.pack_into("B", 15, usb488_dev_capabilities)  # USB488DeviceCapabilities
 
         return resp.b
+
+    def on_device_dependent_out(self, b_tag, tmc_specific, message):
+        """ Action on Bulk out transfer with megID==DEV_DEP_MSG_OUT.
+        Subclasses must override this method.
+
+        :param b_tag:
+        :param tmc_specific:
+        :param message:
+        :return:
+        """
+        """ Table 3 -- Example *IDN? Bulk-OUT USBTMC device dependent command message
+                    |Offset |Field                      |Size   |Value                  |Description
+        ------------------------------------------------------------------------------------------------------------------------
+        Bulk-OUT    |0      |MsgID                      |1      |DEV_DEP_MSG_OUT        |See the USBTMC specification,
+        Header      |1      |bTag                       |1      |0x01 (varies with each |Table 1.
+                    |       |                           |       |transfer)              |
+                    |2      |bTagInverse                |1      |0xFE                   |
+                    |3      |Reserved                   |1      |0x00                   |
+        ------------------------------------------------------------------------------------------------------------------------
+        USBTMC      |4      |TransferSize               |4      |0x06                   |Command specific content.
+        device      |5      |                           |       |0x00                   |See the USBTMC specification,
+        dependent   |6      |                           |       |0x00                   |Table 3.
+        command     |7      |                           |       |0x00                   |
+        message     |8      |bmTransfer                 |1      |0x01 (EOM is set).     |
+                    |       |Attributes                 |       |                       |
+                    |9      |Reserved                   |1      |0x00                   |
+                    |10     |Reserved                   |1      |0x00                   |
+                    |11     |Reserved                   |1      |0x00                   |
+                    |12     |Device dependent           |1      |0x2A = ‘*’             |USBTMC message data byte 0.
+                    |13     |message data bytes         |1      |0x49 = ‘I’             |USBTMC message data byte 1.
+                    |14     |                           |1      |0x44 = ‘D’             |USBTMC message data byte 2.
+                    |15     |                           |1      |0x4E = ‘N’             |USBTMC message data byte 3.
+                    |16     |                           |1      |0x3F = ‘?’             |USBTMC message data byte 4.
+                    |17     |                           |1      |0x0A = ‘\n’ = newline  |USBTMC message data byte 5.
+        ------------------------------------------------------------------------------------------------------------------------
+                    |18-19  |Alignment bytes            |2      |0x0000                 |Two alignment bytes are added
+                    |       |(required to make the      |       |(not required to be    |to bring the number of DATA
+                    |       |number of bytes in the     |       |0x0000)                |bytes in the transaction to 20,
+                    |       |transaction a multiple of  |       |                       |which is divisible by 4.
+                    |       |4)                         |       |                       |
+
+        """
+        transfer_size, attribute = struct.unpack_from("<IB3x", tmc_specific, 0)
+        print("Transfer size:", transfer_size)
+        print("Attribute:", attribute)
+
+    def on_request_device_dependent_in(self, b_tag, tmc_specific, message):
+        """ Action on Bulk out transfer with megID==DEV_DEP_MSG_IN.
+        Subclasses must override this method.
+
+        :param b_tag:
+        :param tmc_specific:
+        :param message:
+        """
+        """ Table 4 -- REQUEST_DEV_DEP_MSG_IN Bulk-OUT Header with command specific content
+                    |Offset |Field          |Size   |Value          |Description
+        ------------------------------------------------------------------------------------------------------------------------
+                    |0-3    |See Table 1.   |4      |See Table 1.   |See Table 1.
+        ------------------------------------------------------------------------------------------------------------------------
+        USBTMC      |4-7    |TransferSize   |4      |Number         |Total number of USBTMC message data bytes to be
+        command     |       |               |       |               |sent in this USB transfer. This does not include the
+        specific    |       |               |       |               |number of bytes in this Bulk-OUT Header or
+        content     |       |               |       |               |alignment bytes. Sent least significant byte first,
+                    |       |               |       |               |most significant byte last. TransferSize must be >
+                    |       |               |       |               |0x00000000.
+                    |8      |bmTransfer     |1      |Bitmap         |D7...D2    |Reserved. All bits must be 0.
+                    |       |Attributes     |       |               |D1         |TermCharEnabled.
+                    |       |               |       |               |           |1 – The Bulk-IN transfer must terminate
+                    |       |               |       |               |           |   on the specified TermChar. The Host
+                    |       |               |       |               |           |   may only set this bit if the USBTMC
+                    |       |               |       |               |           |   interface indicates it supports
+                    |       |               |       |               |           |   TermChar in the GET_CAPABILITIES
+                    |       |               |       |               |           |   response packet.
+                    |       |               |       |               |           |0 – The device must ignore TermChar.
+                    |       |               |       |               |D0         |Must be 0.
+                    |9      |TermChar       |1      |Value          |If bmTransferAttributes.D1 = 1, TermChar is an 8-bit
+                    |       |               |       |               |value representing a termination character. If
+                    |       |               |       |               |supported, the device must terminate the Bulk-IN
+                    |       |               |       |               |transfer after this character is sent.
+                    |       |               |       |               |If bmTransferAttributes.D1 = 0, the device must ignore
+                    |       |               |       |               |this field.
+                    |10-11  |Reserved       |2      |0x0000         |Reserved. Must be 0x0000.
+        """
+        transfer_size, attribute, termchar = struct.unpack_from("<IBB2x", tmc_specific, 0)
+
+        header: Descriptor = self.draft_device_dependent_in_header(b_tag, transfer_size)
+        message: bytes = self.prepare_dev_dep_msg_in()
+
+        self.send_device_dependent_in(header, message)
+
+        return True
