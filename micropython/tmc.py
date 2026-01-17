@@ -838,8 +838,6 @@ class TMCInterface(Interface):
 
         self.send_device_dependent_in(header, message)
 
-        return True
-
     def prepare_dev_dep_msg_in(self) -> bytes:
         """ Prepares Bulk-IN transfer message.
         Subclasses must override this method.
