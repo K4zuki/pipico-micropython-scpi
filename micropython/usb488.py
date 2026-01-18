@@ -6,6 +6,7 @@
 
 from micropython import const
 import time
+import struct
 import usb.device
 from usb.device.core import Interface, Descriptor, split_bmRequestType, Buffer
 from tmc import TMCInterface
