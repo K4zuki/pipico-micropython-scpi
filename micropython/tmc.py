@@ -703,7 +703,7 @@ class TMCInterface(Interface):
             self.on_bulk_out(message)
         self._rx.finish_read(len(message))
 
-    def on_bulk_out(self, message: bytes):
+    def on_bulk_out(self, message: memoryview):
         """ Selects callbacks by given megID
         :param message:
         :return:
@@ -888,7 +888,7 @@ class TMCInterface(Interface):
 
         return header
 
-    def on_vendor_specific_out(self, b_tag: int, tmc_specific: int, message: bytes) -> None:
+    def on_vendor_specific_out(self, b_tag: int, tmc_specific: int, message: memoryview) -> None:
         """ Action on Bulk out transfer with megID==VENDOR_SPECIFIC_OUT
         Subclasses must override this method.
 
@@ -912,7 +912,7 @@ class TMCInterface(Interface):
         transfer_size = struct.unpack_from("<I4x", tmc_specific, 0)
         print("Transfer size:", transfer_size)
 
-    def on_request_vendor_specific_in(self, b_tag: int, tmc_specific: int, message: bytes) -> None:
+    def on_request_vendor_specific_in(self, b_tag: int, tmc_specific: int, message: memoryview) -> None:
         """ Action on Bulk out transfer with megID==REQUEST_VENDOR_SPECIFIC_IN
         Subclasses must override this method.
 
