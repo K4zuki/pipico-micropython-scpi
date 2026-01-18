@@ -316,8 +316,8 @@ class TMCInterface(Interface):
         self.ep_out = None  # Set during enumeration. RX direction (host to device)
         self.ep_in = None  # TX direction (device to host)
         self.ep_int = None  # set during enumeration
-        self._rx = Buffer(_wMaxPacketSize)
-        self._tx = Buffer(_wMaxPacketSize)
+        self._rx = Buffer(256)
+        self._tx = Buffer(256)
 
         self.protocol = protocol
         self.interface_str = interface_str
