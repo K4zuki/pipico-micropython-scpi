@@ -218,5 +218,3 @@ class Usb488Interface(TMCInterface):
         message: bytes = self.prepare_dev_dep_msg_in()
 
         self.send_device_dependent_in(header, message)
-
-        return True
