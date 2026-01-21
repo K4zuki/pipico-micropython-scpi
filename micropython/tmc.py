@@ -661,10 +661,6 @@ class TMCInterface(Interface):
                        )
         return resp.b
 
-    def busy(self, ep):
-        # Returns True if endpoint ep is busy (i.e. existing transfer is pending)
-        return self.is_open() and self.xfer_pending(ep)
-
     def _tx_xfer(self):
         # Keep an active IN transfer to send data to the host, whenever
         # there is data to send.
