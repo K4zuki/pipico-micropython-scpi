@@ -756,6 +756,7 @@ class TMCInterface(Interface):
         transfer_size, attribute = struct.unpack_from("<IB3x", tmc_specific, 0)
         print("Transfer size:", transfer_size)
         print("Attribute:", attribute)
+        print("Message:", bytes(message))
 
     def draft_bulk_in_header(self, msg_id: int, b_tag: int, transfer_size: int) -> Descriptor:
         """ Draft a bulk in header. Subclasses may override this method.
