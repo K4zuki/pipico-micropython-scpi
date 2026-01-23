@@ -702,8 +702,7 @@ class TMCInterface(Interface):
         :param _: dummy argument for micropython.schedule()
         """
         message: memoryview = self._rx.pend_read()
-        if _BULK_OUT_HEADER_SIZE <= len(message) <= _wMaxPacketSize:
-            self.on_bulk_out(message)
+        self.on_bulk_out(message)
         self._rx.finish_read(len(message))
 
     def on_bulk_out(self, message: memoryview):
