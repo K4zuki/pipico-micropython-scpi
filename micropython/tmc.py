@@ -6,7 +6,7 @@
 
 from micropython import const, schedule
 import machine
-from collections import deque
+from collections import deque, namedtuple
 import struct
 import time
 
@@ -302,7 +302,12 @@ _BULK_IN_HEADER_SIZE = const(12)
 _HEADERS_BASE_SIZE = const(4)
 
 
+class LastBulkOutMessage(namedtuple("LastBulkOutMessage", ["msg_id", "b_tag", "tmc_specific", "message"])):
+    pass
+
+
 class TMCInterface(Interface):
+
     def __init__(self,
                  protocol=_PROTOCOL_NONE,
                  interface_str=None,
