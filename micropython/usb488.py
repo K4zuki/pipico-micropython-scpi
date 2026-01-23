@@ -130,7 +130,7 @@ class Usb488Interface(TMCInterface):
 
         return resp.b
 
-    def on_device_dependent_out(self, b_tag: int, tmc_specific: int, message: memoryview) -> None:
+    def on_device_dependent_out(self, b_tag: int, tmc_specific: int, message: bytes) -> None:
         """ Action on Bulk out transfer with megID==DEV_DEP_MSG_OUT.
         Subclasses must override this method.
 
