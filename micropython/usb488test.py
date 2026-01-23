@@ -1,11 +1,3 @@
-import os
-import time
-
-from machine import UART
-
-uart = UART(0, baudrate=115200, tx=0, rx=1)
-os.dupterm(uart)
-
 import usb.device
 from usb488 import Usb488Interface
 
