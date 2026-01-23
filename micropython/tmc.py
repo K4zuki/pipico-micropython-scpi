@@ -990,7 +990,7 @@ class TMCInterface(Interface):
         :param message:
         :return bool:
         """
-        if self.last_bulkout_msgID == _MSGID_REQUEST_DEV_DEP_MSG_IN:
+        if self.last_bulkout_msg.msg_id == _MSGID_REQUEST_DEV_DEP_MSG_IN:
             mes_len = len(message)
             header.pack_into("<I", 4, mes_len)
             padding_len = _HEADERS_BASE_SIZE - (len(message) % _HEADERS_BASE_SIZE)
