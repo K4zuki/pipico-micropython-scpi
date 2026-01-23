@@ -710,24 +710,47 @@ class TMCInterface(Interface):
         :param message:
         :return:
         """
-        msg_id, b_tag, b_tag_inverse, tmc_specific = struct.unpack_from("BBBx8s", message, 0)
-        assert (b_tag & b_tag_inverse) == 0 and (b_tag | b_tag_inverse) == 0xff
-        if len(message) > _BULK_OUT_HEADER_SIZE:
-            message = message[_BULK_OUT_HEADER_SIZE:]
-        else:
-            message = b""
+        if not self._bulkout_header_processed:
+            msg_id, b_tag, b_tag_inverse, tmc_specific = struct.unpack_from("BBBx8s", message, 0)
+            if (b_tag & b_tag_inverse) == 0 and (b_tag | b_tag_inverse) == 0xff:
 
-        self.last_bulkout_msgID = msg_id
-        if msg_id == _MSGID_DEV_DEP_MSG_OUT:
-            self.on_device_dependent_out(b_tag, tmc_specific, message)
-        elif msg_id == _MSGID_REQUEST_DEV_DEP_MSG_IN:
-            self.on_request_device_dependent_in(b_tag, tmc_specific, message)
-        elif msg_id == _MSGID_VENDOR_SPECIFIC_OUT:
-            # Unlikely
-            self.on_vendor_specific_out(b_tag, tmc_specific, message)
-        elif msg_id == _MSGID_REQUEST_VENDOR_SPECIFIC_IN:
-            # Unlikely
-            self.on_request_vendor_specific_in(b_tag, tmc_specific, message)
+                if msg_id in (_MSGID_DEV_DEP_MSG_OUT, _MSGID_VENDOR_SPECIFIC_OUT,
+                              _MSGID_REQUEST_DEV_DEP_MSG_IN, _MSGID_REQUEST_VENDOR_SPECIFIC_IN):
+                    self.last_bulkout_msg = LastBulkOutMessage(msg_id, b_tag, tmc_specific,
+                                                               bytes(message[_BULK_OUT_HEADER_SIZE:]))
+                    self._bulkout_header_processed = True
+                    self.on_bulk_out(message)
+                else:
+                    print("Unknown message ID:", msg_id)
+                print(self.last_bulkout_msg)
+        else:
+            msg_id, b_tag, tmc_specific, message = self.last_bulkout_msg
+            transfer_size, _ = struct.unpack_from("<IB3x", tmc_specific, 0)
+            print("on_bulk_out Transfer size:", transfer_size)
+
+            if msg_id in (_MSGID_DEV_DEP_MSG_OUT, _MSGID_VENDOR_SPECIFIC_OUT):
+                last_bulkout_msg: bytes = self.last_bulkout_msg.message
+                if transfer_size > len(last_bulkout_msg):  # need to receive more
+                    message = last_bulkout_msg + bytes(message)  # concat message
+                    self.last_bulkout_msg = LastBulkOutMessage(self.last_bulkout_msg.msg_id,
+                                                               self.last_bulkout_msg.b_tag,
+                                                               self.last_bulkout_msg.tmc_specific, message)
+                    self._rx_xfer()  # receive more
+                else:
+                    msg_id, b_tag, tmc_specific, message = self.last_bulkout_msg
+                    if msg_id == _MSGID_DEV_DEP_MSG_OUT:
+                        self.on_device_dependent_out(b_tag, tmc_specific, message)
+                        self._bulkout_header_processed = False
+                    elif msg_id == _MSGID_VENDOR_SPECIFIC_OUT:  # Unlikely the case
+                        self.on_vendor_specific_out(b_tag, tmc_specific, message)
+                        self._bulkout_header_processed = False
+            elif msg_id == _MSGID_REQUEST_DEV_DEP_MSG_IN:
+                self.on_request_device_dependent_in(b_tag, tmc_specific, message)
+                self._bulkout_header_processed = False
+            elif msg_id == _MSGID_REQUEST_VENDOR_SPECIFIC_IN:  # Unlikely the case
+                self.on_request_vendor_specific_in(b_tag, tmc_specific, message)
+                self._bulkout_header_processed = False
+        print("self._bulkout_header_processed:", self._bulkout_header_processed)
 
     def on_device_dependent_out(self, b_tag: int, tmc_specific: int, message: bytes) -> None:
         """ Action on Bulk out transfer with megID==DEV_DEP_MSG_OUT.
