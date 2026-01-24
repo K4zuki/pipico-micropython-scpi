@@ -5,6 +5,7 @@
 # MIT license; Copyright (c) 2025 Kazuki Yamamoto
 
 from micropython import const, schedule
+import io
 import machine
 from collections import deque, namedtuple
 import struct
@@ -798,7 +799,7 @@ class TMCInterface(Interface):
         transfer_size, attribute = struct.unpack_from("<IB3x", self.last_bulkout_msg.tmc_specific, 0)
         print("Transfer size:", transfer_size)
         print("Attribute:", attribute)
-        print("Message:", bytes(message))
+        print("Message:", bytes(self.last_bulkout_msg.message))
 
     def draft_bulk_in_header(self, msg_id: int, b_tag: int, transfer_size: int) -> Descriptor:
         """ Draft a bulk in header. Subclasses may override this method.
