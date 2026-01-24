@@ -871,7 +871,7 @@ class TMCInterface(Interface):
                     |       |               |       |               |this field.
                     |10-11  |Reserved       |2      |0x0000         |Reserved. Must be 0x0000.
         """
-        transfer_size, attribute, termchar = struct.unpack_from("<IBB2x", self.last_bulkout_msg.specific, 0)
+        transfer_size, attribute, termchar = struct.unpack_from("<IBB2x", self.last_bulkout_msg.tmc_specific, 0)
 
         header: Descriptor = self.draft_device_dependent_in_header(self.last_bulkout_msg.b_tag, transfer_size)
         message: bytes = self.prepare_dev_dep_msg_in()
