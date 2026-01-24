@@ -1,5 +1,5 @@
 import usb.device
-from usb.device.usb488 import Usb488Interface
+from usb488 import Usb488Interface
 
 usb488 = Usb488Interface()
 

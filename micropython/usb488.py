@@ -9,7 +9,7 @@ import time
 import struct
 import usb.device
 from usb.device.core import Interface, Descriptor, split_bmRequestType, Buffer
-from usb.device.tmc import TMCInterface
+from tmc import TMCInterface
 
 _PROTOCOL_488 = const(0x01)
 
