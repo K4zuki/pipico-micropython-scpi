@@ -737,7 +737,7 @@ class TMCInterface(Interface):
                     print("Unknown message ID:", msg_id)
                 print(self.last_bulkout_msg)
         else:
-            msg_id, b_tag, tmc_specific, message = self.last_bulkout_msg
+            msg_id, b_tag, tmc_specific, message, _ = self.last_bulkout_msg
             transfer_size, _ = struct.unpack_from("<IB3x", tmc_specific, 0)
             print("on_bulk_out Transfer size:", transfer_size)
 
@@ -750,7 +750,7 @@ class TMCInterface(Interface):
                                                                 self.last_bulkout_msg.tmc_specific, message, b"")
                     self._rx_xfer()  # receive more
                 else:
-                    msg_id, b_tag, tmc_specific, message = self.last_bulkout_msg
+                    msg_id, b_tag, tmc_specific, message, _ = self.last_bulkout_msg
                     if msg_id == _MSGID_DEV_DEP_MSG_OUT:
                         self.on_device_dependent_out()
                         self._bulkout_header_processed = False
