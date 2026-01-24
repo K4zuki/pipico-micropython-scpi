@@ -130,7 +130,7 @@ class Usb488Interface(TMCInterface):
 
         return resp.b
 
-    def on_device_dependent_out(self, b_tag: int, tmc_specific: int, message: bytes) -> None:
+    def on_device_dependent_out(self) -> None:
         """ Action on Bulk out transfer with megID==DEV_DEP_MSG_OUT.
         Subclasses must override this method.
 
@@ -171,14 +171,15 @@ class Usb488Interface(TMCInterface):
                     |       |4)                         |       |                       |
 
         """
-        transfer_size, attribute = struct.unpack_from("<IB3x", tmc_specific, 0)
+        transfer_size, attribute = struct.unpack_from("<IB3x", self.last_bulkout_msg.tmc_specific, 0)
         print("Transfer size:", transfer_size)
         print("Attribute:", attribute)
+        message = self.last_bulkout_msg.message
         print("Message:", bytes(message))
         p = len(message)
         print("Actual message size:", p)
 
-    def on_request_device_dependent_in(self, b_tag: int, tmc_specific: int, message: bytes) -> None:
+    def on_request_device_dependent_in(self) -> None:
         """ Action on Bulk out transfer with megID==DEV_DEP_MSG_IN.
         Subclasses must override this method.
 
@@ -215,10 +216,10 @@ class Usb488Interface(TMCInterface):
                     |       |               |       |               |this field.
                     |10-11  |Reserved       |2      |0x0000         |Reserved. Must be 0x0000.
         """
-        transfer_size, attribute, termchar = struct.unpack_from("<IBB2x", tmc_specific, 0)
+        transfer_size, attribute, termchar = struct.unpack_from("<IBB2x", self.last_bulkout_msg.tmc_specific, 0)
         print("on_request_device_dependent_in")
 
-        header: Descriptor = self.draft_device_dependent_in_header(b_tag, transfer_size)
+        header: Descriptor = self.draft_device_dependent_in_header(self.last_bulkout_msg.b_tag, transfer_size)
         message: bytes = self.prepare_dev_dep_msg_in()
         print("message:", message)
 

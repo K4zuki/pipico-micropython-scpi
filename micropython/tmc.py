@@ -752,20 +752,20 @@ class TMCInterface(Interface):
                 else:
                     msg_id, b_tag, tmc_specific, message = self.last_bulkout_msg
                     if msg_id == _MSGID_DEV_DEP_MSG_OUT:
-                        self.on_device_dependent_out(b_tag, tmc_specific, message)
+                        self.on_device_dependent_out()
                         self._bulkout_header_processed = False
                     elif msg_id == _MSGID_VENDOR_SPECIFIC_OUT:  # Unlikely the case
-                        self.on_vendor_specific_out(b_tag, tmc_specific, message)
+                        self.on_vendor_specific_out()
                         self._bulkout_header_processed = False
             elif msg_id == _MSGID_REQUEST_DEV_DEP_MSG_IN:
-                self.on_request_device_dependent_in(b_tag, tmc_specific, message)
+                self.on_request_device_dependent_in()
                 self._bulkout_header_processed = False
             elif msg_id == _MSGID_REQUEST_VENDOR_SPECIFIC_IN:  # Unlikely the case
-                self.on_request_vendor_specific_in(b_tag, tmc_specific, message)
+                self.on_request_vendor_specific_in()
                 self._bulkout_header_processed = False
         print("self._bulkout_header_processed:", self._bulkout_header_processed)
 
-    def on_device_dependent_out(self, b_tag: int, tmc_specific: int, message: bytes) -> None:
+    def on_device_dependent_out(self) -> None:
         """ Action on Bulk out transfer with megID==DEV_DEP_MSG_OUT.
         Subclasses must override this method.
 
@@ -795,7 +795,7 @@ class TMCInterface(Interface):
                     |        |               |       |               |          |   the USBTMC message.
                     |9-11    |Reserved       |3      |0x000000       |Reserved. Must be 0x000000.
         """
-        transfer_size, attribute = struct.unpack_from("<IB3x", tmc_specific, 0)
+        transfer_size, attribute = struct.unpack_from("<IB3x", self.last_bulkout_msg.tmc_specific, 0)
         print("Transfer size:", transfer_size)
         print("Attribute:", attribute)
         print("Message:", bytes(message))
@@ -833,7 +833,7 @@ class TMCInterface(Interface):
                        )
         return resp
 
-    def on_request_device_dependent_in(self, b_tag: int, tmc_specific: int, message: bytes) -> None:
+    def on_request_device_dependent_in(self) -> None:
         """ Action on Bulk out transfer with megID==REQUEST_DEV_DEP_MSG_IN.
         Subclasses must override this method.
 
@@ -870,9 +870,9 @@ class TMCInterface(Interface):
                     |       |               |       |               |this field.
                     |10-11  |Reserved       |2      |0x0000         |Reserved. Must be 0x0000.
         """
-        transfer_size, attribute, termchar = struct.unpack_from("<IBB2x", tmc_specific, 0)
+        transfer_size, attribute, termchar = struct.unpack_from("<IBB2x", self.last_bulkout_msg.specific, 0)
 
-        header: Descriptor = self.draft_device_dependent_in_header(b_tag, transfer_size)
+        header: Descriptor = self.draft_device_dependent_in_header(self.last_bulkout_msg.b_tag, transfer_size)
         message: bytes = self.prepare_dev_dep_msg_in()
 
         self.send_device_dependent_in(header, message)
@@ -927,7 +927,7 @@ class TMCInterface(Interface):
 
         return header
 
-    def on_vendor_specific_out(self, b_tag: int, tmc_specific: int, message: bytes) -> None:
+    def on_vendor_specific_out(self) -> None:
         """ Action on Bulk out transfer with megID==VENDOR_SPECIFIC_OUT
         Subclasses must override this method.
 
@@ -948,10 +948,10 @@ class TMCInterface(Interface):
                     |       |               |       |               |0x00000000.
                     |8-11   |Reserved       |4      |0x00000000     |Reserved. Must be 0x0000000.
         """
-        transfer_size = struct.unpack_from("<I4x", tmc_specific, 0)
+        transfer_size = struct.unpack_from("<I4x", self.last_bulkout_msg.tmc_specific, 0)
         print("Transfer size:", transfer_size)
 
-    def on_request_vendor_specific_in(self, b_tag: int, tmc_specific: int, message: bytes) -> None:
+    def on_request_vendor_specific_in(self) -> None:
         """ Action on Bulk out transfer with megID==REQUEST_VENDOR_SPECIFIC_IN
         Subclasses must override this method.
 
@@ -972,8 +972,8 @@ class TMCInterface(Interface):
                     |       |               |       |               |0x00000000.
                     |8-11   |Reserved       |4      |0x00000000     |Reserved. Must be 0x00000000.
         """
-        transfer_size = struct.unpack_from("<I4x", tmc_specific, 0)
-        header: Descriptor = self.draft_vendor_specific_in_header(b_tag, transfer_size)
+        transfer_size = struct.unpack_from("<I4x", self.last_bulkout_msg.tmc_specific, 0)
+        header: Descriptor = self.draft_vendor_specific_in_header(self.last_bulkout_msg.b_tag, transfer_size)
         print("Transfer size:", transfer_size)
 
     def draft_vendor_specific_in_header(self, b_tag, transfer_size):
