@@ -1,7 +1,7 @@
 import os
 import time
 import usb.device
-from usb488 import TMCInterface
+from usb.device.tmc import TMCInterface
 
 tmc = TMCInterface()
 

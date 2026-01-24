@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 import usb.device
-from usb488 import Usb488Interface
+from usb.device.usb488 import Usb488Interface
 
 usb488 = Usb488Interface()
 
