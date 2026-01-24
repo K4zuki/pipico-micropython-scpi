@@ -302,11 +302,25 @@ _BULK_IN_HEADER_SIZE = const(12)
 _HEADERS_BASE_SIZE = const(4)
 
 
-class LastBulkOutMessage(namedtuple("LastBulkOutMessage", ["msg_id", "b_tag", "tmc_specific", "message"])):
-    pass
+class TmcBulkInOutMessage(namedtuple("TmcBulkInOutMessage",
+                                     [
+                                         "msg_id",  # msgID
+                                         "b_tag",  # bTag
+                                         "tmc_specific",  # USBTMC command message specific
+                                         "message",  # payload message from host
+                                         "response"  # response message to host
+                                     ])):
+    """
+    * ``msg_id``: msgID
+    * ``b_tag``:  bTag
+    * ``tmc_specific``:  USBTMC command message specific
+    * ``message``: payload message from host
+    * ``response``: response message to host
+    """
 
 
 class TMCInterface(Interface):
+    last_bulkout_msg: TmcBulkInOutMessage
 
     def __init__(self,
                  protocol=_PROTOCOL_NONE,
@@ -335,7 +349,6 @@ class TMCInterface(Interface):
 
         self.dev_dep_out_messages = deque([], 16)
         self._bulkout_header_processed = False
-        self.last_bulkout_msg: LastBulkOutMessage = LastBulkOutMessage(0, 0, 0, 0)
 
     def desc_cfg(self, desc, itf_num, ep_num, strs):
         # Function to build configuration descriptor contents for this interface
@@ -716,8 +729,8 @@ class TMCInterface(Interface):
 
                 if msg_id in (_MSGID_DEV_DEP_MSG_OUT, _MSGID_VENDOR_SPECIFIC_OUT,
                               _MSGID_REQUEST_DEV_DEP_MSG_IN, _MSGID_REQUEST_VENDOR_SPECIFIC_IN):
-                    self.last_bulkout_msg = LastBulkOutMessage(msg_id, b_tag, tmc_specific,
-                                                               bytes(message[_BULK_OUT_HEADER_SIZE:]))
+                    self.last_bulkout_msg = TmcBulkInOutMessage(msg_id, b_tag, tmc_specific,
+                                                                bytes(message[_BULK_OUT_HEADER_SIZE:]), b"")
                     self._bulkout_header_processed = True
                     self.on_bulk_out(message)
                 else:
@@ -732,9 +745,9 @@ class TMCInterface(Interface):
                 last_bulkout_msg: bytes = self.last_bulkout_msg.message
                 if transfer_size > len(last_bulkout_msg):  # need to receive more
                     message = last_bulkout_msg + bytes(message)  # concat message
-                    self.last_bulkout_msg = LastBulkOutMessage(self.last_bulkout_msg.msg_id,
-                                                               self.last_bulkout_msg.b_tag,
-                                                               self.last_bulkout_msg.tmc_specific, message)
+                    self.last_bulkout_msg = TmcBulkInOutMessage(self.last_bulkout_msg.msg_id,
+                                                                self.last_bulkout_msg.b_tag,
+                                                                self.last_bulkout_msg.tmc_specific, message, b"")
                     self._rx_xfer()  # receive more
                 else:
                     msg_id, b_tag, tmc_specific, message = self.last_bulkout_msg
