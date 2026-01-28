@@ -1,9 +1,11 @@
 import usb.device
-from usb488 import Usb488Interface
+from Usb488ScpiPico import Usb488ScpiPico
+from RaspberryScpiPico import RaspberryScpiPico
 
-usb488 = Usb488Interface()
+pico = RaspberryScpiPico()
+usb488if = Usb488ScpiPico(pico)
 
-usb.device.get().init(usb488,
+usb.device.get().init(usb488if,
                       id_product=0x0488,
                       builtin_driver=True,
                       max_power_ma=100,
