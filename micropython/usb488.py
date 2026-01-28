@@ -9,7 +9,7 @@ import time
 import struct
 import usb.device
 from usb.device.core import Interface, Descriptor, split_bmRequestType, Buffer
-from tmc import TMCInterface
+from tmc import TMCInterface, TmcBulkInOutMessage
 
 _PROTOCOL_488 = const(0x01)
 
@@ -212,8 +212,10 @@ class Usb488Interface(TMCInterface):
 
         header: Descriptor = self.draft_device_dependent_in_header(self.last_bulkout_msg.b_tag, transfer_size)
         if len(self.dev_dep_out_messages) > 0:
-            message = self.dev_dep_out_messages.popleft()
-            print("response message:", message)
-            self.send_device_dependent_in(header, message)
+            message: TmcBulkInOutMessage = self.dev_dep_out_messages.popleft()
+            print("response message:", message.response)
+            if len(message.response) > 0:
+                # There is query response
+                self.send_device_dependent_in(header, message.response)
         else:
             print("No response stack left")
