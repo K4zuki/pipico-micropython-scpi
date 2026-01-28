@@ -133,11 +133,6 @@ class Usb488Interface(TMCInterface):
     def on_device_dependent_out(self) -> None:
         """ Action on Bulk out transfer with megID==DEV_DEP_MSG_OUT.
         Subclasses must override this method.
-
-        :param b_tag:
-        :param tmc_specific:
-        :param message:
-        :return:
         """
         """ Table 3 -- Example *IDN? Bulk-OUT USBTMC device dependent command message
                     |Offset |Field                      |Size   |Value                  |Description
@@ -182,10 +177,6 @@ class Usb488Interface(TMCInterface):
     def on_request_device_dependent_in(self) -> None:
         """ Action on Bulk out transfer with megID==DEV_DEP_MSG_IN.
         Subclasses must override this method.
-
-        :param b_tag:
-        :param tmc_specific:
-        :param message:
         """
         """ Table 4 -- REQUEST_DEV_DEP_MSG_IN Bulk-OUT Header with command specific content
                     |Offset |Field          |Size   |Value          |Description

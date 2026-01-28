@@ -769,11 +769,6 @@ class TMCInterface(Interface):
     def on_device_dependent_out(self) -> None:
         """ Action on Bulk out transfer with megID==DEV_DEP_MSG_OUT.
         Subclasses must override this method.
-
-        :param b_tag:
-        :param tmc_specific:
-        :param message:
-        :return:
         """
         """ Table 3 -- DEV_DEP_MSG_OUT Bulk-OUT Header with command specific content
                     |Offset  |Field          |Size   |Value          |Description
@@ -837,10 +832,6 @@ class TMCInterface(Interface):
     def on_request_device_dependent_in(self) -> None:
         """ Action on Bulk out transfer with megID==REQUEST_DEV_DEP_MSG_IN.
         Subclasses must override this method.
-
-        :param b_tag:
-        :param tmc_specific:
-        :param message:
         """
         """ Table 4 -- REQUEST_DEV_DEP_MSG_IN Bulk-OUT Header with command specific content
                     |Offset |Field          |Size   |Value          |Description
@@ -931,10 +922,6 @@ class TMCInterface(Interface):
     def on_vendor_specific_out(self) -> None:
         """ Action on Bulk out transfer with megID==VENDOR_SPECIFIC_OUT
         Subclasses must override this method.
-
-        :param b_tag:
-        :param tmc_specific:
-        :param message:
         """
         """ Table 5 -- VENDOR_SPECIFIC_OUT Bulk-OUT Header with command specific content
                     |Offset |Field          |Size   |Value          |Description
@@ -955,10 +942,6 @@ class TMCInterface(Interface):
     def on_request_vendor_specific_in(self) -> None:
         """ Action on Bulk out transfer with megID==REQUEST_VENDOR_SPECIFIC_IN
         Subclasses must override this method.
-
-        :param b_tag:
-        :param tmc_specific:
-        :param message:
         """
         """ Table 6 -- REQUEST_VENDOR_SPECIFIC_IN Bulk-OUT Header with command specific content
                     |Offset |Field          |Size   |Value          |Description
