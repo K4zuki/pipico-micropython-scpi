@@ -515,7 +515,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 duty = pwm_conf.duty_u16
                 message = ";".join([f"PIN{pin}:MODE {IO_MODE_STRINGS[mode]}",
                                     f"PIN{pin}:VALue {IO_VALUE_STRINGS[value]}",
-                                    f"PIN{pin}:PWM:FREQuency {freq}",
+                                    f"PIN{pin}:PWM:FREQuency {freq:_d}",
                                     f"PIN{pin}:PWM:DUTY {duty}"
                                     ])
                 print(message, end=";", file=self.stdout)
@@ -652,7 +652,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         if query:
             # print("cb_pin_pwm_freq", pin_number, "Query", param, file=self.stdout)
             pwm_freq = conf.freq
-            print(f"{pwm_freq}", file=self.stdout)
+            print(f"{pwm_freq:_d}", file=self.stdout)
         elif pwm_freq is not None:
             # print("cb_pin_pwm_freq", pin_number, param, file=self.stdout)
 
@@ -689,7 +689,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         if query:
             # print("cb_pin_pwm_duty", pin_number, "Query", param, file=self.stdout)
             pwm_duty = conf.duty_u16
-            print(f"{pwm_duty}", file=self.stdout)
+            print(f"{pwm_duty:_d}", file=self.stdout)
         elif pwm_duty is not None:
             # print("cb_pin_pwm_duty", pin_number, param, file=self.stdout)
 
@@ -726,7 +726,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         duty = pwm_conf.duty_u16
 
         if query:
-            print(f"LED:VALue {IO_VALUE_STRINGS[value]};LED:PWM:FREQuency {freq};LED:PWM:DUTY {duty}", file=self.stdout)
+            print(f"LED:VALue {IO_VALUE_STRINGS[value]};LED:PWM:FREQuency {freq:_d};LED:PWM:DUTY {duty}",
+                  file=self.stdout)
         else:
             self.error_push(E_SYNTAX)
 
@@ -828,7 +829,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 conf = self.i2c_conf[bus]
                 shift = conf.bit
                 freq = conf.freq
-                print(f"I2C{bus}:ADDRess:BIT {shift};I2C{bus}:FREQuency {freq};", end="", file=self.stdout)
+                print(f"I2C{bus}:ADDRess:BIT {shift};I2C{bus}:FREQuency {freq:_d};", end="", file=self.stdout)
             else:
                 print("", file=self.stdout)
         else:
@@ -879,7 +880,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             # print("cb_i2c_freq", bus_number, "Query", param, file=self.stdout)
 
             bus_freq = conf.freq
-            print(f"{bus_freq}", file=self.stdout)
+            print(f"{bus_freq:_d}", file=self.stdout)
         elif bus_freq is not None:
             # print("cb_i2c_freq", bus_number, param, file=self.stdout)
 
@@ -1153,7 +1154,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 cspol = conf.cspol
                 freq = conf.freq
                 mode = conf.mode
-                print(f"SPI{bus}:CSEL:POLarity {cspol};SPI{bus}:FREQuency {freq};SPI{bus}:MODE {mode};", end="",
+                print(f"SPI{bus}:CSEL:POLarity {cspol};SPI{bus}:FREQuency {freq:_d};SPI{bus}:MODE {mode};", end="",
                       file=self.stdout)
             print("", file=self.stdout)
         else:
@@ -1287,7 +1288,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             # print("cb_spi_freq", bus_number, "Query", param, file=self.stdout)
 
             bus_freq = conf.freq
-            print(f"{bus_freq}", file=self.stdout)
+            print(f"{bus_freq:_d}", file=self.stdout)
         elif bus_freq is not None:
             # print("cb_spi_freq", bus_number, param, file=self.stdout)
             try:
