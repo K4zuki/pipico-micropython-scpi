@@ -994,10 +994,16 @@ class TMCInterface(Interface):
             end_pos = _BULK_IN_HEADER_SIZE + mes_len + padding_len
 
             assert end_pos % _HEADERS_BASE_SIZE == 0
+            print(end_pos, end_pos % 16)
 
             header.pack_into(f"{mes_len}B", 12, *list(message))
-            self._tx.write(header.b[:end_pos])
-            self._tx_xfer()
+            p = 0
+            while p < end_pos:
+                e = min(end_pos - p, _wMaxPacketSize)
+                e = self._tx.write(header.b[p:p + e])  # get actual written bytes
+                print(e)
+                self._tx_xfer()
+                p += e
             return True
 
         return False
