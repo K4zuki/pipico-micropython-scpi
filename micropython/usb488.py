@@ -220,7 +220,9 @@ class Usb488Interface(TMCInterface):
         print("on_request_device_dependent_in")
 
         header: Descriptor = self.draft_device_dependent_in_header(self.last_bulkout_msg.b_tag, transfer_size)
-        message: bytes = self.prepare_dev_dep_msg_in()
-        print("message:", message)
-
-        self.send_device_dependent_in(header, message)
+        if len(self.dev_dep_out_messages) > 0:
+            message = self.dev_dep_out_messages.popleft()
+            print("response message:", message)
+            self.send_device_dependent_in(header, message)
+        else:
+            print("No response stack left")
