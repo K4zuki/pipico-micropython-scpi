@@ -1,6 +1,8 @@
 import io
 import struct
 from MicroScpiDevice import MicroScpiDevice
+from MicroScpiDevice import MicroScpiDevice, ScpiErrorNumber
+from usb.device.core import Descriptor
 from tmc import TmcBulkInOutMessage
 from usb488 import Usb488Interface
 
@@ -63,7 +65,10 @@ class Usb488ScpiPico(Usb488Interface):
                                                     self.last_bulkout_msg.message, response)
         print(response)
 
-        self.dev_dep_out_messages.append(self.last_bulkout_msg)
+            self.dev_dep_out_messages.append(self.last_bulkout_msg)
+        except Exception as e:
+            self.parser.error_push(
+                ScpiErrorNumber(-481, f"{e}"))
 
     def on_request_device_dependent_in(self) -> None:
         """ Action on Bulk out transfer with megID==DEV_DEP_MSG_IN.
