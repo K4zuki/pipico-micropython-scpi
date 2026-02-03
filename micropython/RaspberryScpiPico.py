@@ -458,15 +458,36 @@ class RaspberryScpiPico(MicroScpiDevice):
         else:
             self.error_push(E_SYNTAX)
 
-    @staticmethod
-    def cb_rst(param="", opt=None):
+    def cb_rst(self, param="", opt=None):
         """
         - *RST <No Param>
         """
 
         # print(f"Reset", file=self.stdout)
         machine.freq(DEFAULT_CPU_CLOCK)
-        machine.soft_reset()
+        # machine.soft_reset()
+
+        for pin in self.pins.values():
+            pin.init(DEFAULT_IO_MODE)
+        for pin_cfg in self.pin_conf.keys():
+            self.pin_conf[pin_cfg] = DEFAULT_PIN_CONFIG
+        for pwm_cfg in self.pwm_conf.keys():
+            self.pwm_conf[pwm_cfg] = DEFAULT_PWM_CONFIG
+        for spi in self.spi.values():
+            spi.deinit()
+            spi.init()
+        for spi_k in self.spi_conf.keys():
+            self.spi_conf[spi_k] = SpiConfig(DEFAULT_SPI_CLOCK, SPI_MODE0, SPI_CSPOL_LO,
+                                             self.spi_conf[spi_k].sck, self.spi_conf[spi_k].mosi,
+                                             self.spi_conf[spi_k].miso, self.spi_conf[spi_k].csel)
+            self.spi_conf[spi_k].csel.init()
+
+        # There is no I2C.deinit(); I2C.init() is denied for some reason
+        self.i2c[0] = machine.I2C(0, scl=scl0, sda=sda0, freq=DEFAULT_I2C_CLOCK)
+        self.i2c[1] = machine.I2C(1, scl=scl1, sda=sda1, freq=DEFAULT_I2C_CLOCK)
+        for i2c_k in self.i2c_conf.keys():
+            self.i2c_conf[i2c_k] = I2cConfig(DEFAULT_I2C_CLOCK, DEFAULT_I2C_BIT,
+                                             self.i2c_conf[i2c_k].scl, self.i2c_conf[i2c_k].sda)
 
     @staticmethod
     def cb_version(param="", opt=None):
