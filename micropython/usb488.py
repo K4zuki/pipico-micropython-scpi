@@ -166,6 +166,7 @@ class Usb488Interface(TMCInterface):
                     |       |4)                         |       |                       |
 
         """
+        self._bulkout_header_processed = False
         transfer_size, attribute = struct.unpack_from("<IB3x", self.last_bulkout_msg.tmc_specific, 0)
         print("Transfer size:", transfer_size)
         print("Attribute:", attribute)
@@ -207,6 +208,7 @@ class Usb488Interface(TMCInterface):
                     |       |               |       |               |this field.
                     |10-11  |Reserved       |2      |0x0000         |Reserved. Must be 0x0000.
         """
+        self._bulkout_header_processed = False
         transfer_size, attribute, termchar = struct.unpack_from("<IBB2x", self.last_bulkout_msg.tmc_specific, 0)
         print("on_request_device_dependent_in")
 
