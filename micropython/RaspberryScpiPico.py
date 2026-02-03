@@ -23,6 +23,7 @@ SOFTWARE.
 """
 import time
 from micropython import const
+from collections import OrderedDict
 
 """
 - *CLS <No Param>
@@ -308,7 +309,7 @@ class RaspberryScpiPico(MicroScpiDevice):
     kw_error = ScpiKeyword("ERRor", "ERR", ["?"])
 
     "PIN[14|15|16|17|18|19|20|21|22|25]"
-    pins = {
+    pins = OrderedDict({
         14: pin14,
         15: pin15,
         16: pin16,
@@ -319,23 +320,23 @@ class RaspberryScpiPico(MicroScpiDevice):
         21: pin21,
         22: pin22,
         25: pin25
-    }
-    i2c = {
+    })
+    i2c = OrderedDict({
         0: i2c0,
         1: i2c1
-    }
-    adc = {
+    })
+    adc = OrderedDict({
         0: adc0,
         1: adc1,
         2: adc2,
         3: adc3,
         4: adc4
-    }
-    spi = {
+    })
+    spi = OrderedDict({
         0: spi0,
         1: spi1
-    }
-    pin_conf = {
+    })
+    pin_conf = OrderedDict({
         14: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
         15: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
         16: PinConfig(machine.Pin.IN, IO_OFF, machine.Pin.PULL_DOWN),
