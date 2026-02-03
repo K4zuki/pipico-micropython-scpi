@@ -64,3 +64,69 @@ class Usb488ScpiPico(Usb488Interface):
         print(response)
 
         self.dev_dep_out_messages.append(self.last_bulkout_msg)
+
+    def on_request_device_dependent_in(self) -> None:
+        """ Action on Bulk out transfer with megID==DEV_DEP_MSG_IN.
+        Subclasses must override this method.
+        """
+        """Table 5 -- Bulk-IN example, 488.2 compliant response USBTMC message
+                    |Offset |Field              |Size   |Value                          |Description
+        ------------------------------------------------------------------------------------------------------------------------
+        Bulk-IN     |0      |MsgID              |1      |DEV_DEP_MSG_IN                 |See the USBTMC specification, Table
+        Header      |1      |bTag               |1      |0x02 (matches bTag in          |8.
+                    |       |                   |       |REQUEST_DEV_DEP_               |
+                    |       |                   |       |MSG_IN)                        |
+                    |2      |bTagInverse        |1      |0xFD                           |
+                    |3      |Reserved           |1      |0x00                           |
+                    |4      |TransferSize       |4      |0x17                           |USBTMC response specific content.
+                    |5      |                   |       |0x00                           |See the USBTMC specification, Table
+                    |6      |                   |       |0x00                           |9.
+                    |7      |                   |       |0x00                           |
+                    |8      |bmTransfer         |1      |0x01 (EOM=1)                   |
+                    |       |Attributes         |       |                               |
+                    |9      |Reserved           |1      |0x00                           |
+                    |10     |Reserved           |1      |0x00                           |
+                    |11     |Reserved           |1      |0x00                           |
+        ------------------------------------------------------------------------------------------------------------------------
+        USBTMC      |12     |Device dependent   |1      |0x58 = ‘X’                     |USBTMC message data byte 0.
+        device      |13     |                   |1      |0x59 = ‘Y’                     |USBTMC message data byte 1.
+        dependent   |14     |                   |1      |0x5A = ‘Z’                     |USBTMC message data byte 2.
+        message     |15     |                   |1      |0x43 = ‘C ‘                    |USBTMC message data byte 3.
+                    |16     |                   |1      |0x4F = ‘O’                     |USBTMC message data byte 4.
+                    |17     |                   |1      |0x2C = ‘,’                     |USBTMC message data byte 5.
+                    |18     |                   |1      |0x32 = ‘2’                     |USBTMC message data byte 6.
+                    |19     |                   |1      |0x34 = ‘4’                     |USBTMC message data byte 7.
+                    |20     |                   |1      |0x36 = ‘6’                     |USBTMC message data byte 8.
+                    |21     |                   |1      |0x42 = ‘B’                     |USBTMC message data byte 9.
+                    |22     |                   |1      |0x2C = ‘,’                     |USBTMC message data byte 10.
+                    |23     |                   |1      |0x53 = ‘S’                     |USBTMC message data byte 11.
+                    |24     |                   |1      |0x2D = ‘-‘                     |USBTMC message data byte 12.
+                    |25     |                   |1      |0x30 = ‘0’                     |USBTMC message data byte 13.
+                    |26     |                   |1      |0x31 = ‘1’                     |USBTMC message data byte 14.
+                    |27     |                   |1      |0x32 = ‘2’                     |USBTMC message data byte 15.
+                    |28     |                   |1      |0x33 = ‘3’                     |USBTMC message data byte 16.
+                    |29     |                   |1      |0x2D = ‘-‘                     |USBTMC message data byte 17.
+                    |30     |                   |1      |0x30 = ‘0’                     |USBTMC message data byte 18.
+                    |31     |                   |1      |0x32 = ‘2’                     |USBTMC message data byte 19.
+                    |32     |                   |1      |0x2C = ‘,’                     |USBTMC message data byte 20.
+                    |33     |                   |1      |0x30 = ‘0’                     |USBTMC message data byte 21.
+                    |34     |                   |1      |0x0A = ‘\n’ = newline          |USBTMC message data byte 22.
+                    |35     |Alignment byte     |1      |0x00 (not required to be       |Alignment byte.
+                    |       |                   |       |0x00)                          |
+        """
+        self._bulkout_header_processed = False
+        transfer_size, attribute, termchar = struct.unpack_from("<IBB2x", self.last_bulkout_msg.tmc_specific, 0)
+        print("on_request_device_dependent_in")
+
+        header: Descriptor = self.draft_device_dependent_in_header(self.last_bulkout_msg.b_tag, transfer_size)
+        if len(self.dev_dep_out_messages) > 0:
+            message: TmcBulkInOutMessage = self.dev_dep_out_messages.popleft()
+            print(message)
+            print("response message:", message.response)
+            if len(message.response) > 0:
+                # There is query response
+                self.send_device_dependent_in(header, message.response)
+            else:
+                print("no response")
+        else:
+            print("No response stock left")
