@@ -51,20 +51,23 @@ class Usb488ScpiPico(Usb488Interface):
         self._bulkout_header_processed = False
         transfer_size, attribute = struct.unpack_from("<IB3x", self.last_bulkout_msg.tmc_specific, 0)
 
-        message: str = io.StringIO(self.last_bulkout_msg.message.decode("utf-8")).readline()
-        response = b""
-        with io.StringIO() as sio:
-            self.parser.stdout = sio
-            for line in message.split(";"):
-                self.parser.parse_and_process(line)
-            response = sio.getvalue().encode("utf8")
-            sio.flush()
-        response.replace(b"\n", b";")
+        message: bytes = self.last_bulkout_msg.message.split(b"\n")[0]
+        try:
+            if isinstance(message, bytes):
+                message: str = message.decode("utf-8")
+            response = b""
+            with io.StringIO() as sio:
+                self.parser.stdout = sio
+                for line in message.split(";"):
+                    self.parser.parse_and_process(line)
+                response = sio.getvalue().encode("utf8")
+                sio.flush()
+            response.replace(b"\n", b";")
 
-        self.last_bulkout_msg = TmcBulkInOutMessage(self.last_bulkout_msg.msg_id, self.last_bulkout_msg.b_tag,
-                                                    self.last_bulkout_msg.tmc_specific,
-                                                    self.last_bulkout_msg.message, response)
-        print(response)
+            self.last_bulkout_msg = TmcBulkInOutMessage(self.last_bulkout_msg.msg_id, self.last_bulkout_msg.b_tag,
+                                                        self.last_bulkout_msg.tmc_specific,
+                                                        self.last_bulkout_msg.message, response)
+            print(response)
 
             self.dev_dep_out_messages.append(self.last_bulkout_msg)
         except Exception as e:
