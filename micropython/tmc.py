@@ -1002,20 +1002,22 @@ class TMCInterface(Interface):
         if self.last_bulkout_msg.msg_id == _MSGID_REQUEST_DEV_DEP_MSG_IN:
             mes_len = len(message)
             header.pack_into("<I", 4, mes_len)
-            padding_len = _HEADERS_BASE_SIZE - (len(message) % _HEADERS_BASE_SIZE)
-            end_pos = _BULK_IN_HEADER_SIZE + mes_len + padding_len
-
-            assert end_pos % _HEADERS_BASE_SIZE == 0
-            print(end_pos, end_pos % 16)
+            # padding_len = _HEADERS_BASE_SIZE - (len(message) % _HEADERS_BASE_SIZE)
+            end_pos = _BULK_IN_HEADER_SIZE + mes_len  # + padding_len # seems not needed on sending
 
             header.pack_into(f"{mes_len}B", 12, *list(message))
             p = 0
+            attempt = 0
             while p < end_pos:
+                if attempt > 500:
+                    return False
                 e = min(end_pos - p, _wMaxPacketSize)
                 e = self._tx.write(header.b[p:p + e])  # get actual written bytes
                 print(e)
                 self._tx_xfer()
                 p += e
+                machine.idle()
+                attempt += 1
             return True
 
         return False
