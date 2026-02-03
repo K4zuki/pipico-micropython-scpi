@@ -169,11 +169,11 @@ cs0 = machine.Pin(5, mode=machine.Pin.OUT, value=IO_ON)
 
 sda1 = machine.Pin(6)
 scl1 = machine.Pin(7)
-i2c1 = machine.I2C(1, scl=scl1, sda=sda1)
+i2c1 = machine.I2C(1, scl=scl1, sda=sda1, freq=DEFAULT_I2C_CLOCK)
 
 sda0 = machine.Pin(8)
 scl0 = machine.Pin(9)
-i2c0 = machine.I2C(0, scl=scl0, sda=sda0)
+i2c0 = machine.I2C(0, scl=scl0, sda=sda0, freq=DEFAULT_I2C_CLOCK)
 
 sck1 = machine.Pin(10)
 mosi1 = machine.Pin(11)
@@ -347,6 +347,20 @@ class RaspberryScpiPico(MicroScpiDevice):
         0: SpiConfig(1_000_000, SPI_MODE0, SPI_CSPOL_LO, sck0, mosi0, miso0, cs0),
         1: SpiConfig(1_000_000, SPI_MODE0, SPI_CSPOL_LO, sck1, mosi1, miso1, cs1)
     }
+        14: PwmConfig(DEFAULT_PWM_CLOCK, DEFAULT_PWM_DUTY),
+        15: PwmConfig(DEFAULT_PWM_CLOCK, DEFAULT_PWM_DUTY),
+        16: PwmConfig(DEFAULT_PWM_CLOCK, DEFAULT_PWM_DUTY),
+        17: PwmConfig(DEFAULT_PWM_CLOCK, DEFAULT_PWM_DUTY),
+        18: PwmConfig(DEFAULT_PWM_CLOCK, DEFAULT_PWM_DUTY),
+        19: PwmConfig(DEFAULT_PWM_CLOCK, DEFAULT_PWM_DUTY),
+        20: PwmConfig(DEFAULT_PWM_CLOCK, DEFAULT_PWM_DUTY),
+        21: PwmConfig(DEFAULT_PWM_CLOCK, DEFAULT_PWM_DUTY),
+        22: PwmConfig(DEFAULT_PWM_CLOCK, DEFAULT_PWM_DUTY),
+        25: PwmConfig(DEFAULT_PWM_CLOCK, DEFAULT_PWM_DUTY)
+        0: I2cConfig(DEFAULT_I2C_CLOCK, DEFAULT_I2C_BIT, scl0, sda0),
+        1: I2cConfig(DEFAULT_I2C_CLOCK, DEFAULT_I2C_BIT, scl1, sda1)
+        0: SpiConfig(DEFAULT_SPI_CLOCK, SPI_MODE0, SPI_CSPOL_LO, sck0, mosi0, miso0, cs0),
+        1: SpiConfig(DEFAULT_SPI_CLOCK, SPI_MODE0, SPI_CSPOL_LO, sck1, mosi1, miso1, cs1)
 
     def __init__(self):
         super().__init__()
