@@ -719,9 +719,9 @@ class TMCInterface(Interface):
         self.on_bulk_out(message)
         self._rx.finish_read(len(message))
 
-    def on_bulk_out(self, message: memoryview):
+    def on_bulk_out(self, new_message: memoryview):
         """ Selects callbacks by given megID
-        :param message:
+        :param new_message:
         :return:
         """
         if not self._bulkout_header_processed:
@@ -732,8 +732,9 @@ class TMCInterface(Interface):
                               _MSGID_REQUEST_DEV_DEP_MSG_IN, _MSGID_REQUEST_VENDOR_SPECIFIC_IN):
                     self.last_bulkout_msg = TmcBulkInOutMessage(msg_id, b_tag, tmc_specific,
                                                                 bytes(message[_BULK_OUT_HEADER_SIZE:]), b"")
+                                                                message=bytes(new_message[_BULK_OUT_HEADER_SIZE:]),
                     self._bulkout_header_processed = True
-                    self.on_bulk_out(message)
+                    self.on_bulk_out(new_message)
                 else:
                     print("Unknown message ID:", msg_id)
                 print(self.last_bulkout_msg)
@@ -749,6 +750,7 @@ class TMCInterface(Interface):
                     self.last_bulkout_msg = TmcBulkInOutMessage(self.last_bulkout_msg.msg_id,
                                                                 self.last_bulkout_msg.b_tag,
                                                                 self.last_bulkout_msg.tmc_specific, message, b"")
+                    message = last_bulkout_msg + bytes(new_message)  # concat message
                     self._rx_xfer()  # receive more
                 else:
                     msg_id, b_tag, tmc_specific, message, _ = self.last_bulkout_msg
