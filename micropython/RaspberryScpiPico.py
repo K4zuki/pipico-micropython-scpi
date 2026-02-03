@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 import time
+from micropython import const
 
 """
 - *CLS <No Param>
@@ -84,40 +85,47 @@ from math import ceil
 from collections import namedtuple
 from MicroScpiDevice import ScpiKeyword, ScpiCommand, ScpiErrorNumber, MicroScpiDevice, cb_do_nothing, ERROR_LIST
 
-ABS_MAX_CLOCK = 275_000_000
-DEFAULT_CPU_CLOCK = 125_000_000
-ABS_MIN_CLOCK = 100_000_000
-MAX_PWM_CLOCK = 100_000
-MIN_PWM_CLOCK = 1_000
-MAX_PWM_DUTY = 65535
-MIN_PWM_DUTY = 0
-MAX_I2C_CLOCK = 400_000
-MIN_I2C_CLOCK = 10_000
-MAX_SPI_CLOCK = 10_000_000
-MIN_SPI_CLOCK = 10_000
-MAX_UART_BAUD = 500_000
-MIN_UART_BAUD = 300
-IO_ON = 1
-IO_OFF = 0
+ABS_MAX_CLOCK = const(275_000_000)
+DEFAULT_CPU_CLOCK = const(125_000_000)
+ABS_MIN_CLOCK = const(100_000_000)
+MAX_PWM_CLOCK = const(100_000)
+MIN_PWM_CLOCK = const(1_000)
+DEFAULT_PWM_CLOCK = const(1000)
+MAX_PWM_DUTY = const(65535)
+MIN_PWM_DUTY = const(0)
+DEFAULT_PWM_DUTY = const(32768)
+MAX_I2C_CLOCK = const(400_000)
+MIN_I2C_CLOCK = const(10_000)
+DEFAULT_I2C_CLOCK = const(100_000)
+MAX_SPI_CLOCK = const(10_000_000)
+MIN_SPI_CLOCK = const(10_000)
+DEFAULT_SPI_CLOCK = const(1_000_000)
+MAX_UART_BAUD = const(500_000)
+MIN_UART_BAUD = const(300)
+IO_ON = const(1)
+IO_OFF = const(0)
 IO_VALUE_STRINGS = {IO_ON: "ON", IO_OFF: "OFF"}
 IO_MODE_STRINGS = {machine.Pin.IN: "IN", machine.Pin.OUT: "OUT",
                    machine.Pin.OPEN_DRAIN: "ODrain", machine.Pin.ALT: "PWM"}
-DEFAULT_I2C_BIT = 1
-SPI_MODE0 = 0
-SPI_MODE1 = 1
-SPI_MODE2 = 2
-SPI_MODE3 = 3
+DEFAULT_IO_VALUE = IO_OFF
+DEFAULT_IO_MODE = machine.Pin.IN
+DEFAULT_IO_PULL = machine.Pin.PULL_DOWN
+DEFAULT_I2C_BIT = const(1)
+SPI_MODE0 = const(0)
+SPI_MODE1 = const(1)
+SPI_MODE2 = const(2)
+SPI_MODE3 = const(3)
 DEFAULT_SPI_MODE = SPI_MODE0
-SPI_CSPOL_HI = 1
-SPI_CSPOL_LO = 0
+SPI_CSPOL_HI = const(1)
+SPI_CSPOL_LO = const(0)
 DEFAULT_SPI_CSPOL = SPI_CSPOL_LO
-SPI_MASK_CKPOL = 0x02
-SPI_CKPOL_HI = 1
-SPI_CKPOL_LO = 0
+SPI_MASK_CKPOL = const(0x02)
+SPI_CKPOL_HI = const(1)
+SPI_CKPOL_LO = const(0)
 DEFAULT_SPI_CKPOL = SPI_CKPOL_LO
-SPI_MASK_CKPH = 0x01
-SPI_CKPH_HI = 1
-SPI_CKPH_LO = 0
+SPI_MASK_CKPH = const(0x01)
+SPI_CKPH_HI = const(1)
+SPI_CKPH_LO = const(0)
 DEFAULT_SPI_CKPH = SPI_CKPH_LO
 
 """
@@ -204,6 +212,9 @@ class PinConfig(namedtuple("PinConfig", ["mode", "value", "pull"])):
 
 
 class PwmConfig(namedtuple("PwmConfig", ["freq", "duty_u16"])):
+DEFAULT_PIN_CONFIG = PinConfig(DEFAULT_IO_MODE, DEFAULT_IO_VALUE, DEFAULT_IO_PULL)
+
+
     """
     :int freq: frequency
     :int duty_u16: duty
@@ -211,6 +222,9 @@ class PwmConfig(namedtuple("PwmConfig", ["freq", "duty_u16"])):
 
 
 class I2cConfig(namedtuple("I2cConfig", ["freq", "bit", "scl", "sda"])):
+DEFAULT_PWM_CONFIG = PwmConfig(DEFAULT_PWM_CLOCK, DEFAULT_PWM_DUTY)
+
+
     """
     :int freq: frequency
     :int bit: address bit
