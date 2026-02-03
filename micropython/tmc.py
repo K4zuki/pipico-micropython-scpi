@@ -725,7 +725,7 @@ class TMCInterface(Interface):
         :return:
         """
         if not self._bulkout_header_processed:
-            msg_id, b_tag, b_tag_inverse, tmc_specific = struct.unpack_from("BBBx8s", message, 0)
+            msg_id, b_tag, b_tag_inverse, tmc_specific = struct.unpack_from("BBBx8s", new_message, 0)
             if (b_tag ^ b_tag_inverse) == 0xff:
                 if msg_id in (_MSGID_DEV_DEP_MSG_OUT, _MSGID_VENDOR_SPECIFIC_OUT,
                               _MSGID_REQUEST_DEV_DEP_MSG_IN, _MSGID_REQUEST_VENDOR_SPECIFIC_IN):
