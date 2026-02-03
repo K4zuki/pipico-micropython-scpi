@@ -746,11 +746,10 @@ class TMCInterface(Interface):
             if msg_id in (_MSGID_DEV_DEP_MSG_OUT, _MSGID_VENDOR_SPECIFIC_OUT):
                 last_bulkout_msg: bytes = self.last_bulkout_msg.message
                 if transfer_size > len(last_bulkout_msg):  # need to receive more
-                    message = last_bulkout_msg + bytes(message)  # concat message
-                    self.last_bulkout_msg = TmcBulkInOutMessage(self.last_bulkout_msg.msg_id,
-                                                                self.last_bulkout_msg.b_tag,
-                                                                self.last_bulkout_msg.tmc_specific, message, b"")
                     message = last_bulkout_msg + bytes(new_message)  # concat message
+                    self.last_bulkout_msg = TmcBulkInOutMessage(msg_id=msg_id, b_tag=b_tag, tmc_specific=tmc_specific,
+                                                                message=message,
+                                                                response=b"")
                     self._rx_xfer()  # receive more
                 else:
                     msg_id, b_tag, tmc_specific, message, _ = self.last_bulkout_msg
