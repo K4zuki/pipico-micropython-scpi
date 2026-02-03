@@ -337,7 +337,7 @@ class TMCInterface(Interface):
         self.ep_in = None  # TX direction (device to host)
         self.ep_int = None  # set during enumeration
         self._rx = Buffer(256)
-        self._tx = Buffer(256)
+        self._tx = Buffer(1024)
 
         self.protocol = protocol
         self.interface_str = interface_str
