@@ -799,6 +799,7 @@ class TMCInterface(Interface):
                     |        |               |       |               |          |   the USBTMC message.
                     |9-11    |Reserved       |3      |0x000000       |Reserved. Must be 0x000000.
         """
+        self._bulkout_header_processed = False
         transfer_size, attribute = struct.unpack_from("<IB3x", self.last_bulkout_msg.tmc_specific, 0)
         print("Transfer size:", transfer_size)
         print("Attribute:", attribute)
@@ -870,6 +871,7 @@ class TMCInterface(Interface):
                     |       |               |       |               |this field.
                     |10-11  |Reserved       |2      |0x0000         |Reserved. Must be 0x0000.
         """
+        self._bulkout_header_processed = False
         transfer_size, attribute, termchar = struct.unpack_from("<IBB2x", self.last_bulkout_msg.tmc_specific, 0)
 
         header: Descriptor = self.draft_device_dependent_in_header(self.last_bulkout_msg.b_tag, transfer_size)
@@ -944,6 +946,7 @@ class TMCInterface(Interface):
                     |       |               |       |               |0x00000000.
                     |8-11   |Reserved       |4      |0x00000000     |Reserved. Must be 0x0000000.
         """
+        self._bulkout_header_processed = False
         transfer_size = struct.unpack_from("<I4x", self.last_bulkout_msg.tmc_specific, 0)
         print("Transfer size:", transfer_size)
 
@@ -964,6 +967,7 @@ class TMCInterface(Interface):
                     |       |               |       |               |0x00000000.
                     |8-11   |Reserved       |4      |0x00000000     |Reserved. Must be 0x00000000.
         """
+        self._bulkout_header_processed = False
         transfer_size = struct.unpack_from("<I4x", self.last_bulkout_msg.tmc_specific, 0)
         header: Descriptor = self.draft_vendor_specific_in_header(self.last_bulkout_msg.b_tag, transfer_size)
         print("Transfer size:", transfer_size)
