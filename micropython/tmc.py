@@ -725,13 +725,14 @@ class TMCInterface(Interface):
         :return:
         """
         if not self._bulkout_header_processed:
+            print("process header\n")
             msg_id, b_tag, b_tag_inverse, tmc_specific = struct.unpack_from("BBBx8s", new_message, 0)
             if (b_tag ^ b_tag_inverse) == 0xff:
                 if msg_id in (_MSGID_DEV_DEP_MSG_OUT, _MSGID_VENDOR_SPECIFIC_OUT,
                               _MSGID_REQUEST_DEV_DEP_MSG_IN, _MSGID_REQUEST_VENDOR_SPECIFIC_IN):
-                    self.last_bulkout_msg = TmcBulkInOutMessage(msg_id, b_tag, tmc_specific,
-                                                                bytes(message[_BULK_OUT_HEADER_SIZE:]), b"")
+                    self.last_bulkout_msg = TmcBulkInOutMessage(msg_id=msg_id, b_tag=b_tag, tmc_specific=tmc_specific,
                                                                 message=bytes(new_message[_BULK_OUT_HEADER_SIZE:]),
+                                                                response=b"")
                     self._bulkout_header_processed = True
                     self.on_bulk_out(new_message)
                 else:
