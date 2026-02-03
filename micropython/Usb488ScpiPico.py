@@ -48,6 +48,7 @@ class Usb488ScpiPico(Usb488Interface):
                     |       |4)                         |       |                       |
     
         """
+        self._bulkout_header_processed = False
         transfer_size, attribute = struct.unpack_from("<IB3x", self.last_bulkout_msg.tmc_specific, 0)
 
         message: str = io.StringIO(self.last_bulkout_msg.message.decode("utf-8")).readline()
