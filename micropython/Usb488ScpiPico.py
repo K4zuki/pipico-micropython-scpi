@@ -1,4 +1,5 @@
 import io
+import sys
 import struct
 from MicroScpiDevice import MicroScpiDevice
 from MicroScpiDevice import MicroScpiDevice, ScpiErrorNumber
@@ -62,6 +63,7 @@ class Usb488ScpiPico(Usb488Interface):
                     self.parser.parse_and_process(line)
                 response = sio.getvalue().encode("utf8")
                 sio.flush()
+            self.parser.stdout = sys.stdout
             response.replace(b"\n", b";")
 
             self.last_bulkout_msg = TmcBulkInOutMessage(self.last_bulkout_msg.msg_id, self.last_bulkout_msg.b_tag,
@@ -136,6 +138,10 @@ class Usb488ScpiPico(Usb488Interface):
                 # There is query response
                 self.send_device_dependent_in(header, message.response)
             else:
+                self.parser.error_push(
+                    ScpiErrorNumber(-482, "Read request on non-query message"))
                 print("no response")
         else:
+            self.parser.error_push(
+                ScpiErrorNumber(-483, "No response stock left"))
             print("No response stock left")
