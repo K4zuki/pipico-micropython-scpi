@@ -808,6 +808,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             pwm = machine.PWM(pin)
             pwm.init(freq=conf.freq, duty_u16=conf.duty_u16)
             self.pwmv[pin_number] = 1
+            self.cb_pin_mode("PWM", opt)
         else:
             self.error_push(E_MISSING_PARAM)
 
@@ -831,7 +832,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         elif param is None:
             # print("cb_pin_pwm_off", pin_number, file=sys.stderr)
             self.pwmv[pin_number] = 0
-            self.cb_pin_val(param="OFF", opt=opt)
+            pin.init(DEFAULT_IO_MODE)
+            self.cb_pin_mode("IN", opt)
         else:
             self.error_push(E_MISSING_PARAM)
 
