@@ -321,6 +321,18 @@ class RaspberryScpiPico(MicroScpiDevice):
         22: pin22,
         25: pin25
     })
+    pwmv = OrderedDict({
+        14: 0,
+        15: 0,
+        16: 0,
+        17: 0,
+        18: 0,
+        19: 0,
+        20: 0,
+        21: 0,
+        22: 0,
+        25: 0
+    })
     i2c = OrderedDict({
         0: i2c0,
         1: i2c1
@@ -715,9 +727,10 @@ class RaspberryScpiPico(MicroScpiDevice):
             pwm_freq = int(float(pwm_freq))
 
             if MIN_PWM_CLOCK <= pwm_freq <= MAX_PWM_CLOCK:
-                pwm = machine.PWM(pin)
-                pwm.freq(conf.freq)
-                pwm.duty_u16(conf.duty_u16)
+                if self.pwmv[pin_number] == 1:
+                    pwm = machine.PWM(pin, freq=pwm_freq, duty_u16=conf.duty_u16)
+                    pwm.freq(pwm_freq)
+                    pwm.duty_u16(conf.duty_u16)
                 # print(pwm, file=sys.stderr)
                 vals = list(conf)
                 vals[conf.index(conf.freq)] = pwm_freq
@@ -752,9 +765,11 @@ class RaspberryScpiPico(MicroScpiDevice):
             pwm_duty = int(float(pwm_duty))
 
             if MIN_PWM_DUTY <= pwm_duty <= MAX_PWM_DUTY:
-                pwm = machine.PWM(pin)
-                pwm.freq(conf.freq)
-                pwm.duty_u16(conf.duty_u16)
+                if self.pwmv[pin_number] == 1:
+                    pwm = machine.PWM(pin, freq=conf.freq, duty_u16=pwm_duty)
+                    pwm.freq(conf.freq)
+                    pwm.duty_u16(pwm_duty)
+                    print(pin, pwm)
                 # print(pwm, file=sys.stderr)
                 vals = list(conf)
                 vals[conf.index(conf.duty_u16)] = pwm_duty
