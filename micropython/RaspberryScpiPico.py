@@ -489,6 +489,8 @@ class RaspberryScpiPico(MicroScpiDevice):
             self.pin_conf[pin_cfg] = DEFAULT_PIN_CONFIG
         for pwm_cfg in self.pwm_conf.keys():
             self.pwm_conf[pwm_cfg] = DEFAULT_PWM_CONFIG
+        for pwmv in self.pwmv.keys():
+            self.pwmv[pwmv] = 0
         for spi in self.spi.values():
             spi.deinit()
             spi.init()
