@@ -78,6 +78,7 @@ from collections import OrderedDict
 - ADC[01234]:READ?
 
 """
+from micropython import const
 import sys
 import machine
 
@@ -158,6 +159,8 @@ E_DATA_OVERFLOW = ScpiErrorNumber(-223, "Too much data")
 E_INVALID_PARAMETER = ScpiErrorNumber(-224, "Invalid parameter value")
 E_I2C_FAIL = ScpiErrorNumber(-333, "I2C bus error")
 E_SPI_FAIL = ScpiErrorNumber(-334, "SPI bus error")
+
+ENDCHAR = const("\n")
 
 pin0 = machine.Pin(0, mode=machine.Pin.OUT, value=IO_ON)  # no-error indicator
 pin1 = machine.Pin(1, mode=machine.Pin.OUT, value=IO_OFF)  # error indicator

@@ -99,7 +99,7 @@ class ScpiErrorNumber(namedtuple("ScpiErrorNumber", [
 def cb_do_nothing(*args, **kwargs):
     """Abstract callback function for ScpiCommand class
     """
-    print("cb_do_nothing")
+    print("cb_do_nothing", end="\n")
 
 
 class ScpiCommand(namedtuple("ScpiCommand", [
