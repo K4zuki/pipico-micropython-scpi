@@ -1016,8 +1016,8 @@ class RaspberryScpiPico(MicroScpiDevice):
             if searched is not None:
                 address, data, _, stop = searched.groups()
                 stop = bool(int(stop))
-                address = int(f"0x{address}") >> shift
-                data_array = int(f"0x{data}").to_bytes(ceil(len(data) / 2), "big")
+                address = int(f"0x{address}", 16) >> shift
+                data_array = int(f"0x{data}", 16).to_bytes(ceil(len(data) / 2), "big")
                 # print(f"0x{address:02x}", [f"0x{c:02x}" for c in data_array], stop, file=self.stdout)
                 try:
                     bus.writeto(address, bytes(data_array), stop)
@@ -1109,9 +1109,9 @@ class RaspberryScpiPico(MicroScpiDevice):
                 address, memaddress, _, data, addrsize = searched.groups()
                 # print(address, memaddress, data, addrsize, file=self.stdout)
 
-                address = int(f"0x{address}") >> shift
-                memaddress = int(f"0x{memaddress}")
-                data_array = int(f"0x{data}").to_bytes(ceil(len(data) / 2), "big")
+                address = int(f"0x{address}", 16) >> shift
+                memaddress = int(f"0x{memaddress}", 16)
+                data_array = int(f"0x{data}", 16).to_bytes(ceil(len(data) / 2), "big")
                 addrsize = 8 * int(addrsize)
                 # print(f"0x{address:02x}", f"0x{memaddress:02x}", [f"0x{c:02x}" for c in data_array], addrsize, file=self.stdout)
                 try:
@@ -1152,9 +1152,9 @@ class RaspberryScpiPico(MicroScpiDevice):
                 searched = rstring.search(param)
                 if searched is not None:
                     address, memaddress, _, length, addrsize = searched.groups()
-                    address = int(f"0x{address}") >> shift
-                    memaddress = int(f"0x{memaddress}")
-                    length = int(f"0x{length}")
+                    address = int(f"0x{address}", 16) >> shift
+                    memaddress = int(f"0x{memaddress}", 16)
+                    length = int(f"0x{length}", 16)
                     addrsize = 8 * int(addrsize)
 
                     try:
@@ -1393,7 +1393,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 data, _, pre_cs, post_cs = searched.groups()
                 # print(f"0x{data}", file=self.stdout)
                 string_length = len(data)
-                data_array = tuple(int(data[i:i + 2], 16) for i in range(0, string_length, 2))
+                data_array = tuple(int(f"0x{data[i:i + 2]}", 16) for i in range(0, string_length, 2))
                 length = len(data_array)
                 read_data_array = bytearray([0] * length)
                 # print([hex(c) for c in data_array], file=self.stdout)
@@ -1435,7 +1435,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 data, _, pre_cs, post_cs = searched.groups()
                 # print(f"0x{data}", file=self.stdout)
                 string_length = len(data)
-                data_array = (int(data[i:i + 2], 16) for i in range(0, string_length, 2))
+                data_array = (int(f"0x{data[i:i + 2]}", 16) for i in range(0, string_length, 2))
                 # print([hex(c) for c in data_array], file=self.stdout)
                 try:
                     self.cb_spi_cs_val(pre_cs, [bus_number, ""])
@@ -1472,7 +1472,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 # print(length, mask, file=self.stdout)
                 try:
                     data_array = bytearray([0] * int(length))
-                    mask = int("0x" + mask)
+                    mask = int(f"0x{mask}", 16)
                     self.cb_spi_cs_val(pre_cs, [bus_number, ""])
                     bus.readinto(data_array, mask)
                     self.cb_spi_cs_val(post_cs, [bus_number, ""])
