@@ -406,6 +406,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         pin_off = ScpiCommand((self.kw_pin, self.kw_off), False, self.cb_pin_off)
         pin_pwm_freq = ScpiCommand((self.kw_pin, self.kw_pwm, self.kw_freq), False, self.cb_pin_pwm_freq)
         pin_pwm_duty = ScpiCommand((self.kw_pin, self.kw_pwm, self.kw_duty), False, self.cb_pin_pwm_duty)
+        pin_pwm_on = ScpiCommand((self.kw_pin, self.kw_pwm, self.kw_on), False, self.cb_pin_pwm_on)
+        pin_pwm_off = ScpiCommand((self.kw_pin, self.kw_pwm, self.kw_off), False, self.cb_pin_pwm_off)
 
         led_q = ScpiCommand((self.kw_led,), True, self.cb_led_status)
         led_val = ScpiCommand((self.kw_led, self.kw_value), True, self.cb_led_val)
@@ -413,6 +415,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         led_off = ScpiCommand((self.kw_led, self.kw_off), False, self.cb_led_off)
         led_pwm_freq = ScpiCommand((self.kw_led, self.kw_pwm, self.kw_freq), False, self.cb_led_pwm_freq)
         led_pwm_duty = ScpiCommand((self.kw_led, self.kw_pwm, self.kw_duty), False, self.cb_led_pwm_duty)
+        led_pwm_on = ScpiCommand((self.kw_led, self.kw_pwm, self.kw_on), False, self.cb_led_pwm_on)
+        led_pwm_off = ScpiCommand((self.kw_led, self.kw_pwm, self.kw_off), False, self.cb_led_pwm_off)
 
         i2c_q = ScpiCommand((self.kw_i2c,), True, self.cb_i2c_status)
         i2c_scan_q = ScpiCommand((self.kw_i2c, self.kw_scan), True, self.cb_i2c_scan)
@@ -437,8 +441,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         self.commands = [cls, ese, opc, rst, sre, esr_q, idn_q, stb_q, tst_q,
                          machine_freq,
                          system_error,
-                         pin_q, pin_mode, pin_val, pin_on, pin_off, pin_pwm_freq, pin_pwm_duty,
-                         led_q, led_val, led_on, led_off, led_pwm_freq, led_pwm_duty,
+                         pin_q, pin_mode, pin_val, pin_on, pin_off, pin_pwm_freq, pin_pwm_duty, pin_pwm_on, pin_pwm_off,
+                         led_q, led_val, led_on, led_off, led_pwm_freq, led_pwm_duty, led_pwm_on, led_pwm_off,
                          i2c_q, i2c_scan_q, i2c_freq, i2c_abit, i2c_write, i2c_read_q,
                          i2c_write_memory, i2c_read_memory,
                          spi_q, spi_cs_pol, spi_mode, spi_freq, spi_write, spi_read, spi_cs_val, spi_transfer,
