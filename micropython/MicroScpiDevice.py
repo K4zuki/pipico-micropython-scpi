@@ -31,12 +31,15 @@ from collections import namedtuple
 rstring = re.compile(r"^(\*?[a-zA-Z]\w+[a-zA-Z])(\d+|\?)$")
 
 
-class ScpiKeyword(namedtuple("ScpiKeyword", ["long", "short", "opt"])):
+class ScpiKeyword(namedtuple("ScpiKeyword", [
+    "long",  # [str] Long form string
+    "short",  # [str] Short form string
+    "opt"  # [list(str)] list of option strings
+])):
     """
     - long: `str`
     - short: `str`
     - opt: `list(str)`
-    - param_callback: `function`
     """
 
     def __str__(self):
@@ -71,7 +74,10 @@ class ScpiKeyword(namedtuple("ScpiKeyword", ["long", "short", "opt"])):
             return ScpiMatch(False, optionval)
 
 
-class ScpiMatch(namedtuple("ScpiMatch", ["match", "opt"])):
+class ScpiMatch(namedtuple("ScpiMatch", [
+    "match",  # [bool] matched flag
+    "opt"  # [str] option string
+])):
     """
     - match: `bool`
     - opt: `str`
@@ -79,7 +85,10 @@ class ScpiMatch(namedtuple("ScpiMatch", ["match", "opt"])):
     pass
 
 
-class ScpiErrorNumber(namedtuple("ScpiErrorNumber", ["id", "message"])):
+class ScpiErrorNumber(namedtuple("ScpiErrorNumber", [
+    "id",  # [int] Error number
+    "message"  # [str] Error message
+])):
     """
     - id: `int`
     - message: `str`
@@ -93,7 +102,11 @@ def cb_do_nothing(*args, **kwargs):
     print("cb_do_nothing")
 
 
-class ScpiCommand(namedtuple("ScpiCommand", ["keywords", "query", "callback"])):
+class ScpiCommand(namedtuple("ScpiCommand", [
+    "keywords",  # list of `ScpiKeyword`
+    "query",  # flag if command is a query
+    "callback"  # function pointer
+])):
     """
     - `keywords`: list of `ScpiKeyword`
     - `query`: flag if command is a query
