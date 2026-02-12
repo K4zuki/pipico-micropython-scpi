@@ -463,7 +463,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         - *RST <No Param>
         """
 
-        # print(f"Reset", file=self.stdout)
+        # print(f"Reset", file=sys.stderr)
         machine.freq(DEFAULT_CPU_CLOCK)
         # machine.soft_reset()
 
@@ -494,7 +494,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """The command returns a string in the form of “YYYY.V”, where “YYYY” represents
         the year of the version and “V” represents a version for that year (e.g. 1997.0).
         """
-        print("2023.04", file=self.stdout)
+        print("2023.04", file=sys.stderr)
 
     def cb_machine_freq(self, param="", opt=None):
         """
@@ -506,12 +506,12 @@ class RaspberryScpiPico(MicroScpiDevice):
         machine_freq = param
         query = (opt[-1] == "?")
 
-        # print("cb_machine_freq", param, opt, file=self.stdout)
+        # print("cb_machine_freq", param, opt, file=sys.stderr)
         if query:
             machine_freq = machine.freq()
             print(f"{machine_freq:_d}", file=self.stdout)
         elif machine_freq is not None:
-            # print("cb_machine_freq", param, file=self.stdout)
+            # print("cb_machine_freq", param, file=sys.stderr)
 
             try:
                 machine_freq = int(float(machine_freq))
@@ -594,11 +594,11 @@ class RaspberryScpiPico(MicroScpiDevice):
         conf = self.pin_conf[pin_number]
 
         if query:
-            # print("cb_pin_val", pin_number, "Query", param, file=self.stdout)
+            # print("cb_pin_val", pin_number, "Query", param, file=sys.stderr)
             val = pin.value()
             print(IO_VALUE_STRINGS[val], file=self.stdout)
         elif param is not None:
-            # print("cb_pin_val", pin_number, param, file=self.stdout)
+            # print("cb_pin_val", pin_number, param, file=sys.stderr)
             if param == str(IO_ON) or self.kw_on.match(param).match:
                 pin.init(machine.Pin.OUT, value=IO_ON)
                 self.pin_conf[pin_number] = PinConfig(machine.Pin.OUT, IO_ON, conf.pull)
@@ -627,10 +627,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         alt = 0
 
         if query:
-            # print("cb_pin_mode", pin_number, "Query", param, file=self.stdout)
+            # print("cb_pin_mode", pin_number, "Query", param, file=sys.stderr)
             print(IO_MODE_STRINGS[conf.mode], file=self.stdout)
         elif param is not None:
-            # print("cb_pin_mode", pin_number, param, file=self.stdout)
+            # print("cb_pin_mode", pin_number, param, file=sys.stderr)
             if self.kw_in.match(param).match:
                 mode = machine.Pin.IN
             elif self.kw_out.match(param).match:
@@ -646,7 +646,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             pin.init(mode, alt=alt, pull=conf.pull)
             self.pins[pin_number] = pin
             self.pin_conf[pin_number] = PinConfig(mode, conf.value, conf.pull)
-            # print(pin, file=self.stdout)
+            # print(pin, file=sys.stderr)
         else:
             self.error_push(E_MISSING_PARAM)
 
@@ -664,10 +664,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
 
         if query:
-            # print("cb_pin_on", pin_number, "Query", param, file=self.stdout)
+            # print("cb_pin_on", pin_number, "Query", param, file=sys.stderr)
             self.error_push(E_SYNTAX)
         else:
-            # print("cb_pin_on", pin_number, param, file=self.stdout)
+            # print("cb_pin_on", pin_number, param, file=sys.stderr)
             self.cb_pin_val(param="ON", opt=opt)
 
     def cb_pin_off(self, param="", opt=None):
@@ -684,10 +684,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
 
         if query:
-            # print("cb_pin_off", pin_number, "Query", param, file=self.stdout)
+            # print("cb_pin_off", pin_number, "Query", param, file=sys.stderr)
             self.error_push(E_SYNTAX)
         else:
-            # print("cb_pin_off", pin_number, param, file=self.stdout)
+            # print("cb_pin_off", pin_number, param, file=sys.stderr)
             self.cb_pin_val(param="OFF", opt=opt)
 
     def cb_pin_pwm_freq(self, param="", opt=None):
@@ -706,11 +706,11 @@ class RaspberryScpiPico(MicroScpiDevice):
         pwm_freq = param
 
         if query:
-            # print("cb_pin_pwm_freq", pin_number, "Query", param, file=self.stdout)
+            # print("cb_pin_pwm_freq", pin_number, "Query", param, file=sys.stderr)
             pwm_freq = conf.freq
             print(f"{pwm_freq:_d}", file=self.stdout)
         elif pwm_freq is not None:
-            # print("cb_pin_pwm_freq", pin_number, param, file=self.stdout)
+            # print("cb_pin_pwm_freq", pin_number, param, file=sys.stderr)
 
             pwm_freq = int(float(pwm_freq))
 
@@ -718,7 +718,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 pwm = machine.PWM(pin)
                 pwm.freq(conf.freq)
                 pwm.duty_u16(conf.duty_u16)
-                # print(pwm, file=self.stdout)
+                # print(pwm, file=sys.stderr)
                 vals = list(conf)
                 vals[conf.index(conf.freq)] = pwm_freq
                 self.pwm_conf[pin_number] = PwmConfig(*vals)
@@ -743,11 +743,11 @@ class RaspberryScpiPico(MicroScpiDevice):
         pwm_duty = param
 
         if query:
-            # print("cb_pin_pwm_duty", pin_number, "Query", param, file=self.stdout)
+            # print("cb_pin_pwm_duty", pin_number, "Query", param, file=sys.stderr)
             pwm_duty = conf.duty_u16
             print(f"{pwm_duty:_d}", file=self.stdout)
         elif pwm_duty is not None:
-            # print("cb_pin_pwm_duty", pin_number, param, file=self.stdout)
+            # print("cb_pin_pwm_duty", pin_number, param, file=sys.stderr)
 
             pwm_duty = int(float(pwm_duty))
 
@@ -755,7 +755,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 pwm = machine.PWM(pin)
                 pwm.freq(conf.freq)
                 pwm.duty_u16(conf.duty_u16)
-                # print(pwm, file=self.stdout)
+                # print(pwm, file=sys.stderr)
                 vals = list(conf)
                 vals[conf.index(conf.duty_u16)] = pwm_duty
                 self.pwm_conf[pin_number] = PwmConfig(*vals)
@@ -800,10 +800,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
 
         if query:
-            # print("cb_led_on", "Query", param, file=self.stdout)
+            # print("cb_led_on", "Query", param, file=sys.stderr)
             self.error_push(E_SYNTAX)
         else:
-            # print("cb_led_on", param, file=self.stdout)
+            # print("cb_led_on", param, file=sys.stderr)
             self.cb_pin_val(param="ON", opt=opt)
 
     def cb_led_off(self, param="", opt=None):
@@ -819,10 +819,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
 
         if query:
-            # print("cb_led_off", "Query", param, file=self.stdout)
+            # print("cb_led_off", "Query", param, file=sys.stderr)
             self.error_push(E_SYNTAX)
         else:
-            # print("cb_led_off", param, file=self.stdout)
+            # print("cb_led_off", param, file=sys.stderr)
             self.cb_pin_val(param="OFF", opt=opt)
 
     def cb_led_val(self, param, opt):
@@ -907,7 +907,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             conf = self.i2c_conf[bus_number]
             shift = conf.bit
             if query:
-                # print("cb_i2c_scan", "Query", param, file=self.stdout)
+                # print("cb_i2c_scan", "Query", param, file=sys.stderr)
                 scanned = bus.scan()
                 if not scanned:
                     print(BUS_FAIL_CODE, file=self.stdout)
@@ -933,12 +933,12 @@ class RaspberryScpiPico(MicroScpiDevice):
         conf = self.i2c_conf[bus_number]
 
         if query:
-            # print("cb_i2c_freq", bus_number, "Query", param, file=self.stdout)
+            # print("cb_i2c_freq", bus_number, "Query", param, file=sys.stderr)
 
             bus_freq = conf.freq
             print(f"{bus_freq:_d}", file=self.stdout)
         elif bus_freq is not None:
-            # print("cb_i2c_freq", bus_number, param, file=self.stdout)
+            # print("cb_i2c_freq", bus_number, param, file=sys.stderr)
 
             bus_freq = int(float(bus_freq))
 
@@ -968,12 +968,12 @@ class RaspberryScpiPico(MicroScpiDevice):
         conf = self.i2c_conf[bus_number]
 
         if query:
-            # print("cb_i2c_address_bit", "Query", param, file=self.stdout)
+            # print("cb_i2c_address_bit", "Query", param, file=sys.stderr)
 
             bit = conf.bit
             print(f"{bit}", file=self.stdout)
         elif bit is not None:
-            # print("cb_i2c_address_bit", param, file=self.stdout)
+            # print("cb_i2c_address_bit", param, file=sys.stderr)
             if param in ["0", "1"]:
                 vals = list(conf)
                 vals[conf.index(conf.bit)] = int(param)
@@ -1008,17 +1008,17 @@ class RaspberryScpiPico(MicroScpiDevice):
         rstring = re.compile(r"^([1-9a-fA-F][0-9a-fA-F]) *, *(([0-9a-fA-F][0-9a-fA-F])+) *, *([01])$")
 
         if query:
-            # print("cb_i2c_write", "Query", param, file=self.stdout)
+            # print("cb_i2c_write", "Query", param, file=sys.stderr)
             self.error_push(E_SYNTAX)
         elif param is not None:
-            # print("cb_i2c_write", param, file=self.stdout)
+            # print("cb_i2c_write", param, file=sys.stderr)
             searched = rstring.search(param)
             if searched is not None:
                 address, data, _, stop = searched.groups()
                 stop = bool(int(stop))
                 address = int(f"0x{address}", 16) >> shift
                 data_array = int(f"0x{data}", 16).to_bytes(ceil(len(data) / 2), "big")
-                # print(f"0x{address:02x}", [f"0x{c:02x}" for c in data_array], stop, file=self.stdout)
+                # print(f"0x{address:02x}", [f"0x{c:02x}" for c in data_array], stop, file=sys.stderr)
                 try:
                     bus.writeto(address, bytes(data_array), stop)
                 except OSError:
@@ -1049,16 +1049,16 @@ class RaspberryScpiPico(MicroScpiDevice):
         rstring = re.compile(r"^([1-9a-fA-F][0-9a-fA-F]) *, *([1-9]|[1-9][0-9]+) *, *([01])$")
 
         if query:
-            # print("cb_i2c_read", "Query", param, file=self.stdout)
+            # print("cb_i2c_read", "Query", param, file=sys.stderr)
             if param is not None:
-                # print("cb_i2c_read", param, file=self.stdout)
+                # print("cb_i2c_read", param, file=sys.stderr)
 
                 searched = rstring.search(param)
                 if searched is not None:
                     address, length, stop = searched.groups()
                     stop = bool(int(stop))
                     address = int(f"0x{address}") >> shift
-                    # print(f"0x{address:02x}", length, stop, file=self.stdout)
+                    # print(f"0x{address:02x}", length, stop, file=sys.stderr)
                     try:
                         read = bus.readfrom(int(address), int(length), stop)
                         data = ",".join(f"{d:02x}" for d in read)
@@ -1098,22 +1098,22 @@ class RaspberryScpiPico(MicroScpiDevice):
             r"^([1-9a-fA-F][0-9a-fA-F]) *, *(([0-9a-fA-F][0-9a-fA-F])+) *, *([0-9a-fA-F]+) *, *([12])$")
 
         if query:
-            # print("cb_i2c_write_memory", "Query", param, file=self.stdout)
+            # print("cb_i2c_write_memory", "Query", param, file=sys.stderr)
             self.error_push(E_SYNTAX)
         elif param is not None:
-            # print("cb_i2c_write_memory", param, file=self.stdout)
+            # print("cb_i2c_write_memory", param, file=sys.stderr)
 
             searched = rstring.search(param)
 
             if searched is not None:
                 address, memaddress, _, data, addrsize = searched.groups()
-                # print(address, memaddress, data, addrsize, file=self.stdout)
+                # print(address, memaddress, data, addrsize, file=sys.stderr)
 
                 address = int(f"0x{address}", 16) >> shift
                 memaddress = int(f"0x{memaddress}", 16)
                 data_array = int(f"0x{data}", 16).to_bytes(ceil(len(data) / 2), "big")
                 addrsize = 8 * int(addrsize)
-                # print(f"0x{address:02x}", f"0x{memaddress:02x}", [f"0x{c:02x}" for c in data_array], addrsize, file=self.stdout)
+                # print(f"0x{address:02x}", f"0x{memaddress:02x}", [f"0x{c:02x}" for c in data_array], addrsize, file=sys.stderr)
                 try:
                     bus.writeto_mem(address, memaddress, data_array)
                 except OSError:
@@ -1146,7 +1146,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             r"^([1-9a-fA-F][0-9a-fA-F]) *, *(([0-9a-fA-F][0-9a-fA-F])+) *, *([1-9]|[1-9][0-9]+) *, *([12])$")
 
         if query:
-            # print("cb_i2c_read_memory", "Query", param, file=self.stdout)
+            # print("cb_i2c_read_memory", "Query", param, file=sys.stderr)
 
             if param is not None:
                 searched = rstring.search(param)
@@ -1187,7 +1187,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         adc = self.adc[adc_ch]
 
         if query:
-            # print("cb_adc_read", "Query", param, file=self.stdout)
+            # print("cb_adc_read", "Query", param, file=sys.stderr)
             value = adc.read_u16()
             print(f"{value}", file=self.stdout)  # decimal
         else:
@@ -1231,11 +1231,11 @@ class RaspberryScpiPico(MicroScpiDevice):
         cspol = param
 
         if query:
-            # print("cb_spi_cs_pol", "Query", param, file=self.stdout)
+            # print("cb_spi_cs_pol", "Query", param, file=sys.stderr)
             cspol = conf.cspol
             print(cspol, file=self.stdout)
         elif cspol is not None:
-            # print("cb_spi_cs_pol", param, file=self.stdout)
+            # print("cb_spi_cs_pol", param, file=sys.stderr)
             if cspol in ["0", "1"]:
                 vals = list(conf)
                 vals[conf.index(conf.cspol)] = int(cspol)
@@ -1267,10 +1267,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         cs_pol = conf.cspol
 
         if query:
-            # print("cb_spi_cs_val", "Query", param, file=self.stdout)
+            # print("cb_spi_cs_val", "Query", param, file=sys.stderr)
             print(IO_VALUE_STRINGS[int(cs_pin.value() ^ (not cs_pol))], file=self.stdout)
         elif param is not None:
-            # print("cb_spi_cs_val", param, file=self.stdout)
+            # print("cb_spi_cs_val", param, file=sys.stderr)
             if param == str(SPI_CSPOL_HI) or self.kw_on.match(param).match:
                 cs_pin.value(int(not (cs_pol ^ SPI_CSPOL_HI)))
             elif param == str(SPI_CSPOL_LO) or self.kw_off.match(param).match:
@@ -1297,10 +1297,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         vals = list(conf)
 
         if query:
-            # print("cb_spi_clock_phase", "Query", param, file=self.stdout)
+            # print("cb_spi_clock_phase", "Query", param, file=sys.stderr)
             print(conf.mode, file=self.stdout)
         elif mode is not None:
-            # print("cb_spi_clock_phase", param, file=self.stdout)
+            # print("cb_spi_clock_phase", param, file=sys.stderr)
             if self.kw_def.match(param).match:
                 vals[conf.index(conf.mode)] = DEFAULT_SPI_MODE
                 conf = SpiConfig(*vals)
@@ -1341,12 +1341,12 @@ class RaspberryScpiPico(MicroScpiDevice):
         vals = list(conf)
 
         if query:
-            # print("cb_spi_freq", bus_number, "Query", param, file=self.stdout)
+            # print("cb_spi_freq", bus_number, "Query", param, file=sys.stderr)
 
             bus_freq = conf.freq
             print(f"{bus_freq:_d}", file=self.stdout)
         elif bus_freq is not None:
-            # print("cb_spi_freq", bus_number, param, file=self.stdout)
+            # print("cb_spi_freq", bus_number, param, file=sys.stderr)
             try:
                 bus_freq = int(float(bus_freq))
 
@@ -1384,19 +1384,19 @@ class RaspberryScpiPico(MicroScpiDevice):
             r"^(([0-9a-fA-F][0-9a-fA-F])+) *, *([oO][nN]|[oO][fF][fF]|[01]) *, *([oO][nN]|[oO][fF][fF]|[01])$")
 
         if query:
-            # print("cb_spi_tx", bus_number, "Query", param, file=self.stdout)
+            # print("cb_spi_tx", bus_number, "Query", param, file=sys.stderr)
             self.error_push(E_SYNTAX)
         elif param is not None:
-            # print("cb_spi_tx", bus_number, param, file=self.stdout)
+            # print("cb_spi_tx", bus_number, param, file=sys.stderr)
             searched = rstring.search(param)
             if searched is not None:
                 data, _, pre_cs, post_cs = searched.groups()
-                # print(f"0x{data}", file=self.stdout)
+                # print(f"0x{data}", file=sys.stderr)
                 string_length = len(data)
                 data_array = tuple(int(f"0x{data[i:i + 2]}", 16) for i in range(0, string_length, 2))
                 length = len(data_array)
                 read_data_array = bytearray([0] * length)
-                # print([hex(c) for c in data_array], file=self.stdout)
+                # print([hex(c) for c in data_array], file=sys.stderr)
                 try:
                     self.cb_spi_cs_val(pre_cs, [bus_number, ""])
                     bus.write_readinto(bytes(data_array), read_data_array)
@@ -1426,17 +1426,17 @@ class RaspberryScpiPico(MicroScpiDevice):
             r"^(([0-9a-fA-F][0-9a-fA-F])+) *, *([oO][nN]|[oO][fF][fF]|[01]) *, *([oO][nN]|[oO][fF][fF]|[01])$")
 
         if query:
-            # print("cb_spi_write", bus_number, "Query", param, file=self.stdout)
+            # print("cb_spi_write", bus_number, "Query", param, file=sys.stderr)
             self.error_push(E_SYNTAX)
         elif param is not None:
-            # print("cb_spi_write", bus_number, param, file=self.stdout)
+            # print("cb_spi_write", bus_number, param, file=sys.stderr)
             searched = rstring.search(param)
             if searched is not None:
                 data, _, pre_cs, post_cs = searched.groups()
-                # print(f"0x{data}", file=self.stdout)
+                # print(f"0x{data}", file=sys.stderr)
                 string_length = len(data)
                 data_array = (int(f"0x{data[i:i + 2]}", 16) for i in range(0, string_length, 2))
-                # print([hex(c) for c in data_array], file=self.stdout)
+                # print([hex(c) for c in data_array], file=sys.stderr)
                 try:
                     self.cb_spi_cs_val(pre_cs, [bus_number, ""])
                     bus.write(bytes(data_array))
@@ -1464,12 +1464,12 @@ class RaspberryScpiPico(MicroScpiDevice):
             r"^([1-9]|[1-9][0-9]+) *, *([0-9a-fA-F][0-9a-fA-F]) *, *([oO][nN]|[oO][fF][fF]|[01]) *, *([oO][nN]|[oO][fF][fF]|[01])$")
 
         if query:
-            # print("cb_spi_read", bus_number, "Query", param, file=self.stdout)
+            # print("cb_spi_read", bus_number, "Query", param, file=sys.stderr)
             searched = rstring.search(param)
 
             if searched is not None:
                 length, mask, pre_cs, post_cs = searched.groups()
-                # print(length, mask, file=self.stdout)
+                # print(length, mask, file=sys.stderr)
                 try:
                     data_array = bytearray([0] * int(length))
                     mask = int(f"0x{mask}", 16)
