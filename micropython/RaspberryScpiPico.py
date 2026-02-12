@@ -103,8 +103,8 @@ MIN_SPI_CLOCK = const(10_000)
 DEFAULT_SPI_CLOCK = const(1_000_000)
 MAX_UART_BAUD = const(500_000)
 MIN_UART_BAUD = const(300)
-IO_ON = const(1)
-IO_OFF = const(0)
+IO_ON = 1
+IO_OFF = 0
 IO_VALUE_STRINGS = {IO_ON: "ON", IO_OFF: "OFF"}
 IO_MODE_STRINGS = {machine.Pin.IN: "IN", machine.Pin.OUT: "OUT",
                    machine.Pin.OPEN_DRAIN: "ODrain", machine.Pin.ALT: "PWM"}
@@ -596,7 +596,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         if query:
             # print("cb_pin_val", pin_number, "Query", param, file=self.stdout)
             val = pin.value()
-            print(IO_VALUE_STRINGS[val])
+            print(IO_VALUE_STRINGS[val], file=self.stdout)
         elif param is not None:
             # print("cb_pin_val", pin_number, param, file=self.stdout)
             if param == str(IO_ON) or self.kw_on.match(param).match:
