@@ -800,10 +800,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
 
         if query:
-            print("cb_pin_pwm_on", pin_number, "Query", param, file=sys.stderr)
+            # print("cb_pin_pwm_on", pin_number, "Query", param, file=sys.stderr)
             self.error_push(E_SYNTAX)
         elif param is None:
-            print("cb_pin_pwm_on", pin_number, file=sys.stderr)
+            # print("cb_pin_pwm_on", pin_number, file=sys.stderr)
             pwm = machine.PWM(pin)
             pwm.init(freq=conf.freq, duty_u16=conf.duty_u16)
             self.pwmv[pin_number] = 1
@@ -825,10 +825,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         query = (opt[-1] == "?")
 
         if query:
-            print("cb_pin_pwm_off", pin_number, "Query", param, file=sys.stderr)
+            # print("cb_pin_pwm_off", pin_number, "Query", param, file=sys.stderr)
             self.error_push(E_SYNTAX)
         elif param is None:
-            print("cb_pin_pwm_off", pin_number, file=sys.stderr)
+            # print("cb_pin_pwm_off", pin_number, file=sys.stderr)
             self.pwmv[pin_number] = 0
             self.cb_pin_val(param="OFF", opt=opt)
         else:
