@@ -155,7 +155,7 @@ E_CHARACTER_UNALLOWED = ScpiErrorNumber(-148, "Character data not allowed")
 E_STRING_UNALLOWED = ScpiErrorNumber(-158, "String data not allowed")
 E_OUT_OF_RANGE = ScpiErrorNumber(-222, "Data out of range")
 E_DATA_OVERFLOW = ScpiErrorNumber(-223, "Too much data")
-E_INVALID_PARAMETER = ScpiErrorNumber(-224, "Illegal parameter value")
+E_INVALID_PARAMETER = ScpiErrorNumber(-224, "Invalid parameter value")
 E_I2C_FAIL = ScpiErrorNumber(-333, "I2C bus error")
 E_SPI_FAIL = ScpiErrorNumber(-334, "SPI bus error")
 
