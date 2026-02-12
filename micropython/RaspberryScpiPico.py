@@ -779,6 +779,55 @@ class RaspberryScpiPico(MicroScpiDevice):
         else:
             self.error_push(E_MISSING_PARAM)
 
+    def cb_pin_pwm_on(self, param="", opt=None):
+        """
+        - PIN[14|15|16|17|18|19|20|21|22|25]:PWM:ON
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        pin_number = int(opt[0])
+        pin = self.pins[pin_number]
+        conf = self.pwm_conf[pin_number]
+        query = (opt[-1] == "?")
+
+        if query:
+            print("cb_pin_pwm_on", pin_number, "Query", param, file=sys.stderr)
+            self.error_push(E_SYNTAX)
+        elif param is None:
+            print("cb_pin_pwm_on", pin_number, file=sys.stderr)
+            pwm = machine.PWM(pin)
+            pwm.init(freq=conf.freq, duty_u16=conf.duty_u16)
+            self.pwmv[pin_number] = 1
+        else:
+            self.error_push(E_MISSING_PARAM)
+
+    def cb_pin_pwm_off(self, param="", opt=None):
+        """
+        - PIN[14|15|16|17|18|19|20|21|22|25]:PWM:OFF
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        pin_number = int(opt[0])
+        pin = self.pins[pin_number]
+        conf = self.pwm_conf[pin_number]
+        query = (opt[-1] == "?")
+
+        if query:
+            print("cb_pin_pwm_off", pin_number, "Query", param, file=sys.stderr)
+            self.error_push(E_SYNTAX)
+        elif param is None:
+            print("cb_pin_pwm_off", pin_number, file=sys.stderr)
+            self.pwmv[pin_number] = 0
+            self.cb_pin_val(param="OFF", opt=opt)
+        else:
+            self.error_push(E_MISSING_PARAM)
+
     def cb_led_status(self, param="", opt=None):
         """
         - ``LED?``
@@ -883,6 +932,36 @@ class RaspberryScpiPico(MicroScpiDevice):
         pwm_duty = param
 
         self.cb_pin_pwm_duty(param, opt)
+
+    def cb_led_pwm_on(self, param="", opt=None):
+        """
+        - LED:PWM:ON
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        opt[0] = "25"
+        query = (opt[-1] == "?")
+        pwm_duty = param
+
+        self.cb_pin_pwm_on(param, opt)
+
+    def cb_led_pwm_off(self, param="", opt=None):
+        """
+        - LED:PWM:OFF
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        opt[0] = "25"
+        query = (opt[-1] == "?")
+        pwm_duty = param
+
+        self.cb_pin_pwm_off(param, opt)
 
     def cb_i2c_status(self, param="", opt=None):
         """
