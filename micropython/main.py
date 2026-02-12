@@ -21,15 +21,38 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
-import sys
-
+import usb.device
+from Usb488ScpiPico import Usb488ScpiPico
 from RaspberryScpiPico import RaspberryScpiPico
 
-gets = sys.stdin.readline
 pico = RaspberryScpiPico()
+usb488if = Usb488ScpiPico(pico)
 
-while True:
-    line = gets().strip()
-    if len(line) > 0:
-        for _line in line.split(";"):
-            pico.parse_and_process(_line)
+usb.device.get().init(usb488if,
+                      id_product=0x0488,
+                      builtin_driver=False,
+                      max_power_ma=100,
+                      manufacturer_str="MicroPython",
+                      product_str="MicroPython USB488 device",
+                      )
+
+from machine import UART
+import os
+
+uart = UART(0)
+os.dupterm(uart, 0)
+uart.irq(os.dupterm_notify, UART.IRQ_RXIDLE)
+
+if False:
+    import sys
+
+    from RaspberryScpiPico import RaspberryScpiPico
+
+    gets = sys.stdin.readline
+    pico = RaspberryScpiPico()
+
+    while True:
+        line = gets().strip()
+        if len(line) > 0:
+            for _line in line.split(";"):
+                pico.parse_and_process(_line)
