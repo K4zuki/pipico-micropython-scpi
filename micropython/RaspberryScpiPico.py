@@ -509,7 +509,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         # print("cb_machine_freq", param, opt, file=self.stdout)
         if query:
             machine_freq = machine.freq()
-            print(f"{machine_freq}", file=self.stdout)
+            print(f"{machine_freq:_d}", file=self.stdout)
         elif machine_freq is not None:
             # print("cb_machine_freq", param, file=self.stdout)
 
