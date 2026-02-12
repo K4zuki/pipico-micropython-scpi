@@ -656,6 +656,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             elif self.kw_od.match(param).match:
                 mode = machine.Pin.OPEN_DRAIN
             elif self.kw_pwm.match(param).match:
+                self.cb_pin_pwm_on(param, opt)
                 mode = machine.Pin.ALT
                 alt = machine.Pin.ALT_PWM
             else:
