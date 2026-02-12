@@ -30,11 +30,18 @@ usb488if = Usb488ScpiPico(pico)
 
 usb.device.get().init(usb488if,
                       id_product=0x0488,
-                      builtin_driver=True,
+                      builtin_driver=False,
                       max_power_ma=100,
                       manufacturer_str="MicroPython",
                       product_str="MicroPython USB488 device",
                       )
+
+from machine import UART
+import os
+
+uart = UART(0)
+os.dupterm(uart, 0)
+uart.irq(os.dupterm_notify, UART.IRQ_RXIDLE)
 
 if False:
     import sys
