@@ -572,7 +572,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 message = ";".join([f"PIN{pin}:MODE {IO_MODE_STRINGS[mode]}",
                                     f"PIN{pin}:VALue {IO_VALUE_STRINGS[value]}",
                                     f"PIN{pin}:PWM:FREQuency {freq:_d}",
-                                    f"PIN{pin}:PWM:DUTY {duty}"
+                                    f"PIN{pin}:PWM:DUTY {duty:_d}"
                                     ])
                 print(message, end=";", file=self.stdout)
             print("", file=self.stdout)
@@ -782,7 +782,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         duty = pwm_conf.duty_u16
 
         if query:
-            print(f"LED:VALue {IO_VALUE_STRINGS[value]};LED:PWM:FREQuency {freq:_d};LED:PWM:DUTY {duty}",
+            print(f"LED:VALue {IO_VALUE_STRINGS[value]};LED:PWM:FREQuency {freq:_d};LED:PWM:DUTY {duty:_d}",
                   file=self.stdout)
         else:
             self.error_push(E_SYNTAX)
