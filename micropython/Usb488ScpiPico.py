@@ -7,6 +7,10 @@ from usb.device.core import Descriptor
 from tmc import TmcBulkInOutMessage
 from usb488 import Usb488Interface
 
+E_PARSE = ScpiErrorNumber(-481, "Parse failed")
+E_NO_RESP_LAST_BULKOUT = ScpiErrorNumber(-482, "No response on last bulkout")
+E_RESP_OUT_OF_STOCK = ScpiErrorNumber(-483, "No response stock left")
+
 
 class Usb488ScpiPico(Usb488Interface):
     def __init__(self, parser: MicroScpiDevice):
@@ -73,8 +77,8 @@ class Usb488ScpiPico(Usb488Interface):
 
             self.dev_dep_out_messages.append(self.last_bulkout_msg)
         except Exception as e:
-            self.parser.error_push(
-                ScpiErrorNumber(-481, f"{e}"))
+            self.parser.error_push(E_PARSE)
+            print(e)
 
     def on_request_device_dependent_in(self) -> None:
         """ Action on Bulk out transfer with megID==DEV_DEP_MSG_IN.
@@ -138,10 +142,8 @@ class Usb488ScpiPico(Usb488Interface):
                 # There is query response
                 self.send_device_dependent_in(header, message.response)
             else:
-                self.parser.error_push(
-                    ScpiErrorNumber(-482, "Read request on non-query message"))
-                print("no response")
+                self.parser.error_push(E_NO_RESP_LAST_BULKOUT)
+                print(E_NO_RESP_LAST_BULKOUT.message)
         else:
-            self.parser.error_push(
-                ScpiErrorNumber(-483, "No response stock left"))
-            print("No response stock left")
+            self.parser.error_push(E_RESP_OUT_OF_STOCK)
+            print(E_RESP_OUT_OF_STOCK.message)
