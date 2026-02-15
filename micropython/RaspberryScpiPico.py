@@ -617,14 +617,17 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_pin_val", pin_number, "Query", param, file=sys.stderr)
-            val = pin.value()
+            if self.kw_def.match(param).match:
+                val = DEFAULT_IO_VALUE
+            else:
+                val = pin.value()
             print(IO_VALUE_STRINGS[val], file=self.stdout)
         elif param is not None:
             # print("cb_pin_val", pin_number, param, file=sys.stderr)
             if param == str(IO_ON) or self.kw_on.match(param).match:
                 pin.init(machine.Pin.OUT, value=IO_ON)
                 self.pin_conf[pin_number] = PinConfig(machine.Pin.OUT, IO_ON, conf.pull)
-            elif param == str(IO_OFF) or self.kw_off.match(param).match:
+            elif param == str(IO_OFF) or self.kw_off.match(param).match or self.kw_def.match(param).match:
                 pin.init(machine.Pin.OUT, value=IO_OFF)
                 self.pin_conf[pin_number] = PinConfig(machine.Pin.OUT, IO_OFF, conf.pull)
             else:
@@ -651,10 +654,12 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_pin_mode", pin_number, "Query", param, file=sys.stderr)
-            print(IO_MODE_STRINGS[conf.mode], file=self.stdout)
+            if self.kw_def.match(param).match:
+                mode = DEFAULT_IO_MODE
+            print(IO_MODE_STRINGS[mode], file=self.stdout)
         elif param is not None:
             # print("cb_pin_mode", pin_number, param, file=sys.stderr)
-            if self.kw_in.match(param).match:
+            if self.kw_in.match(param).match or self.kw_def.match(param).match:
                 mode = machine.Pin.IN
             elif self.kw_out.match(param).match:
                 mode = machine.Pin.OUT
@@ -666,6 +671,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 alt = machine.Pin.ALT_PWM
             else:
                 self.error_push(E_INVALID_PARAMETER)
+                return
 
             pin.init(mode, alt=alt, pull=conf.pull)
             self.pins[pin_number] = pin
@@ -732,12 +738,17 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_pin_pwm_freq", pin_number, "Query", param, file=sys.stderr)
-            pwm_freq = conf.freq
+            if self.kw_def.match(param).match:
+                pwm_freq = DEFAULT_PWM_CLOCK
+            else:
+                pwm_freq = conf.freq
             print(f"{pwm_freq:_d}", file=self.stdout)
         elif pwm_freq is not None:
             # print("cb_pin_pwm_freq", pin_number, param, file=sys.stderr)
-
-            pwm_freq = int(float(pwm_freq))
+            if self.kw_def.match(pwm_freq).match:
+                pwm_freq = DEFAULT_PWM_CLOCK
+            else:
+                pwm_freq = int(float(pwm_freq))
 
             if MIN_PWM_CLOCK <= pwm_freq <= MAX_PWM_CLOCK:
                 if self.pwmv[pin_number] == 1:
@@ -771,12 +782,18 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_pin_pwm_duty", pin_number, "Query", param, file=sys.stderr)
-            pwm_duty = conf.duty_u16
+            if self.kw_def.match(param).match:
+                pwm_duty = DEFAULT_PWM_DUTY
+            else:
+                pwm_duty = conf.duty_u16
             print(f"{pwm_duty:_d}", file=self.stdout)
         elif pwm_duty is not None:
             # print("cb_pin_pwm_duty", pin_number, param, file=sys.stderr)
 
-            pwm_duty = int(float(pwm_duty))
+            if self.kw_def.match(pwm_duty).match:
+                pwm_duty = DEFAULT_PWM_DUTY
+            else:
+                pwm_duty = int(float(pwm_duty))
 
             if MIN_PWM_DUTY <= pwm_duty <= MAX_PWM_DUTY:
                 if self.pwmv[pin_number] == 1:
@@ -1048,12 +1065,18 @@ class RaspberryScpiPico(MicroScpiDevice):
         if query:
             # print("cb_i2c_freq", bus_number, "Query", param, file=sys.stderr)
 
-            bus_freq = conf.freq
+            if self.kw_def.match(param).match:
+                bus_freq = DEFAULT_I2C_CLOCK
+            else:
+                bus_freq = conf.freq
             print(f"{bus_freq:_d}", file=self.stdout)
         elif bus_freq is not None:
             # print("cb_i2c_freq", bus_number, param, file=sys.stderr)
 
-            bus_freq = int(float(bus_freq))
+            if self.kw_def.match(bus_freq).match:
+                bus_freq = DEFAULT_I2C_CLOCK
+            else:
+                bus_freq = int(float(bus_freq))
 
             if MIN_I2C_CLOCK <= bus_freq <= MAX_I2C_CLOCK:
                 bus = machine.I2C(bus_number, scl=conf.scl, sda=conf.sda, freq=bus_freq)
@@ -1456,13 +1479,18 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_spi_freq", bus_number, "Query", param, file=sys.stderr)
-
-            bus_freq = conf.freq
+            if self.kw_def.match(param).match:
+                bus_freq = DEFAULT_SPI_CLOCK
+            else:
+                bus_freq = conf.freq
             print(f"{bus_freq:_d}", file=self.stdout)
         elif bus_freq is not None:
             # print("cb_spi_freq", bus_number, param, file=sys.stderr)
             try:
-                bus_freq = int(float(bus_freq))
+                if self.kw_def.match(bus_freq).match:
+                    bus_freq = DEFAULT_SPI_CLOCK
+                else:
+                    bus_freq = int(float(bus_freq))
 
                 if MIN_SPI_CLOCK <= bus_freq <= MAX_SPI_CLOCK:
                     ckpol = SPI_CKPOL_HI if conf.mode & SPI_MASK_CKPOL else SPI_CKPOL_LO
