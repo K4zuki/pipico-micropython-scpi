@@ -519,7 +519,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_machine_freq(self, param="", opt=None):
         """
-        - MACHINE:FREQuency[?] num
+        - MACHINE:FREQuency[?] num|DEFault
 
         :return:
         """
@@ -529,13 +529,21 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         # print("cb_machine_freq", param, opt, file=sys.stderr)
         if query:
-            machine_freq = machine.freq()
+            if self.kw_def.match(param).match:
+                machine_freq = DEFAULT_CPU_CLOCK
+            else:
+                machine_freq = machine.freq()
+
             print(f"{machine_freq:_d}", file=self.stdout)
         elif machine_freq is not None:
             # print("cb_machine_freq", param, file=sys.stderr)
 
             try:
-                machine_freq = int(float(machine_freq))
+                if self.kw_def.match(machine_freq).match:
+                    machine_freq = DEFAULT_CPU_CLOCK
+                else:
+                    machine_freq = int(float(machine_freq))
+
                 if ABS_MIN_CLOCK < machine_freq < ABS_MAX_CLOCK:
                     machine.freq(machine_freq)
                 else:
