@@ -41,25 +41,27 @@ from collections import OrderedDict
 - SYSTem:ERRor?
 
 - PIN[6|7|14|15|20|21|22|25]?
-- PIN[6|7|14|15|20|21|22|25]:MODE[?] INput|OUTput|ODrain|PWM
-- PIN[6|7|14|15|20|21|22|25]:VALue[?] 0|1|OFF|ON
+- PIN[6|7|14|15|20|21|22|25]:MODE[?] INput|OUTput|ODrain|PWM|DEFault
+- PIN[6|7|14|15|20|21|22|25]:VALue[?] 0|1|OFF|ON|DEFault
 - PIN[6|7|14|15|20|21|22|25]:ON
 - PIN[6|7|14|15|20|21|22|25]:OFF
-- PIN[6|7|14|15|20|21|22|25]:PWM:FREQuency[?] num
-- PIN[6|7|14|15|20|21|22|25]:PWM:DUTY[?] num
+- PIN[6|7|14|15|20|21|22|25]:PWM:ON
+- PIN[6|7|14|15|20|21|22|25]:PWM:OFF
+- PIN[6|7|14|15|20|21|22|25]:PWM:FREQuency[?] num|DEFault
+- PIN[6|7|14|15|20|21|22|25]:PWM:DUTY[?] num|DEFault
 
 - LED?
 - LED:ON
 - LED:OFF
-- LED:VALue[?] 0|1|OFF|ON
-- LED:PWM:ENable
-- LED:PWM:DISable
-- LED:PWM:FREQuency[?] num
-- LED:PWM:DUTY[?] num
+- LED:VALue[?] 0|1|OFF|ON|DEFault
+- LED:PWM:ON
+- LED:PWM:OFF
+- LED:PWM:FREQuency[?] num|DEFault
+- LED:PWM:DUTY[?] num|DEFault
 
 - I2C?
 - I2C[01]:SCAN?
-- I2C[01]:FREQuency[?] num
+- I2C[01]:FREQuency[?] num|DEFault
 - I2C[01]:ADDRess:BIT[?] 0|1|DEFault
 - I2C[01]:WRITE address,buffer,stop
 - I2C[01]:READ? address,length,stop
@@ -70,7 +72,7 @@ from collections import OrderedDict
 - SPI[01]:CSEL:POLarity[?] 0|1|DEFault
 - SPI[01]:CSEL:VALue[?] 0|1|OFF|ON
 - SPI[01]:MODE[?] 0|1|2|3|DEFault
-- SPI[01]:FREQuency[?] num
+- SPI[01]:FREQuency[?] num|DEFault
 - SPI[01]:TRANSfer data,pre_cs,post_cs
 - SPI[01]:WRITE data,pre_cs,post_cs
 - SPI[01]:READ? length,mask,pre_cs,post_cs
@@ -600,7 +602,8 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_pin_val(self, param="", opt=None):
         """
-        - PIN[14|15|16|17|18|19|20|21|22|25]:VALue[?] 0|1|OFF|ON
+        - PIN[14|15|16|17|18|19|20|21|22|25]:VALue[?] 0|1|OFF|ON|DEFault
+        - DEFault is OFF
 
         :param param:
         :param opt:
@@ -631,7 +634,8 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_pin_mode(self, param="", opt=None):
         """
-        - PIN[14|15|16|17|18|19|20|21|22|25]:MODE INput|OUTput|ODrain|PWM
+        - PIN[14|15|16|17|18|19|20|21|22|25]:MODE[?] INput|OUTput|ODrain|PWM|DEFault
+        - DEFault is INput
 
         :param param:
         :param opt:
@@ -712,7 +716,8 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_pin_pwm_freq(self, param="", opt=None):
         """
-        - PIN[14|15|16|17|18|19|20|21|22|25]:PWM:FREQuency[?] num
+        - PIN[14|15|16|17|18|19|20|21|22|25]:PWM:FREQuency[?] num|DEFault
+        - DEFault is 1000 [Hz]
 
         :param param:
         :param opt:
@@ -750,7 +755,8 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_pin_pwm_duty(self, param="", opt=None):
         """
-        - PIN[14|15|16|17|18|19|20|21|22|25]:PWM:DUTY[?] num
+        - PIN[14|15|16|17|18|19|20|21|22|25]:PWM:DUTY[?] num|DEFault
+        - DEFault is 32768
 
         :param param:
         :param opt:
@@ -915,7 +921,8 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_led_pwm_freq(self, param="", opt=None):
         """
-        - LED:PWM:FREQuency[?] num
+        - LED:PWM:FREQuency[?] num|DEFault
+        - DEFault is 2000 [Hz]
 
         :param param:
         :param opt:
@@ -930,7 +937,8 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_led_pwm_duty(self, param, opt):
         """
-        - LED:PWM:DUTY[?] num
+        - LED:PWM:DUTY[?] num|DEFault
+        - DEFault is 32768
 
         :param param:
         :param List[str] opt:
@@ -1024,7 +1032,8 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_i2c_freq(self, param, opt):
         """
-        - I2C[01]:FREQuency[?] num
+        - I2C[01]:FREQuency[?] num|DEFault
+        - DEFault is 100_000 [Hz]
 
         :param param:
         :param opt:
@@ -1431,7 +1440,8 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_spi_freq(self, param, opt):
         """
-        - SPI[01]:FREQuency[?] num
+        - SPI[01]:FREQuency[?] num|DEFault
+        - DEFault is 1_000_000 [Hz]
 
         :param param:
         :param opt:
