@@ -26,6 +26,7 @@ jobs:
         with:
           path: |
             micropython/build
+          compression-level: 0 # no compression
       - name: Release firmware (at a tag)
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         uses: softprops/action-gh-release@v2
