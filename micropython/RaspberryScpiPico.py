@@ -89,7 +89,7 @@ from math import ceil
 from collections import namedtuple
 from MicroScpiDevice import ScpiKeyword, ScpiCommand, ScpiErrorNumber, MicroScpiDevice, cb_do_nothing, ERROR_LIST
 
-ABS_MAX_CLOCK = const(275_000_000)
+ABS_MAX_CLOCK = const(264_000_000)
 DEFAULT_CPU_CLOCK = const(125_000_000)
 ABS_MIN_CLOCK = const(100_000_000)
 MAX_PWM_CLOCK = const(100_000)
@@ -310,6 +310,8 @@ class RaspberryScpiPico(MicroScpiDevice):
     kw_transfer = ScpiKeyword("TRANSfer", "TRANS", None)
     kw_system = ScpiKeyword("SYSTem", "SYST", None)
     kw_error = ScpiKeyword("ERRor", "ERR", ["?"])
+    kw_min = ScpiKeyword("MINimum", "MIN", None)
+    kw_max = ScpiKeyword("MAXimum", "MAX", None)
 
     "PIN[14|15|16|17|18|19|20|21|22|25]"
     pins = OrderedDict({
