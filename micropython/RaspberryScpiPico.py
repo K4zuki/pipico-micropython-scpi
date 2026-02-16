@@ -1235,7 +1235,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 if searched is not None:
                     address, length, stop = searched.groups()
                     stop = bool(int(stop))
-                    address = int(f"0x{address}") >> shift
+                    address = int(f"0x{address}", 16) >> shift
                     # print(f"0x{address:02x}", length, stop, file=sys.stderr)
                     try:
                         read = bus.readfrom(int(address), int(length), stop)
