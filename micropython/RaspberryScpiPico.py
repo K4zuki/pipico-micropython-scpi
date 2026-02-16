@@ -40,15 +40,17 @@ from collections import OrderedDict
 
 - SYSTem:ERRor?
 
-- PIN[14|15|16|17|18|19|20|21|22|25]?
+- PIN?
 - PIN[14|15|16|17|18|19|20|21|22|25]:MODE[?] INput|OUTput|ODrain|PWM|DEFault
 - PIN[14|15|16|17|18|19|20|21|22|25]:VALue[?] 0|1|OFF|ON|DEFault
 - PIN[14|15|16|17|18|19|20|21|22|25]:ON
 - PIN[14|15|16|17|18|19|20|21|22|25]:OFF
-- PIN[14|15|16|17|18|19|20|21|22|25]:PWM:ON
-- PIN[14|15|16|17|18|19|20|21|22|25]:PWM:OFF
-- PIN[14|15|16|17|18|19|20|21|22|25]:PWM:FREQuency[?] num|DEFault|MINimum|MAXimum
-- PIN[14|15|16|17|18|19|20|21|22|25]:PWM:DUTY[?] num|DEFault|MINimum|MAXimum
+
+- PWM?
+- PWM[14|15|16|17|18|19|20|21|22|25]:ON
+- PWM[14|15|16|17|18|19|20|21|22|25]:OFF
+- PWM[14|15|16|17|18|19|20|21|22|25]:FREQuency[?] num|DEFault|MINimum|MAXimum
+- PWM[14|15|16|17|18|19|20|21|22|25]:DUTY[?] num|DEFault|MINimum|MAXimum
 
 - LED?
 - LED:ON
@@ -277,7 +279,7 @@ class RaspberryScpiPico(MicroScpiDevice):
     kw_od = ScpiKeyword("ODrain", "OD", None)
     kw_led = ScpiKeyword("LED", "LED", ["?"])
     kw_status = ScpiKeyword("STATe", "STAT", ["?"])
-    kw_pwm = ScpiKeyword("PWM", "PWM", None)
+    kw_pwm = ScpiKeyword("PWM", "PWM", ["14", "15", "16", "17", "18", "19", "20", "21", "22", "25", "?"])
     kw_en = ScpiKeyword("ENable", "EN", None)
     kw_dis = ScpiKeyword("DISable", "DIS", None)
     kw_duty = ScpiKeyword("DUTY", "DUTY", ["?"])
@@ -409,10 +411,12 @@ class RaspberryScpiPico(MicroScpiDevice):
         pin_val = ScpiCommand((self.kw_pin, self.kw_value), False, self.cb_pin_val)
         pin_on = ScpiCommand((self.kw_pin, self.kw_on), False, self.cb_pin_on)
         pin_off = ScpiCommand((self.kw_pin, self.kw_off), False, self.cb_pin_off)
-        pin_pwm_freq = ScpiCommand((self.kw_pin, self.kw_pwm, self.kw_freq), False, self.cb_pin_pwm_freq)
-        pin_pwm_duty = ScpiCommand((self.kw_pin, self.kw_pwm, self.kw_duty), False, self.cb_pin_pwm_duty)
-        pin_pwm_on = ScpiCommand((self.kw_pin, self.kw_pwm, self.kw_on), False, self.cb_pin_pwm_on)
-        pin_pwm_off = ScpiCommand((self.kw_pin, self.kw_pwm, self.kw_off), False, self.cb_pin_pwm_off)
+
+        pwm_q = ScpiCommand((self.kw_pwm,), True, self.cb_pwm_status)
+        pwm_freq = ScpiCommand((self.kw_pwm, self.kw_freq), False, self.cb_pin_pwm_freq)
+        pwm_duty = ScpiCommand((self.kw_pwm, self.kw_duty), False, self.cb_pin_pwm_duty)
+        pwm_on = ScpiCommand((self.kw_pwm, self.kw_on), False, self.cb_pin_pwm_on)
+        pwm_off = ScpiCommand((self.kw_pwm, self.kw_off), False, self.cb_pin_pwm_off)
 
         led_q = ScpiCommand((self.kw_led,), True, self.cb_led_status)
         led_val = ScpiCommand((self.kw_led, self.kw_value), True, self.cb_led_val)
@@ -446,7 +450,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         self.commands = [cls, ese, opc, rst, sre, esr_q, idn_q, stb_q, tst_q,
                          machine_freq,
                          system_error,
-                         pin_q, pin_mode, pin_val, pin_on, pin_off, pin_pwm_freq, pin_pwm_duty, pin_pwm_on, pin_pwm_off,
+                         pin_q, pin_mode, pin_val, pin_on, pin_off,
+                         pwm_q, pwm_freq, pwm_duty, pwm_on, pwm_off,
                          led_q, led_val, led_on, led_off, led_pwm_freq, led_pwm_duty, led_pwm_on, led_pwm_off,
                          i2c_q, i2c_scan_q, i2c_freq, i2c_abit, i2c_write, i2c_read_q,
                          i2c_write_memory, i2c_read_memory,
@@ -603,15 +608,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         if query:
             for pin in self.pin_conf.keys():
                 conf = self.pin_conf[pin]
-                pwm_conf = self.pwm_conf[pin]
                 mode = conf.mode
                 value = conf.value
-                freq = pwm_conf.freq
-                duty = pwm_conf.duty_u16
                 message = ";".join([f"PIN{pin}:MODE {IO_MODE_STRINGS[mode]}",
                                     f"PIN{pin}:VALue {IO_VALUE_STRINGS[value]}",
-                                    f"PIN{pin}:PWM:FREQuency {freq:_d}",
-                                    f"PIN{pin}:PWM:DUTY {duty:_d}"
                                     ])
                 print(message, end=";", file=self.stdout)
             print("", file=self.stdout)
@@ -738,9 +738,33 @@ class RaspberryScpiPico(MicroScpiDevice):
             # print("cb_pin_off", pin_number, param, file=sys.stderr)
             self.cb_pin_val(param="OFF", opt=opt)
 
+    def cb_pwm_status(self, param="", opt=None):
+        """
+        - ``PWM?``
+
+        :param param:
+        :param opt:
+        :return:
+        """
+
+        query = (opt[-1] == "?")
+
+        if query:
+            for pin in self.pin_conf.keys():
+                pwm_conf = self.pwm_conf[pin]
+                freq = pwm_conf.freq
+                duty = pwm_conf.duty_u16
+                message = ";".join([f"PWM{pin}:FREQuency {freq:_d}",
+                                    f"PWM{pin}:DUTY {duty:_d}"
+                                    ])
+                print(message, end=";", file=self.stdout)
+            print("", file=self.stdout)
+        else:
+            self.error_push(E_SYNTAX)
+
     def cb_pin_pwm_freq(self, param="", opt=None):
         """
-        - PIN[14|15|16|17|18|19|20|21|22|25]:PWM:FREQuency[?] num|DEFault|MINimum|MAXimum
+        - PWM[14|15|16|17|18|19|20|21|22|25]:FREQuency[?] num|DEFault|MINimum|MAXimum
         - DEFault is 1000 [Hz]
 
         :param param:
@@ -792,7 +816,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_pin_pwm_duty(self, param="", opt=None):
         """
-        - PIN[14|15|16|17|18|19|20|21|22|25]:PWM:DUTY[?] num|DEFault|MINimum|MAXimum
+        - PWM[14|15|16|17|18|19|20|21|22|25]:DUTY[?] num|DEFault|MINimum|MAXimum
         - DEFault is 32768
 
         :param param:
@@ -846,7 +870,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_pin_pwm_on(self, param="", opt=None):
         """
-        - PIN[14|15|16|17|18|19|20|21|22|25]:PWM:ON
+        - PWM[14|15|16|17|18|19|20|21|22|25]:ON
 
         :param param:
         :param opt:
@@ -872,7 +896,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_pin_pwm_off(self, param="", opt=None):
         """
-        - PIN[14|15|16|17|18|19|20|21|22|25]:PWM:OFF
+        - PWM[14|15|16|17|18|19|20|21|22|25]:OFF
 
         :param param:
         :param opt:
