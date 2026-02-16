@@ -811,9 +811,9 @@ class RaspberryScpiPico(MicroScpiDevice):
             if self.kw_def.match(param).match:
                 pwm_duty = DEFAULT_PWM_DUTY
             elif self.kw_max.match(param).match:
-                pwm_freq = MAX_PWM_DUTY
+                pwm_duty = MAX_PWM_DUTY
             elif self.kw_min.match(param).match:
-                pwm_freq = MIN_PWM_DUTY
+                pwm_duty = MIN_PWM_DUTY
             else:
                 pwm_duty = conf.duty_u16
             print(f"{pwm_duty:_d}", file=self.stdout)
@@ -823,9 +823,9 @@ class RaspberryScpiPico(MicroScpiDevice):
             if self.kw_def.match(pwm_duty).match:
                 pwm_duty = DEFAULT_PWM_DUTY
             elif self.kw_max.match(param).match:
-                pwm_freq = MAX_PWM_DUTY
+                pwm_duty = MAX_PWM_DUTY
             elif self.kw_min.match(param).match:
-                pwm_freq = MIN_PWM_DUTY
+                pwm_duty = MIN_PWM_DUTY
             else:
                 pwm_duty = int(float(pwm_duty))
 
