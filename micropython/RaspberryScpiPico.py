@@ -36,7 +36,7 @@ from collections import OrderedDict
 - *STB? <No Param>
 - *TST? <No Param>
 
-- MACHINE:FREQuency[?] num
+- MACHINE:FREQuency[?] num|DEFault|MINimum|MAXimum
 
 - SYSTem:ERRor?
 
@@ -47,8 +47,8 @@ from collections import OrderedDict
 - PIN[6|7|14|15|20|21|22|25]:OFF
 - PIN[6|7|14|15|20|21|22|25]:PWM:ON
 - PIN[6|7|14|15|20|21|22|25]:PWM:OFF
-- PIN[6|7|14|15|20|21|22|25]:PWM:FREQuency[?] num|DEFault
-- PIN[6|7|14|15|20|21|22|25]:PWM:DUTY[?] num|DEFault
+- PIN[6|7|14|15|20|21|22|25]:PWM:FREQuency[?] num|DEFault|MINimum|MAXimum
+- PIN[6|7|14|15|20|21|22|25]:PWM:DUTY[?] num|DEFault|MINimum|MAXimum
 
 - LED?
 - LED:ON
@@ -56,12 +56,12 @@ from collections import OrderedDict
 - LED:VALue[?] 0|1|OFF|ON|DEFault
 - LED:PWM:ON
 - LED:PWM:OFF
-- LED:PWM:FREQuency[?] num|DEFault
-- LED:PWM:DUTY[?] num|DEFault
+- LED:PWM:FREQuency[?] num|DEFault|MINimum|MAXimum
+- LED:PWM:DUTY[?] num|DEFault|MINimum|MAXimum
 
 - I2C?
 - I2C[01]:SCAN?
-- I2C[01]:FREQuency[?] num|DEFault
+- I2C[01]:FREQuency[?] num|DEFault|MINimum|MAXimum
 - I2C[01]:ADDRess:BIT[?] 0|1|DEFault
 - I2C[01]:WRITE address,buffer,stop
 - I2C[01]:READ? address,length,stop
@@ -72,7 +72,7 @@ from collections import OrderedDict
 - SPI[01]:CSEL:POLarity[?] 0|1|DEFault
 - SPI[01]:CSEL:VALue[?] 0|1|OFF|ON
 - SPI[01]:MODE[?] 0|1|2|3|DEFault
-- SPI[01]:FREQuency[?] num|DEFault
+- SPI[01]:FREQuency[?] num|DEFault|MINimum|MAXimum
 - SPI[01]:TRANSfer data,pre_cs,post_cs
 - SPI[01]:WRITE data,pre_cs,post_cs
 - SPI[01]:READ? length,mask,pre_cs,post_cs
@@ -521,7 +521,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_machine_freq(self, param="", opt=None):
         """
-        - MACHINE:FREQuency[?] num|DEFault
+        - MACHINE:FREQuency[?] num|DEFault|MINimum|MAXimum
 
         :return:
         """
@@ -533,6 +533,10 @@ class RaspberryScpiPico(MicroScpiDevice):
         if query:
             if self.kw_def.match(param).match:
                 machine_freq = DEFAULT_CPU_CLOCK
+            elif self.kw_max.match(param).match:
+                machine_freq = ABS_MAX_CLOCK
+            elif self.kw_min.match(param).match:
+                machine_freq = ABS_MIN_CLOCK
             else:
                 machine_freq = machine.freq()
 
@@ -543,10 +547,14 @@ class RaspberryScpiPico(MicroScpiDevice):
             try:
                 if self.kw_def.match(machine_freq).match:
                     machine_freq = DEFAULT_CPU_CLOCK
+                elif self.kw_max.match(param).match:
+                    machine_freq = ABS_MAX_CLOCK - 1
+                elif self.kw_min.match(param).match:
+                    machine_freq = ABS_MIN_CLOCK + 1
                 else:
                     machine_freq = int(float(machine_freq))
 
-                if ABS_MIN_CLOCK < machine_freq < ABS_MAX_CLOCK:
+                if ABS_MIN_CLOCK <= machine_freq <= ABS_MAX_CLOCK:
                     machine.freq(machine_freq)
                 else:
                     self.error_push(E_OUT_OF_RANGE)
@@ -732,7 +740,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_pin_pwm_freq(self, param="", opt=None):
         """
-        - PIN[14|15|16|17|18|19|20|21|22|25]:PWM:FREQuency[?] num|DEFault
+        - PIN[14|15|16|17|18|19|20|21|22|25]:PWM:FREQuency[?] num|DEFault|MINimum|MAXimum
         - DEFault is 1000 [Hz]
 
         :param param:
@@ -750,6 +758,10 @@ class RaspberryScpiPico(MicroScpiDevice):
             # print("cb_pin_pwm_freq", pin_number, "Query", param, file=sys.stderr)
             if self.kw_def.match(param).match:
                 pwm_freq = DEFAULT_PWM_CLOCK
+            elif self.kw_max.match(param).match:
+                pwm_freq = MAX_PWM_CLOCK
+            elif self.kw_min.match(param).match:
+                pwm_freq = MIN_PWM_CLOCK
             else:
                 pwm_freq = conf.freq
             print(f"{pwm_freq:_d}", file=self.stdout)
@@ -757,6 +769,10 @@ class RaspberryScpiPico(MicroScpiDevice):
             # print("cb_pin_pwm_freq", pin_number, param, file=sys.stderr)
             if self.kw_def.match(pwm_freq).match:
                 pwm_freq = DEFAULT_PWM_CLOCK
+            elif self.kw_max.match(param).match:
+                pwm_freq = MAX_PWM_CLOCK
+            elif self.kw_min.match(param).match:
+                pwm_freq = MIN_PWM_CLOCK
             else:
                 pwm_freq = int(float(pwm_freq))
 
@@ -776,7 +792,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_pin_pwm_duty(self, param="", opt=None):
         """
-        - PIN[14|15|16|17|18|19|20|21|22|25]:PWM:DUTY[?] num|DEFault
+        - PIN[14|15|16|17|18|19|20|21|22|25]:PWM:DUTY[?] num|DEFault|MINimum|MAXimum
         - DEFault is 32768
 
         :param param:
@@ -794,6 +810,10 @@ class RaspberryScpiPico(MicroScpiDevice):
             # print("cb_pin_pwm_duty", pin_number, "Query", param, file=sys.stderr)
             if self.kw_def.match(param).match:
                 pwm_duty = DEFAULT_PWM_DUTY
+            elif self.kw_max.match(param).match:
+                pwm_freq = MAX_PWM_DUTY
+            elif self.kw_min.match(param).match:
+                pwm_freq = MIN_PWM_DUTY
             else:
                 pwm_duty = conf.duty_u16
             print(f"{pwm_duty:_d}", file=self.stdout)
@@ -802,6 +822,10 @@ class RaspberryScpiPico(MicroScpiDevice):
 
             if self.kw_def.match(pwm_duty).match:
                 pwm_duty = DEFAULT_PWM_DUTY
+            elif self.kw_max.match(param).match:
+                pwm_freq = MAX_PWM_DUTY
+            elif self.kw_min.match(param).match:
+                pwm_freq = MIN_PWM_DUTY
             else:
                 pwm_duty = int(float(pwm_duty))
 
@@ -948,7 +972,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_led_pwm_freq(self, param="", opt=None):
         """
-        - LED:PWM:FREQuency[?] num|DEFault
+        - LED:PWM:FREQuency[?] num|DEFault|MINimum|MAXimum
         - DEFault is 2000 [Hz]
 
         :param param:
@@ -964,7 +988,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_led_pwm_duty(self, param, opt):
         """
-        - LED:PWM:DUTY[?] num|DEFault
+        - LED:PWM:DUTY[?] num|DEFault|MINimum|MAXimum
         - DEFault is 32768
 
         :param param:
@@ -1059,7 +1083,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_i2c_freq(self, param, opt):
         """
-        - I2C[01]:FREQuency[?] num|DEFault
+        - I2C[01]:FREQuency[?] num|DEFault|MINimum|MAXimum
         - DEFault is 100_000 [Hz]
 
         :param param:
@@ -1077,6 +1101,10 @@ class RaspberryScpiPico(MicroScpiDevice):
 
             if self.kw_def.match(param).match:
                 bus_freq = DEFAULT_I2C_CLOCK
+            elif self.kw_max.match(param).match:
+                bus_freq = MAX_I2C_CLOCK
+            elif self.kw_min.match(param).match:
+                bus_freq = MIN_I2C_CLOCK
             else:
                 bus_freq = conf.freq
             print(f"{bus_freq:_d}", file=self.stdout)
@@ -1085,6 +1113,10 @@ class RaspberryScpiPico(MicroScpiDevice):
 
             if self.kw_def.match(bus_freq).match:
                 bus_freq = DEFAULT_I2C_CLOCK
+            elif self.kw_max.match(param).match:
+                bus_freq = MAX_I2C_CLOCK
+            elif self.kw_min.match(param).match:
+                bus_freq = MIN_I2C_CLOCK
             else:
                 bus_freq = int(float(bus_freq))
 
@@ -1473,7 +1505,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
     def cb_spi_freq(self, param, opt):
         """
-        - SPI[01]:FREQuency[?] num|DEFault
+        - SPI[01]:FREQuency[?] num|DEFault|MINimum|MAXimum
         - DEFault is 1_000_000 [Hz]
 
         :param param:
@@ -1491,6 +1523,10 @@ class RaspberryScpiPico(MicroScpiDevice):
             # print("cb_spi_freq", bus_number, "Query", param, file=sys.stderr)
             if self.kw_def.match(param).match:
                 bus_freq = DEFAULT_SPI_CLOCK
+            elif self.kw_max.match(param).match:
+                bus_freq = MAX_SPI_CLOCK
+            elif self.kw_min.match(param).match:
+                bus_freq = MIN_SPI_CLOCK
             else:
                 bus_freq = conf.freq
             print(f"{bus_freq:_d}", file=self.stdout)
@@ -1499,6 +1535,10 @@ class RaspberryScpiPico(MicroScpiDevice):
             try:
                 if self.kw_def.match(bus_freq).match:
                     bus_freq = DEFAULT_SPI_CLOCK
+                elif self.kw_max.match(param).match:
+                    bus_freq = MAX_SPI_CLOCK
+                elif self.kw_min.match(param).match:
+                    bus_freq = MIN_SPI_CLOCK
                 else:
                     bus_freq = int(float(bus_freq))
 
