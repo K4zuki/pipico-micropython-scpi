@@ -1391,7 +1391,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         if query:
             # print("cb_adc_read", "Query", param, file=sys.stderr)
             value = adc.read_u16()
-            print(f"{value}", file=self.stdout)  # decimal
+            print(f"{value:_d}", file=self.stdout)  # decimal
         else:
             self.error_push(E_SYNTAX)
 
