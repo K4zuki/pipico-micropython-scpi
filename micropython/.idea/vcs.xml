@@ -3,12 +3,38 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/../../micropython" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../../micropython-lib" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/alif-security-toolkit" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/alif_ensemble-cmsis-dfp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/arduino-lib" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/asf4" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/axtls" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/berkeley-db-1.xx" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/btstack" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/cyw43-driver" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/fsp" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/libffi" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/libhydrogen" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/libmetal" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/lwip" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../../micropython/lib/mbedtls" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/mbedtls/framework" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../../micropython/lib/micropython-lib" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/mynewt-nimble" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/nrfx" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/nxp_driver" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/open-amp" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../../micropython/lib/pico-sdk" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/pico-sdk/lib/btstack" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/pico-sdk/lib/cyw43-driver" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/pico-sdk/lib/lwip" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/pico-sdk/lib/mbedtls" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/pico-sdk/lib/tinyusb" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/protobuf-c" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/stm32lib" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../../micropython/lib/tinyusb" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/../../micropython/ports/rp2/build-RPI_PICO/submodules/_deps/picotool-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../../micropython/lib/wiznet5k" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../doc" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/../doc/easy-pandoc-templates" vcs="Git" />
   </component>
 </project>
