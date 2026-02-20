@@ -635,8 +635,12 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_pin_val", pin_number, "Query", param, file=sys.stderr)
-            if self.kw_def.match(param).match:
-                val = DEFAULT_IO_VALUE
+            if param is not None:
+                if self.kw_def.match(param).match:
+                    val = DEFAULT_IO_VALUE
+                else:
+                    self.error_push(E_INVALID_PARAMETER)
+                    return
             else:
                 val = pin.value()
             print(IO_VALUE_STRINGS[val], file=self.stdout)
@@ -672,8 +676,12 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_pin_mode", pin_number, "Query", param, file=sys.stderr)
-            if self.kw_def.match(param).match:
-                mode = DEFAULT_IO_MODE
+            if param is not None:
+                if self.kw_def.match(param).match:
+                    mode = DEFAULT_IO_MODE
+                else:
+                    self.error_push(E_INVALID_PARAMETER)
+                    return
             print(IO_MODE_STRINGS[mode], file=self.stdout)
         elif param is not None:
             # print("cb_pin_mode", pin_number, param, file=sys.stderr)
@@ -780,12 +788,16 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_pin_pwm_freq", pin_number, "Query", param, file=sys.stderr)
-            if self.kw_def.match(param).match:
-                pwm_freq = DEFAULT_PWM_CLOCK
-            elif self.kw_max.match(param).match:
-                pwm_freq = MAX_PWM_CLOCK
-            elif self.kw_min.match(param).match:
-                pwm_freq = MIN_PWM_CLOCK
+            if param is not None:
+                if self.kw_def.match(param).match:
+                    pwm_freq = DEFAULT_PWM_CLOCK
+                elif self.kw_max.match(param).match:
+                    pwm_freq = MAX_PWM_CLOCK
+                elif self.kw_min.match(param).match:
+                    pwm_freq = MIN_PWM_CLOCK
+                else:
+                    self.error_push(E_INVALID_PARAMETER)
+                    return
             else:
                 pwm_freq = conf.freq
             print(f"{pwm_freq:_d}", file=self.stdout)
@@ -798,7 +810,11 @@ class RaspberryScpiPico(MicroScpiDevice):
             elif self.kw_min.match(param).match:
                 pwm_freq = MIN_PWM_CLOCK
             else:
-                pwm_freq = int(float(pwm_freq))
+                try:
+                    pwm_freq = int(float(pwm_freq))
+                except:
+                    self.error_push(E_INVALID_PARAMETER)
+                    return
 
             if MIN_PWM_CLOCK <= pwm_freq <= MAX_PWM_CLOCK:
                 if self.pwmv[pin_number] == 1:
@@ -832,12 +848,16 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         if query:
             # print("cb_pin_pwm_duty", pin_number, "Query", param, file=sys.stderr)
-            if self.kw_def.match(param).match:
-                pwm_duty = DEFAULT_PWM_DUTY
-            elif self.kw_max.match(param).match:
-                pwm_duty = MAX_PWM_DUTY
-            elif self.kw_min.match(param).match:
-                pwm_duty = MIN_PWM_DUTY
+            if pwm_duty is not None:
+                if self.kw_def.match(param).match:
+                    pwm_duty = DEFAULT_PWM_DUTY
+                elif self.kw_max.match(param).match:
+                    pwm_duty = MAX_PWM_DUTY
+                elif self.kw_min.match(param).match:
+                    pwm_duty = MIN_PWM_DUTY
+                else:
+                    self.error_push(E_INVALID_PARAMETER)
+                    return
             else:
                 pwm_duty = conf.duty_u16
             print(f"{pwm_duty:_d}", file=self.stdout)
@@ -851,7 +871,11 @@ class RaspberryScpiPico(MicroScpiDevice):
             elif self.kw_min.match(param).match:
                 pwm_duty = MIN_PWM_DUTY
             else:
-                pwm_duty = int(float(pwm_duty))
+                try:
+                    pwm_duty = int(float(pwm_duty))
+                except:
+                    self.error_push(E_INVALID_PARAMETER)
+                    return
 
             if MIN_PWM_DUTY <= pwm_duty <= MAX_PWM_DUTY:
                 if self.pwmv[pin_number] == 1:
