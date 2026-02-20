@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-MANIFEST=/root/manifest.py
+MANIFEST=/root/tmc/manifest.py
 make -C ports/rp2 -j6 BOARD=RPI_PICO FROZEN_MANIFEST=$MANIFEST clean
 make -C ports/rp2 -j6 BOARD=RPI_PICO FROZEN_MANIFEST=$MANIFEST clean all
 mkdir -p /root/build
