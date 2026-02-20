@@ -882,7 +882,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                     pwm = machine.PWM(pin, freq=conf.freq, duty_u16=pwm_duty)
                     pwm.freq(conf.freq)
                     pwm.duty_u16(pwm_duty)
-                    print(pin, pwm)
+                    # print(pin, pwm)
                 # print(pwm, file=sys.stderr)
                 vals = list(conf)
                 vals[conf.index(conf.duty_u16)] = pwm_duty
