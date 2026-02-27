@@ -692,7 +692,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             elif self.kw_od.match(param).match:
                 mode = machine.Pin.OPEN_DRAIN
             elif self.kw_pwm.match(param).match:
-                self.cb_pin_pwm_on(param, opt)
+                self.cb_pin_pwm_on("cb_pin_mode", opt)
                 mode = machine.Pin.ALT
                 alt = machine.Pin.ALT_PWM
             else:
@@ -915,8 +915,8 @@ class RaspberryScpiPico(MicroScpiDevice):
             pwm.init(freq=conf.freq, duty_u16=conf.duty_u16)
             self.pwmv[pin_number] = 1
             self.cb_pin_mode("PWM", opt)
-        else:
-            self.error_push(E_MISSING_PARAM)
+        elif param != "cb_pin_mode":
+            self.error_push(E_SYNTAX)
 
     def cb_pin_pwm_off(self, param="", opt=None):
         """
