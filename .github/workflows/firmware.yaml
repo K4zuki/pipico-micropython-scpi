@@ -33,7 +33,7 @@ jobs:
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
         uses: softprops/action-gh-release@v2
         with:
-          files: micropython/build/pipico-micropython-scpi-*.uf2
+          files: mpy/build/pipico-micropython-scpi-*.uf2
 
   make-document:
     name: Compile document

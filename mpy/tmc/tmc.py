@@ -711,9 +711,9 @@ class TMCInterface(Interface):
         self._rx_xfer()
 
     def _on_rx(self, _):
-        """ Receive USBTMC messages. Called via micropython.schedule, outside of the USB callback function.
+        """ Receive USBTMC messages. Called via mpy.schedule, outside of the USB callback function.
 
-        :param _: dummy argument for micropython.schedule()
+        :param _: dummy argument for mpy.schedule()
         """
         message: memoryview = self._rx.pend_read()
         self.on_bulk_out(message)
