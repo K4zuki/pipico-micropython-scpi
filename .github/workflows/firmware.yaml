@@ -21,8 +21,8 @@ jobs:
           make docker
           make firmware
           make firmware-cdc
-          sudo mv micropython/build/pipico-micropython-scpi.uf2 "micropython/build/pipico-micropython-scpi-${REF##*/}.uf2"
-          sudo mv micropython/build/pipico-micropython-scpi-cdc.uf2 "micropython/build/pipico-micropython-scpi-cdc-${REF##*/}.uf2"
+          sudo mv mpy/build/pipico-micropython-scpi.uf2 "mpy/build/pipico-micropython-scpi-${REF##*/}.uf2"
+          sudo mv mpy/build/pipico-micropython-scpi-cdc.uf2 "mpy/build/pipico-micropython-scpi-cdc-${REF##*/}.uf2"
       - name: Upload artifact files (at a push)
         uses: actions/upload-artifact@v4
         with:
