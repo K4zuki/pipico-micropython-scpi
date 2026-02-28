@@ -1,0 +1,14 @@
+{
+  "urls": [
+    [
+      "uscpi/__init__.py",
+      "github:k4zuki/pipico-micropython-scpi/mpy/__init__.py"
+    ],
+    [
+      "uscpi/MicroScpiDevice.py",
+      "github:k4zuki/pipico-micropython-scpi/mpy/MicroScpiDevice.py"
+    ]
+  ],
+  "deps": [],
+  "version": "0.0.1"
+}
