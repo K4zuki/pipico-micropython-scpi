@@ -1314,11 +1314,11 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         query = (opt[-1] == "?")
         bus_number = int(opt[0])
-        bus = self.i2c[bus_number]
+        bus: machine.I2C = self.i2c[bus_number]
         conf = self.i2c_conf[bus_number]
         shift = conf.bit
         rstring = re.compile(
-            r"^([1-9a-fA-F][0-9a-fA-F]) *, *(([0-9a-fA-F][0-9a-fA-F])+) *, *([0-9a-fA-F]+) *, *([12])$")
+            r"^([1-9a-fA-F][0-9a-fA-F])\s*,\s*(([0-9a-fA-F][0-9a-fA-F])(|[0-9a-fA-F][0-9a-fA-F]))\s*,\s*([0-9a-fA-F]+)\s*,\s*([12])$")
 
         if query:
             # print("cb_i2c_write_memory", "Query", param, file=sys.stderr)
@@ -1338,7 +1338,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                 addrsize = 8 * int(addrsize)
                 # print(f"0x{address:02x}", f"0x{memaddress:02x}", [f"0x{c:02x}" for c in data_array], addrsize, file=sys.stderr)
                 try:
-                    bus.writeto_mem(address, memaddress, data_array)
+                    bus.writeto_mem(address, memaddress, data_array, addrsize=addrsize)
                 except OSError:
                     self.error_push(E_I2C_FAIL)
             else:
@@ -1362,11 +1362,11 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         query = (opt[-1] == "?")
         bus_number = int(opt[0])
-        bus = self.i2c[bus_number]
-        conf = self.i2c_conf[bus_number]
+        bus: machine.I2C = self.i2c[bus_number]
+        conf: I2cConfig = self.i2c_conf[bus_number]
         shift = conf.bit
         rstring = re.compile(
-            r"^([1-9a-fA-F][0-9a-fA-F]) *, *(([0-9a-fA-F][0-9a-fA-F])+) *, *([1-9]|[1-9][0-9]+) *, *([12])$")
+            r"^([1-9a-fA-F][0-9a-fA-F])\s*,\s*(([0-9a-fA-F][0-9a-fA-F])(|[0-9a-fA-F][0-9a-fA-F]))\s*,\s*([1-9]|[1-9][0-9])\s*,\s*([12])$")
 
         if query:
             # print("cb_i2c_read_memory", "Query", param, file=sys.stderr)
@@ -1377,11 +1377,11 @@ class RaspberryScpiPico(MicroScpiDevice):
                     address, memaddress, _, length, addrsize = searched.groups()
                     address = int(f"0x{address}", 16) >> shift
                     memaddress = int(f"0x{memaddress}", 16)
-                    length = int(f"0x{length}", 16)
+                    length = int(length)
                     addrsize = 8 * int(addrsize)
 
                     try:
-                        read = bus.readfrom_mem(address, memaddress, length)
+                        read = bus.readfrom_mem(address, memaddress, length, addrsize=addrsize)
                         data = ",".join(f"{d:02x}" for d in read)
                         print(data, file=self.stdout)
                         return
