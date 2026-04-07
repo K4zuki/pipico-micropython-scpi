@@ -254,7 +254,6 @@ class I2cConfig(namedtuple("I2cConfig", [
 class SpiConfig(namedtuple("SpiConfig", [
     "freq",  # frequency
     "mode",  # clock/phase mode
-    "cspol",  # csel pin polarity
     "sck",  # sck pin
     "mosi",  # mosi pin
     "miso",  # miso pin
@@ -263,7 +262,6 @@ class SpiConfig(namedtuple("SpiConfig", [
     """
     :int freq: frequency
     :int mode: clock/phase mode
-    :Pin cspol: csel pin polarity
     :Pin sck: sck pin
     :Pin mosi: mosi pin
     :Pin miso: miso pin
@@ -384,8 +382,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         1: I2cConfig(DEFAULT_I2C_CLOCK, DEFAULT_I2C_BIT, scl1, sda1)
     })
     spi_conf = OrderedDict({
-        0: SpiConfig(DEFAULT_SPI_CLOCK, SPI_MODE0, SPI_CSPOL_LO, sck0, mosi0, miso0, cs0),
-        1: SpiConfig(DEFAULT_SPI_CLOCK, SPI_MODE0, SPI_CSPOL_LO, sck1, mosi1, miso1, cs1)
+        0: SpiConfig(DEFAULT_SPI_CLOCK, SPI_MODE0, sck0, mosi0, miso0, cs0),
+        1: SpiConfig(DEFAULT_SPI_CLOCK, SPI_MODE0, sck1, mosi1, miso1, cs1)
     })
 
     def __init__(self):
@@ -437,7 +435,6 @@ class RaspberryScpiPico(MicroScpiDevice):
         i2c_read_memory = ScpiCommand((self.kw_i2c, self.kw_memory, self.kw_read), True, self.cb_i2c_read_memory)
 
         spi_q = ScpiCommand((self.kw_spi,), True, self.cb_spi_status)
-        spi_cs_pol = ScpiCommand((self.kw_spi, self.kw_csel, self.kw_pol), False, self.cb_spi_cs_pol)
         spi_cs_val = ScpiCommand((self.kw_spi, self.kw_csel, self.kw_value), False, self.cb_spi_cs_val)
         spi_mode = ScpiCommand((self.kw_spi, self.kw_mode), False, self.cb_spi_clock_phase)
         spi_freq = ScpiCommand((self.kw_spi, self.kw_freq), False, self.cb_spi_freq)
@@ -455,7 +452,7 @@ class RaspberryScpiPico(MicroScpiDevice):
                          led_q, led_val, led_on, led_off, led_pwm_freq, led_pwm_duty, led_pwm_on, led_pwm_off,
                          i2c_q, i2c_scan_q, i2c_freq, i2c_abit, i2c_write, i2c_read_q,
                          i2c_write_memory, i2c_read_memory,
-                         spi_q, spi_cs_pol, spi_mode, spi_freq, spi_write, spi_read, spi_cs_val, spi_transfer,
+                         spi_q, spi_mode, spi_freq, spi_write, spi_read, spi_cs_val, spi_transfer,
                          adc_read,
                          ]
 
@@ -1490,17 +1487,16 @@ class RaspberryScpiPico(MicroScpiDevice):
         bus_number = int(opt[0])
         conf = self.spi_conf[bus_number]
         cs_pin = conf.csel
-        cs_pol = conf.cspol
 
         if query:
             # print("cb_spi_cs_val", "Query", param, file=sys.stderr)
-            print(IO_VALUE_STRINGS[int(cs_pin.value() ^ (not cs_pol))], file=self.stdout)
+            print(IO_VALUE_STRINGS[cs_pin.value()], file=self.stdout)
         elif param is not None:
             # print("cb_spi_cs_val", param, file=sys.stderr)
             if param == str(SPI_CSPOL_HI) or self.kw_on.match(param).match:
-                cs_pin.value(int(not (cs_pol ^ SPI_CSPOL_HI)))
+                cs_pin.value(SPI_CSPOL_HI)
             elif param == str(SPI_CSPOL_LO) or self.kw_off.match(param).match:
-                cs_pin.value(int(not (cs_pol ^ SPI_CSPOL_LO)))
+                cs_pin.value(SPI_CSPOL_LO)
             else:
                 self.error_push(E_INVALID_PARAMETER)
         else:
