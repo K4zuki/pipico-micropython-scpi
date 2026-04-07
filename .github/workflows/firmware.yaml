@@ -96,7 +96,7 @@ jobs:
       - name: docx2pdf
         run: |
           cd artifact
-          ../docx2pdf/docx2pdf.ps1
+          ../${{env.DOC_BASE}}/docx2pdf/docx2pdf.ps1
       - name: Make a release
         uses: softprops/action-gh-release@v2
         with:
