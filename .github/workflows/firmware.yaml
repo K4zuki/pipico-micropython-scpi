@@ -1,5 +1,8 @@
 name: Build document
 on: [ push, create ]
+env:
+  DOC_BASE: ./
+  DOWNLOAD_URL_BASE: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/${GITHUB_REF#refs/*/}
 jobs:
   make-firmware:
     name: Compile firmware
@@ -27,7 +30,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           path: |
-            micropython/build
+            mpy/build
           compression-level: 0 # no compression
       - name: Release firmware (at a tag)
         if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
