@@ -1,7 +1,7 @@
 name: Build document
 on: [ push, create ]
 env:
-  DOC_BASE: ./
+  DOC_BASE: ./doc
   DOWNLOAD_URL_BASE: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/download/${GITHUB_REF#refs/*/}
 jobs:
   make-firmware:
