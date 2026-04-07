@@ -39,8 +39,7 @@ jobs:
     name: Compile document
     runs-on: ubuntu-latest
     container:
-      image: k4zuki/pandocker-alpine:2.19
-    #    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+      image: k4zuki/pandocker-alpine:3.5-core
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -53,16 +52,51 @@ jobs:
           git config --global --add safe.directory /__w/${repo}/${repo}
       - name: Update dependencies
         run: |
-          pip3 install pandocker-lua-filters
-          pip3 install -U docx-coreprop-writer
-          pip3 install git+https://github.com/k4zuki/pandoc_misc.git@2.16.2
+          pip3 install pandocker-lua-filters docx-coreprop-writer --break-system-packages 
+          pip3 install git+https://github.com/k4zuki/pandoc_misc.git@2.16.2 --break-system-packages
+      - name: Prepare QR code for this build (at a tag)
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+        run: |
+          pip3 install qrcode --break-system-packages 
+          make initdir html
+          TARGET=`ls ${{env.DOC_BASE}}/Out/*.html`
+          TARGET=${TARGET#${{env.DOC_BASE}}/Out}
+          qr ${{env.DOWNLOAD_URL_BASE}}/${TARGET//.html/}.pdf > ${{env.DOC_BASE}}/images/QRcode.png
       - name: Build document
         run: |
-          make initdir apidoc html
-      - name: Release manuals (at a tag)
-        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+          make initdir html docx
+      - name: Upload artifact files (at a push)
+        uses: actions/upload-artifact@v4
+        with:
+          path: ${{env.DOC_BASE}}/Out
+
+  docx2pdf:
+    name: Docx to PDF conversion and release
+    runs-on: windows-latest
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: Install Office
+        run: choco install office365business # This takes about 5min
+      - name: Wait for artifact build
+        uses: yogeshlonkar/wait-for-jobs@v0
+        with:
+          jobs: "Compile document"
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v4
+      - name: ls
+        run: ls -R
+      - name: docx2pdf
+        run: |
+          cd artifact
+          ../docx2pdf/docx2pdf.ps1
+      - name: Make a release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            doc/Out/*.docx
-            doc/Out/*.html
+            ./artifact/*.html
+            ./artifact/*.pdf
