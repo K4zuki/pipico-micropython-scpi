@@ -601,6 +601,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
 
         if query:
             for pin in self.pin_conf.keys():
@@ -628,6 +629,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         pin_number = int(opt[0])
         pin = self.pins[pin_number]
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
         conf = self.pin_conf[pin_number]
 
         if query:
@@ -667,6 +669,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         pin_number = int(opt[0])
         pin = self.pins[pin_number]
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
         conf = self.pin_conf[pin_number]
         mode = conf.mode
         alt = 0
@@ -715,6 +718,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         pin_number = int(opt[0])
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
 
         if query:
             # print("cb_pin_on", pin_number, "Query", param, file=sys.stderr)
@@ -735,6 +739,7 @@ class RaspberryScpiPico(MicroScpiDevice):
 
         pin_number = int(opt[0])
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
 
         if query:
             # print("cb_pin_off", pin_number, "Query", param, file=sys.stderr)
@@ -753,6 +758,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
 
         if query:
             for pin in self.pin_conf.keys():
@@ -782,6 +788,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         conf = self.pwm_conf[pin_number]
         query = (opt[-1] == "?")
         pwm_freq = param
+        param = param.replace(" ", "")
 
         if query:
             # print("cb_pin_pwm_freq", pin_number, "Query", param, file=sys.stderr)
@@ -841,6 +848,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         pin = self.pins[pin_number]
         conf = self.pwm_conf[pin_number]
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
         pwm_duty = param
 
         if query:
@@ -902,6 +910,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         pin = self.pins[pin_number]
         conf = self.pwm_conf[pin_number]
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
 
         if query:
             # print("cb_pin_pwm_on", pin_number, "Query", param, file=sys.stderr)
@@ -928,6 +937,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         pin = self.pins[pin_number]
         conf = self.pwm_conf[pin_number]
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
 
         if query:
             # print("cb_pin_pwm_off", pin_number, "Query", param, file=sys.stderr)
@@ -1087,6 +1097,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
 
         if query:
             for bus in self.i2c_conf.keys():
@@ -1109,6 +1120,8 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
+
         if isinstance(opt[0], str):
             bus_number = int(opt[0])
             bus = self.i2c[bus_number]
@@ -1137,6 +1150,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
         bus_number = int(opt[0])
         bus_freq = param
         conf = self.i2c_conf[bus_number]
@@ -1186,6 +1200,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
         bus_number = int(opt[0])
         bit = param
         conf = self.i2c_conf[bus_number]
@@ -1224,6 +1239,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
         bus_number = int(opt[0])
         bus = self.i2c[bus_number]
         conf = self.i2c_conf[bus_number]
@@ -1265,6 +1281,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
         bus_number = int(opt[0])
         bus = self.i2c[bus_number]
         conf = self.i2c_conf[bus_number]
@@ -1313,6 +1330,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
         bus_number = int(opt[0])
         bus: machine.I2C = self.i2c[bus_number]
         conf = self.i2c_conf[bus_number]
@@ -1361,6 +1379,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
         bus_number = int(opt[0])
         bus: machine.I2C = self.i2c[bus_number]
         conf: I2cConfig = self.i2c_conf[bus_number]
@@ -1406,6 +1425,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
         adc_ch = int(opt[0])
         adc = self.adc[adc_ch]
 
@@ -1426,6 +1446,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
 
         if query:
             for bus in self.spi_conf.keys():
@@ -1449,6 +1470,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
         bus_number = int(opt[0])
         conf = self.spi_conf[bus_number]
         cspol = param
@@ -1484,6 +1506,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
         bus_number = int(opt[0])
         conf = self.spi_conf[bus_number]
         cs_pin = conf.csel
@@ -1512,6 +1535,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
         bus_number = int(opt[0])
         bus = self.spi[bus_number]
         conf = self.spi_conf[bus_number]
@@ -1558,6 +1582,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
         bus_number = int(opt[0])
         bus_freq = param
         conf = self.spi_conf[bus_number]
@@ -1613,6 +1638,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
         bus_number = int(opt[0])
         bus = self.spi[bus_number]
 
@@ -1656,6 +1682,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         :return:
         """
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
         bus_number = int(opt[0])
         bus = self.spi[bus_number]
         rstring = re.compile(
@@ -1694,6 +1721,7 @@ class RaspberryScpiPico(MicroScpiDevice):
         """
 
         query = (opt[-1] == "?")
+        param = param.replace(" ", "")
         bus_number = int(opt[0])
         bus = self.spi[bus_number]
         rstring = re.compile(
