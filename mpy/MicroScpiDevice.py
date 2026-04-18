@@ -170,7 +170,7 @@ class MicroScpiDevice:
         :param str line: candidate command string
         :return tuple: ([keywords], param)
         """
-        lexer_rstring = re.compile(r"^(([\w:?\*]+)\s?([\w.,]+)?);?")
+        lexer_rstring = re.compile(r"^(([\w:?*]+)\s+([\w\s.,]+)?);?")
 
         search = lexer_rstring.search(line)
         if search is not None:
