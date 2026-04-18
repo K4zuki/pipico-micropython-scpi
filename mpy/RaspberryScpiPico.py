@@ -502,7 +502,7 @@ class RaspberryScpiPico(MicroScpiDevice):
             spi.deinit()
             spi.init()
         for spi_k in self.spi_conf.keys():
-            self.spi_conf[spi_k] = SpiConfig(DEFAULT_SPI_CLOCK, SPI_MODE0, SPI_CSPOL_LO,
+            self.spi_conf[spi_k] = SpiConfig(DEFAULT_SPI_CLOCK, SPI_MODE0,
                                              self.spi_conf[spi_k].sck, self.spi_conf[spi_k].mosi,
                                              self.spi_conf[spi_k].miso, self.spi_conf[spi_k].csel)
             self.spi_conf[spi_k].csel.init()
